@@ -2,10 +2,14 @@
 <?php
 error_reporting(E_ALL|E_STRICT);
 
+$options = array_merge(
+  array('default'=>'index'),
+  getopt('', array('default:'))
+);
+
 // Not using __FILE__ since it resolves symlinks
 $path = realpath(dirname($argv[0]).'/../web');
 $files = array('dir'=>array(), 'php'=>array(), 'file'=>array());
-$default = 'index.php';
 foreach (new DirectoryIterator($path) as $file)
 {
   $name = $file->getFilename();
@@ -41,5 +45,5 @@ url.rewrite-once = (
   "^/<?php echo preg_quote($name) ?>(/[^\?]*)?(\?.*)?" => "/<?php echo $name ?>$2$3",
 <?php endforeach ?>
 
-  "^(/[^\?]*)(\?.*)?" => "/<?php echo $default ?>/$2$3"
+  "^(/[^\?]*)(\?.*)?" => "/<?php echo $options['default'] ?>.php/$2$3"
 )
