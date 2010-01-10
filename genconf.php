@@ -42,8 +42,8 @@ url.rewrite-once = (
 <?php endforeach ?>
 
 <?php foreach ($files['php'] as $name): ?>
-  "^/<?php echo preg_quote($name) ?>(/[^\?]*)?(\?.*)?" => "/<?php echo $name ?>$2$3",
+  "^/<?php echo preg_quote($name) ?>(/[^\?]*)?(\?.*)?" => "/<?php echo $name ?>$1$2",
 <?php endforeach ?>
 
-  "^(/[^\?]*)(\?.*)?" => "/<?php echo $options['default'] ?>.php/$2$3"
+  "^(/[^\?]*)(\?.*)?" => "/<?php echo $options['default'] ?>.php$1$2"
 )
