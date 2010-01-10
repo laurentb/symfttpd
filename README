@@ -2,3 +2,19 @@
 
 lighttpd being pronounced lighty, I recommend symfy.
 
+
+# How do I use it?
+
+    cd /path/to/example.com/config
+    ln -s /path/to/symfttpd/genconf.php ./lighttpd.php
+
+lighttpd config:
+
+    $HTTP["host"] == "example.com" {
+      include_shell "/path/to/example.com/config/lighttpd.php"
+    }
+
+
+# How is the /sf/ alias handled?
+Since now plugins’ web dirs are handled by symbolic links, using an alias in the server config for /sf doesn’t make sense. A tool to create the symbolic links should be coming soon.
+

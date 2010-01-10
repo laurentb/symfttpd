@@ -2,11 +2,6 @@
 <?php
 error_reporting(E_ALL|E_STRICT);
 
-/**
- * @author Laurent Bachelier <laurent@bachelier.name>
- * @license MIT
- */
-
 // Not using __FILE__ since it resolves symlinks
 $path = realpath(dirname($argv[0]).'/../web');
 $files = array('dir'=>array(), 'php'=>array(), 'file'=>array());
