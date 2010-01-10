@@ -16,5 +16,11 @@ lighttpd config:
 
 
 # How is the /sf/ alias handled?
-Since now plugins’ web dirs are handled by symbolic links, using an alias in the server config for /sf doesn’t make sense. A tool to create the symbolic links should be coming soon.
+Since now plugins’ web dirs are handled by symbolic links,
+using an alias in the server config for /sf doesn’t make sense.
+There is a tool to create it:
 
+    cd /path/to/example.com
+    /path/to/symfttpd/symlinksf.php
+
+It should work with symfony from 1.0 to 1.4.
