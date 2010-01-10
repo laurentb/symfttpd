@@ -2,10 +2,20 @@
 <?php
 error_reporting(E_ALL|E_STRICT);
 
+/* Command-line options:
+ *   --default=<app>: change default application
+ *   --only: do not allow other applications automatically
+ *   --allow=<app1,app2>: allow the following apps
+ */
 $options = array_merge(
-  array('default'=>'index'),
-  getopt('', array('default:'))
+  array('default'=>'index', 'allow'=>false, 'only'=>true),
+  getopt('', array('default:', 'only', 'allow:'))
 );
+// WTF: option present = set to false
+$options['only'] = !$options['only'];
+$options['allow'] = $options['allow']
+                  ? explode(',', $options['allow'])
+                  : array();
 
 // Not using __FILE__ since it resolves symlinks
 $path = realpath(dirname($argv[0]).'/../web');
@@ -19,15 +29,19 @@ foreach (new DirectoryIterator($path) as $file)
     {
       $files['dir'][] = $name;
     }
-    elseif (preg_match('/\.php$/', $file))
-    {
-      $files['php'][] = $name;
-    }
-    else
+    elseif (!preg_match('/\.php$/', $name))
     {
       $files['file'][] = $name;
     }
+    elseif (empty($options['only']))
+    {
+        $files['php'][] = $name;
+    }
   }
+}
+foreach ($options['allow'] as $name)
+{
+  $files['php'][] = $name.'.php';
 }
 ?>
 server.document-root = "<?php echo $path ?>"
