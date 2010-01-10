@@ -1,3 +1,10 @@
+symfttpd is a tool to use symfony and lighttpd together,
+aimed at lazy developers and sysadmins.
+
+If you don’t want to copy/paste configs, handle regexps when
+you add files (considering that most examples are badly written),
+then this tool is for you.
+
 # How do I pronounce it?!
 
 lighttpd being pronounced lighty, I recommend symfy.
@@ -17,6 +24,7 @@ lighttpd config:
 You have to restart lighttpd each time you add a file the the web/
 root. Hopefully it doesn’t happen often. Also, don’t forget to run
 `php symfony plugin:publish-assets` before.
+
 
 # How is the /sf/ alias handled?
 Since now plugins’ web dirs are handled by symbolic links,
