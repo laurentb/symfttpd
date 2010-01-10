@@ -14,11 +14,14 @@ lighttpd config:
       include_shell "/path/to/example.com/config/lighttpd.php"
     }
 
+You have to restart lighttpd each time you add a file the the web/
+root. Hopefully it doesn’t happen often. Also, don’t forget to run
+`php symfony plugin:publish-assets` before.
 
 # How is the /sf/ alias handled?
 Since now plugins’ web dirs are handled by symbolic links,
 using an alias in the server config for /sf doesn’t make sense.
-There is a tool to create it:
+There is a tool to create the symlink:
 
     cd /path/to/example.com
     /path/to/symfttpd/symlinksf.php
