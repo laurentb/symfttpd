@@ -31,6 +31,8 @@ foreach (new DirectoryIterator($path) as $file)
   }
 }
 ?>
+server.document-root = "<?php echo $path ?>"
+
 url.rewrite-once = (
 <?php foreach ($files['dir'] as $name): ?>
   "^/<?php echo preg_quote($name) ?>/.+" => "$0",
