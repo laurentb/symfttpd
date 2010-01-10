@@ -1,17 +1,24 @@
+# symfttpd
+
 symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.
+
+
+
+## How do I pronounce it?!
+
+lighttpd being pronounced lighty, I recommend symfy.
+
+
+
+## genconf
 
 If you don’t want to copy/paste configs, handle regexps when
 you add files (considering that most examples are badly written),
 then this tool is for you.
 
 
-# How do I pronounce it?!
-
-lighttpd being pronounced lighty, I recommend symfy.
-
-
-# How do I use it?
+### Usage
 
     cd /path/to/example.com/config
     ln -s /path/to/symfttpd/genconf.php ./lighttpd.php
@@ -33,15 +40,15 @@ root. Hopefully it doesn’t happen often. Also, don’t forget to run
 `php symfony plugin:publish-assets` before.
 
 
-# Available options
+### Available options
 
- --default=<app> Change the default application (default being index)
- --only Do not allow any other application
- --allow=<app1,app2> Useful with --only, allow some applications
-    (useful for allowing a _dev alternative, for example)
+ `--default=<app>` Change the default application (default being index)
+ `--only` Do not allow any other application
+ `--allow=<app1,app2>` Useful with --only, allow some applications
+    (useful for allowing a `_dev` alternative, for example)
 
 
-# How is the /sf/ alias handled?
+### How is the /sf/ alias handled?
 
 Since now plugins’ web dirs are handled by symbolic links,
 using an alias in the server config for /sf doesn’t make sense.
@@ -51,3 +58,10 @@ There is a tool to create the symlink:
     /path/to/symfttpd/symlinksf.php
 
 It should work with symfony from 1.0 to 1.4.
+
+
+
+## Is Windows supported?
+
+No, and it probably never will be.
+
