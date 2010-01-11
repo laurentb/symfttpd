@@ -5,12 +5,6 @@ aimed at lazy developers and sysadmins.
 
 
 
-## How do I pronounce it?!
-
-lighttpd being pronounced lighty, I recommend symfy.
-
-
-
 ## genconf
 
 If you don’t want to copy/paste configs, handle regexps when
@@ -61,7 +55,21 @@ It should work with symfony from 1.0 to 1.4.
 
 
 
-## Is Windows supported?
+## FAQ
+
+
+### How do I pronounce it?!
+
+lighttpd being pronounced lighty, I recommend symfy.
+
+
+### Is Windows supported?
 
 No, and it probably never will be.
 
+
+### Can I use it in production?
+
+Yes. I’d say you _should_, since the command line options of `genconf.php` are
+thought for that particular use. genconf does not run symfony or any other
+external files, nor writes anything anywhere, so it’s pretty secure.
