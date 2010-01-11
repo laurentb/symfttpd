@@ -1,8 +1,20 @@
 #!/usr/bin/env php
 <?php
+/**
+ * Create the symbolic link for "/sf"
+ *
+ * @author Laurent Bachelier <laurent@bachelier.name>
+ */
+
 error_reporting(E_ALL|E_STRICT);
 
-$path = getcwd();
+/**
+ * Guess the symfony data dir path
+ * @param string $path Project path
+ * @return string|boolean The absolute symfony data dir path or false
+ *
+ * @author Laurent Bachelier <laurent@bachelier.name>
+ */
 function get_data_dir($path)
 {
   if (file_exists($path.'/config/config.php'))
@@ -29,6 +41,7 @@ function get_data_dir($path)
   return $sf_data_dir;
 }
 
+$path = getcwd();
 $sf_data_dir = get_data_dir($path);
 $sf_data_web_dir = $sf_data_dir ? realpath($sf_data_dir.'/web/sf') : false;
 echo "'web/sf' => ".var_export($sf_data_web_dir, true)."\n";

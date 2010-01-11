@@ -1,12 +1,16 @@
 #!/usr/bin/env php
 <?php
-error_reporting(E_ALL|E_STRICT);
-
-/* Command-line options:
+/**
+ * Command-line options:
  *   --default=<app>: change default application
  *   --only: do not allow other applications automatically
  *   --allow=<app1,app2>: allow the following apps
+ *
+ * @author Laurent Bachelier <laurent@bachelier.name>
  */
+
+error_reporting(E_ALL|E_STRICT);
+
 $options = array_merge(
   array('default'=>'index', 'allow'=>false, 'only'=>true),
   getopt('', array('default:', 'only', 'allow:'))
