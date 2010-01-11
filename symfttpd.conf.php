@@ -61,10 +61,10 @@ $options['want'] = '1.4';
  * @var array version=>path
  */
 $options['sf_path'] = array(
-    '1.0'=>getenv('HOME').'/Dev/symfony-1.0',
-    '1.1'=>getenv('HOME').'/Dev/symfony-1.1',
-    '1.2'=>getenv('HOME').'/Dev/symfony-1.2',
-    '1.3'=>getenv('HOME').'/Dev/symfony-1.3',
-    '1.4'=>getenv('HOME').'/Dev/symfony-1.4',
+    '1.0'=>getenv('HOME').'/Dev/symfony/1.0',
+    '1.1'=>getenv('HOME').'/Dev/symfony/1.1',
+    '1.2'=>getenv('HOME').'/Dev/symfony/1.2',
+    '1.3'=>getenv('HOME').'/Dev/symfony/1.3',
+    '1.4'=>getenv('HOME').'/Dev/symfony/1.4',
 );
 
