@@ -95,8 +95,13 @@ foreach (array(
   }
 }
 
-log_message("Creating symbolic links...");
+log_message('Creating symbolic links...');
 foreach ($symlinks as $link => $target)
 {
   replace_symlink($target, $link);
+}
+if ($options['do_plugins'])
+{
+  log_message('Creating symbolic links for plugins...');
+  system('/usr/bin/env php symfony plugin:publish-assets');
 }

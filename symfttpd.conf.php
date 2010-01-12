@@ -52,6 +52,12 @@ $options['symfony_symlink'] = false;
 $options['web_symlink'] = 'web/sf';
 
 /**
+ * Try to run symfony:publish-assets
+ * @var boolean
+ */
+$options['do_plugins'] = true;
+
+/**
  * Wanted symfony version
  * You should override this in the project-level config
  * @var string
