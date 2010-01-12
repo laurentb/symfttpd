@@ -36,4 +36,67 @@ function get_options()
   return $options;
 }
 
-var_dump(get_options());
+/**
+ * @param string $target The destination of the symlink
+ * @param string $link The path of the symlink to create
+ * @return boolean Success
+ */
+function replace_symlink($target, $link)
+{
+  // Erase only if it is already a symlink
+  if (is_link($link))
+  {
+    unlink($link);
+  }
+  log_message(' '.$link.' => '.$target);
+
+  return symlink($target, $link);
+}
+
+function log_message($message)
+{
+  echo $message."\n";
+}
+
+
+$options = get_options();
+
+$project_path = getcwd();
+if (!is_file($project_path.'/symfony'))
+{
+  throw new Exception('Not in a symfony project');
+}
+
+log_message("Using symfony version ".$options['want']);
+$symlinks = array();
+if ($options['genconf'])
+{
+  $symlinks[$options['genconf']] = $options['path'].'/genconf.php';
+}
+
+$sf_path = $options['sf_path'][$options['want']];
+foreach (array(
+    'symfony_symlink' => '',
+    'lib_symlink' => 'lib',
+    'data_symlink' => 'data',
+    'web_symlink' => 'data/web/sf',
+  )
+  as $option => $relpath)
+{
+  $link = $options[$option];
+  if ($link)
+  {
+    $target = realpath($sf_path.'/'.$relpath);
+    if (!is_dir($target))
+    {
+      throw new Exception($target.' is not a directory');
+    }
+    $symlinks[$link] = $target;
+  }
+}
+
+log_message("Creating symbolic links...");
+foreach ($symlinks as $link => $target)
+{
+  replace_symlink($target, $link);
+}
