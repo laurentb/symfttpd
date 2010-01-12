@@ -7,6 +7,7 @@
  */
 
 error_reporting(E_ALL|E_STRICT);
+require(dirname(__FILE__).'/sfTools.class.php');
 
 /**
  * Get config options from multiple files
@@ -43,14 +44,8 @@ function get_options()
  */
 function replace_symlink($target, $link)
 {
-  // Erase only if it is already a symlink
-  if (is_link($link))
-  {
-    unlink($link);
-  }
-  log_message(' '.$link.' => '.$target);
-
-  return symlink($target, $link);
+  $success = sfTools::symlink($target, $link);
+  log_message($link.' => '.$target.($success ? '' : ' ...FAILED!'));
 }
 
 function log_message($message)
