@@ -102,6 +102,14 @@ foreach ($symlinks as $link => $target)
 }
 if ($options['do_plugins'])
 {
-  log_message('Creating symbolic links for plugins...');
-  system('/usr/bin/env php symfony plugin:publish-assets');
+  if (version_compare($options['want'], '1.2') >= 0)
+  {
+    log_message('Creating symbolic links for plugins...');
+    system('/usr/bin/env php symfony plugin:publish-assets');
+  }
+  else
+  {
+    log_message('WARNING: Creating symbolic links for plugins is'
+       . 'not yet supported for symfony < 1.2');
+  }
 }
