@@ -21,23 +21,21 @@ class sfTools
    */
   static public function symlink($originDir, $targetDir)
   {
-    $ok = false;
     if (is_link($targetDir))
     {
-      if (readlink($targetDir) != $originDir)
+      if (readlink($targetDir) == $originDir)
       {
-        unlink($targetDir);
+        // Nothing to do here!
+
+        return true;
       }
       else
       {
-        $ok = true;
+        unlink($targetDir);
       }
     }
 
-    if (!$ok)
-    {
-      symlink($originDir, $targetDir);
-    }
+    return symlink($originDir, $targetDir);
   }
 
   /**
@@ -49,7 +47,8 @@ class sfTools
   static public function relativeSymlink($originDir, $targetDir)
   {
     $originDir = self::calculateRelativeDir($targetDir, $originDir);
-    self::symlink($originDir, $targetDir);
+
+    return self::symlink($originDir, $targetDir);
   }
 
   /**
