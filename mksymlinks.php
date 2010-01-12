@@ -105,6 +105,6 @@ if ($options['do_plugins'])
   else
   {
     log_message('WARNING: Creating symbolic links for plugins is'
-       . 'not yet supported for symfony < 1.2');
+       . ' not yet supported for symfony < 1.2');
   }
 }
