@@ -4,6 +4,19 @@ symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.
 
 
+`mksymlinks` will help you create all the necessary symbolik links to setup a project. It handles:
+
+ * symfony symlinks (configurable)
+ * web/sf (was done as an alias in Apache config examples)
+ * publish-assets, even for symfony 1.0 and 1.1
+ * genconf.php (see below)
+
+Once configured (which is straightforward), it will take only one command to create all the symlinks.
+
+
+`genconf` will generate all the rules necessary to setup a vhost in lighttpd. It leverages the `include_shell` directive which means no endless copy/pasting and easy updates (only restarting lighttpd is necessary).
+
+
 
 ## mksymlinks.php
 
@@ -25,7 +38,7 @@ Create a `config/symfttpd.conf.php` file with the following contents:
     php /path/to/symfttpd/mksymlinks.php
 
 All done!
-You should ignore all the symlinks in your version control system, but commit config/symfttpd.conf.php so other developers can use it if they wish to do so.
+You should ignore all the symlinks in your version control system, but commit `config/symfttpd.conf.php` so other developers can use it if they wish to do so.
 
 
 ### Other typical setups
@@ -66,8 +79,9 @@ while project-level config is for things that only concern your project.
 ## genconf.php
 
 If you don’t want to copy/paste lighttpd configs, handle regexps when
-you add files, or fight rewriting issues considering that most examples
-are badly written), then this tool is for you.
+you add files, or fight rewriting issues (which can often happen
+considering that most available examples are badly written),
+then this tool is for you.
 
 
 ### Quick start
@@ -122,7 +136,7 @@ lighttpd being pronounced lighty, I recommend symfy.
 No, and it probably never will be.
 
 
-### Can I use it in production?
+### Can I use genconf in production?
 
 Yes. I’d say you _should_, since the command line options of `genconf.php` are
 thought for that particular use. genconf does not run symfony or any other
