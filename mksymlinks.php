@@ -48,21 +48,49 @@ function get_options()
  */
 function replace_symlink($project_path, $target, $link, $relative = true)
 {
-  $success = $relative
-        ? sfTools::relativeSymlink($target, $project_path.'/'.$link)
-        : sfTools::symlink($target, $project_path.'/'.$link);
+  if ($relative)
+  {
+    $target = sfTools::calculateRelativeDir($project_path.'/'.$link, $target);
+  }
 
-  log_message($link.' => '.$target.($success ? '' : ' ...FAILED!'));
+  $success = sfTools::symlink($target, $project_path.'/'.$link);
+
+  log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'));
 }
 
 /**
- * @param string $message;
+ * @param string $message
  *
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
 function log_message($message)
 {
   echo $message."\n";
+}
+
+/**
+ * Find plugins with a "web" directory
+ * @param string $project_path
+ * @return array Plugin names
+ *
+ * @author Laurent Bachelier <laurentb@theodo.fr>
+ */
+function find_plugins($project_path)
+{
+  $plugins = array();
+  foreach (new DirectoryIterator($project_path."/plugins") as $file)
+  {
+    $name = $file->getFilename();
+    if ($file->isDir()
+        && preg_match('/^[^\.].+Plugin$/', $name)
+        && is_dir($project_path.'/plugins/'.$name.'/web')
+    )
+    {
+      $plugins[] = $name;
+    }
+  }
+
+  return $plugins;
 }
 
 
@@ -111,12 +139,21 @@ if ($options['do_plugins'])
 {
   if (version_compare($options['want'], '1.2') >= 0)
   {
-    log_message('Creating symbolic links for plugins...');
+    log_message('Creating symbolic links for plugins... (calling symfony)');
     system('/usr/bin/env php symfony plugin:publish-assets');
   }
   else
   {
-    log_message('WARNING: Creating symbolic links for plugins is'
-       . ' not yet supported for symfony < 1.2');
+    log_message('Creating symbolic links for plugins... (internal method)');
+    foreach (find_plugins($project_path) as $name)
+    {
+      $link = 'web/'.$name;
+      $target = $project_path.'/plugins/'.$name.'/web';
+      // Ignore if there is a real directory with this name
+      if (is_link($project_path.'/'.$link) || !is_dir($project_path.'/'.$link))
+      {
+        replace_symlink($project_path, $target, $link, $options['relative']);
+      }
+    }
   }
 }

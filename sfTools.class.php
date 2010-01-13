@@ -39,19 +39,6 @@ class sfTools
   }
 
   /**
-   * Creates a symbolic link using a relative path if possible.
-   *
-   * @param string $originDir      The origin directory path
-   * @param string $targetDir      The symbolic link name
-   */
-  static public function relativeSymlink($originDir, $targetDir)
-  {
-    $originDir = self::calculateRelativeDir($targetDir, $originDir);
-
-    return self::symlink($originDir, $targetDir);
-  }
-
-  /**
    * Calculates the relative path from one to another directory.
    *
    * If the paths share no common path the absolute target dir is returned.
@@ -61,7 +48,7 @@ class sfTools
    *
    * @return string
    */
-  static protected function calculateRelativeDir($from, $to)
+  static public function calculateRelativeDir($from, $to)
   {
     $from = self::canonicalizePath($from);
     $to = self::canonicalizePath($to);
