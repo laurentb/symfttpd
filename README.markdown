@@ -11,14 +11,71 @@ lighttpd being pronounced lighty, I recommend symfy.
 
 
 
-## genconf
-
-If you don’t want to copy/paste configs, handle regexps when
-you add files (considering that most examples are badly written),
-then this tool is for you.
+## mksymlinks.php
 
 
-### Usage
+### Quick start
+
+    mkdir -p ~/Dev
+    cd ~/Dev # default path, you can customize it (see Configuration)
+    # get all symfony branches
+    svn co http://svn.symfony-project.com/branches symfony
+
+Create a `config/symfttpd.conf.php` file with the following contents:
+
+    <?php
+    $options['want'] = '1.2'; // The version of symfony used by your project
+    $options['lib_symlink'] = 'lib/symfony'; // lib/symfony will lead to the "lib" directory of symfony
+
+    cd /path/to/your-project
+    php /path/to/symfttpd/mksymlinks.php
+
+All done!
+You should ignore all the symlinks in your version control system, but commit config/symfttpd.conf.php so other developers can use it if they wish to do so.
+
+
+### Other typical setups
+
+Typical contents for a symfony 1.0 project:
+
+    <?php
+    $options['want'] = '1.0';
+    $options['lib_symlink'] = 'lib/symfony';
+    $options['data_symlink'] = 'data/symfony'; // leads to the "data" directory of symfony
+
+Typical contents for a symfony 1.1 project:
+
+    <?php
+    $options['want'] = '1.1';
+    $options['lib_symlink'] = false;
+    $options['symfony_symlink'] = 'vendor/symfony'; // leads to the root directory of symfony
+
+
+## Configuration
+
+You can override many default options globally (user-level)
+or locally (project-level).
+For example, putting this in `~/.symfttpd.conf.php` will change the path
+of symfony 1.0 to `~/symfony-1.0` for all of your projects.
+
+    <?php
+    $options['sf_path']['1.0]'=>getenv('HOME').'/symfony-1.0'
+
+If you want to know all available options and their use,
+you can open `symfttpd.conf.php` in symfttpd directory.
+
+As a rule, user-level config is for things that only concern your computer,
+while project-level config is for things that only concern your project.
+
+
+## genconf.php
+
+If you don’t want to copy/paste lighttpd configs, handle regexps when
+you add files, or fight rewriting issues considering that most examples
+are badly written), then this tool is for you.
+
+
+### Quick start
 
     cd /path/to/example.com/config
     ln -s /path/to/symfttpd/genconf.php ./lighttpd.php
@@ -37,7 +94,7 @@ or if you want a different default application:
 
 You have to restart lighttpd each time you add a file the the web/
 root. Hopefully it doesn’t happen often. Also, don’t forget to run
-`php symfony plugin:publish-assets` before.
+`php symfony plugin:publish-assets`, or even better, `mksymlinks.php` before.
 
 
 ### Available options
@@ -52,12 +109,8 @@ root. Hopefully it doesn’t happen often. Also, don’t forget to run
 
 Since now plugins’ web dirs are handled by symbolic links,
 using an alias in the server config for /sf doesn’t make sense.
-There is a tool to create the symlink:
-
-    cd /path/to/example.com
-    /path/to/symfttpd/symlinksf.php
-
-It should work with symfony from 1.0 to 1.4.
+You can use `mksymlinks.php` to create this symlink and many
+others for you (including the symlink for `genconf.php`!).
 
 
 
