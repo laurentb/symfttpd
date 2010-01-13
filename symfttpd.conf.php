@@ -58,6 +58,13 @@ $options['web_symlink'] = 'web/sf';
 $options['do_plugins'] = true;
 
 /**
+ * Create relative symlinks
+ * (recommended)
+ * @var boolean
+ */
+$options['relative'] = true;
+
+/**
  * Wanted symfony version
  * You should override this in the project-level config
  * @var string

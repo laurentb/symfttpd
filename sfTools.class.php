@@ -60,8 +60,8 @@ class sfTools
    * @param string $to   The target directory
    *
    * @return string
-   */ 
-  protected function calculateRelativeDir($from, $to)
+   */
+  static protected function calculateRelativeDir($from, $to)
   {
     $from = self::canonicalizePath($from);
     $to = self::canonicalizePath($to);
@@ -104,7 +104,7 @@ class sfTools
    *
    * @return string
    */
-  protected function canonicalizePath($path)
+  static protected function canonicalizePath($path)
   {
     if (empty($path))
     {

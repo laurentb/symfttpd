@@ -38,16 +38,28 @@ function get_options()
 }
 
 /**
+ * @pram string $project_path Absolute project path
  * @param string $target The destination of the symlink
- * @param string $link The path of the symlink to create
+ * @param string $link The relative path of the symlink to create
+ * @param boolean $relative Try to use a relative destination
  * @return boolean Success
+ *
+ * @author Laurent Bachelier <laurent@bachelier.name>
  */
-function replace_symlink($target, $link)
+function replace_symlink($project_path, $target, $link, $relative = true)
 {
-  $success = sfTools::symlink($target, $link);
+  $success = $relative
+        ? sfTools::relativeSymlink($target, $project_path.'/'.$link)
+        : sfTools::symlink($target, $project_path.'/'.$link);
+
   log_message($link.' => '.$target.($success ? '' : ' ...FAILED!'));
 }
 
+/**
+ * @param string $message;
+ *
+ * @author Laurent Bachelier <laurent@bachelier.name>
+ */
 function log_message($message)
 {
   echo $message."\n";
@@ -81,7 +93,7 @@ foreach (array(
   $link = $options[$option];
   if ($link)
   {
-    $target = realpath($sf_path.'/'.$relpath);
+    $target = $sf_path.'/'.$relpath;
     if (!is_dir($target))
     {
       throw new Exception($target.' is not a directory');
@@ -93,7 +105,7 @@ foreach (array(
 log_message('Creating symbolic links...');
 foreach ($symlinks as $link => $target)
 {
-  replace_symlink($target, $link);
+  replace_symlink($project_path, $target, $link, $options['relative']);
 }
 if ($options['do_plugins'])
 {
