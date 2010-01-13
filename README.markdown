@@ -58,7 +58,7 @@ Typical contents for a symfony 1.1 project:
     $options['symfony_symlink'] = 'vendor/symfony'; // leads to the root directory of symfony
 
 
-## Configuration
+### Configuration
 
 You can override many default options globally (user-level)
 or locally (project-level).
