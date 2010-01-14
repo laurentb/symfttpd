@@ -73,7 +73,7 @@ function log_message($message)
  * @param string $project_path
  * @return array Plugin names
  *
- * @author Laurent Bachelier <laurentb@theodo.fr>
+ * @author Laurent Bachelier <laurent@bachelier.name>
  */
 function find_plugins($project_path)
 {

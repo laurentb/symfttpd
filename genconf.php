@@ -12,11 +12,10 @@
 error_reporting(E_ALL|E_STRICT);
 
 $options = array_merge(
-  array('default'=>'index', 'allow'=>false, 'only'=>true),
+  array('default'=>'index', 'allow'=>false),
   getopt('', array('default:', 'only', 'allow:'))
 );
-// WTF: option present = set to false
-$options['only'] = !$options['only'];
+$options['only'] = isset($options['only']);
 $options['allow'] = $options['allow']
                   ? explode(',', $options['allow'])
                   : array();
