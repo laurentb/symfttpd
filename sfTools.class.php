@@ -122,4 +122,23 @@ class sfTools
 
     return $result;
   }
+
+  /**
+   * Creates a directory recursively.
+   *
+   * @param  string $path  The directory path
+   * @param  int    $mode  The directory mode
+   *
+   * @return bool true if the directory has been created, false otherwise
+   */
+  static public function mkdirs($path, $mode = 0750)
+  {
+    if (is_dir($path))
+    {
+      return true;
+    }
+
+    return mkdir($path, $mode, true);
+  }
+
 }
