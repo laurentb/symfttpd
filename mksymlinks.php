@@ -7,7 +7,7 @@
  */
 
 error_reporting(E_ALL|E_STRICT);
-require(dirname(__FILE__).'/sfTools.class.php');
+require(dirname(__FILE__).'/lib/sfTools.php');
 
 /**
  * Get config options from multiple files
