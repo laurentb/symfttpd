@@ -114,7 +114,7 @@ $options['php_cmd'] = realpath(PHP_BINDIR.'/php');
  * Absolute path to the CGI PHP executable
  * @var string|boolean false to autodetect (try to find "php-cgi" in the path)
  */
-$options['php-cgi_cmd'] = realpath(PHP_BINDIR.'/php-cgi');
+$options['php_cgi_cmd'] = realpath(PHP_BINDIR.'/php-cgi');
 
 /**
  * Default server template path

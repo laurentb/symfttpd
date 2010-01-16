@@ -11,15 +11,14 @@ require dirname(__FILE__).'/lib/Symfony.php';
 
 $project_path = Symfony::getProjectPath();
 $options = MultiConfig::get();
-$arguments = array(
-  'port' => intval(Argument::get('p', 'port', 4042)),
-  'project_path' => $project_path,
-  'config_dir' => $project_path.'/cache/lighttpd',
-  'log_dir' => $project_path.'/logs/lighttpd',
-);
 
-FileTools::mkdirs($arguments['config_dir']);
-FileTools::mkdirs($arguments['log_dir']);
+$options['port'] = intval(Argument::get('p', 'port', 4042));
+$options['project_path'] = $project_path;
+$options['config_dir'] = $project_path.'/cache/lighttpd';
+$options['log_dir'] = $project_path.'/log/lighttpd';
+
+FileTools::mkdirs($options['config_dir']);
+FileTools::mkdirs($options['log_dir']);
 
 PosixTools::setCustomPath($options['custom_path']);
 if (empty($options['lighttpd_cmd']))
@@ -27,16 +26,16 @@ if (empty($options['lighttpd_cmd']))
   $options['lighttpd_cmd'] = PosixTools::which('lighttpd');
 }
 
-if (empty($options['php-cgi_cmd']))
+if (empty($options['php_cgi_cmd']))
 {
-  $options['php-cgi_cmd'] = PosixTools::which('php-cgi');
+  $options['php_cgi_cmd'] = PosixTools::which('php-cgi');
 }
 
-if (empty($options['php-cgi_cmd']))
+if (empty($options['php_cmd']))
 {
-  $options['php-cgi_cmd'] = PosixTools::which('php-cgi');
+  $options['php_cmd'] = PosixTools::which('php');
 }
 
-$template = Template::get($options['config_template'], $arguments);
+$template = Template::get($options['config_template'], $options);
 
 echo $template;
