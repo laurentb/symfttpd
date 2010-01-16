@@ -7,35 +7,8 @@
  */
 
 error_reporting(E_ALL|E_STRICT);
-require(dirname(__FILE__).'/lib/sfTools.php');
-
-/**
- * Get config options from multiple files
- * @return array
- *
- * @author Laurent Bachelier <laurent@bachelier.name>
- */
-function get_options()
-{
-  $options = array();
-  $cfgname = 'symfttpd.conf.php';
-
-  $configs = array(
-      dirname(__FILE__).'/'.$cfgname, // defaults
-      getenv('HOME').'/.'.$cfgname, // user configuration
-      getcwd().'/config/'.$cfgname, // project configuration
-  );
-
-  foreach ($configs as $config)
-  {
-    if (file_exists($config))
-    {
-      require $config;
-    }
-  }
-
-  return $options;
-}
+require(dirname(__FILE__).'/lib/FileTools.php');
+require(dirname(__FILE__).'/lib/MultiConfig.php');
 
 /**
  * @pram string $project_path Absolute project path
@@ -50,10 +23,10 @@ function replace_symlink($project_path, $target, $link, $relative = true)
 {
   if ($relative)
   {
-    $target = sfTools::calculateRelativeDir($project_path.'/'.$link, $target);
+    $target = FileTools::calculateRelativeDir($project_path.'/'.$link, $target);
   }
 
-  $success = sfTools::symlink($target, $project_path.'/'.$link);
+  $success = FileTools::symlink($target, $project_path.'/'.$link);
 
   log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'));
 }
@@ -94,7 +67,7 @@ function find_plugins($project_path)
 }
 
 
-$options = get_options();
+$options = MultiConfig::get();
 
 $project_path = getcwd();
 if (!is_file($project_path.'/symfony'))

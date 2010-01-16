@@ -11,7 +11,7 @@
  * file that was distributed with this source code.
  */
 
-class sfTools
+class FileTools
 {
   /**
    * Creates a symbolic link or copy a directory.

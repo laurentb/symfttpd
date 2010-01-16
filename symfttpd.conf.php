@@ -1,4 +1,7 @@
 <?php
+
+// {{{ mksymlinks configuration
+
 /**
  * Default configuration options
  *
@@ -85,3 +88,13 @@ $options['sf_path'] = array(
     '1.4'=>getenv('HOME').'/Dev/symfony/1.4',
 );
 
+// }}}
+
+// {{{ spawn configuration
+
+$options['custom_path'] = array('/usr/sbin');
+$options['lighttpd_cmd'] = null;
+$options['php_cmd'] = null;
+$options['php-cgi_cmd'] = null;
+
+// }}}
