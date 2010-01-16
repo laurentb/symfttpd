@@ -2,16 +2,16 @@
 <?php
 error_reporting(E_ALL|E_STRICT);
 
-require dirname(__FILE__).'/lib/getopt.php';
-require dirname(__FILE__).'/lib/template.php';
+require dirname(__FILE__).'/lib/Argument.php';
+require dirname(__FILE__).'/lib/Template.php';
 require dirname(__FILE__).'/lib/FileTools.php';
 require dirname(__FILE__).'/lib/PosixTools.php';
 require dirname(__FILE__).'/lib/MultiConfig.php';
 
 $options = MultiConfig::get();
 $arguments = array(
-  'port' => intval(get_opt('p', 'port', 4042)),
-  'project_path' => realpath(get_opt('P', 'path', getcwd())),
+  'port' => intval(Argument::get('p', 'port', 4042)),
+  'project_path' => realpath(Argument::get('P', 'path', getcwd())),
 );
 
 if (!is_file($arguments['project_path'].'/symfony'))
