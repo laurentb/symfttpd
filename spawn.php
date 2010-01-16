@@ -36,6 +36,11 @@ if (empty($options['php_cmd']))
   $options['php_cmd'] = PosixTools::which('php');
 }
 
-$template = Template::get($options['config_template'], $options);
+$config_file = $options['config_dir'].'/lighttpd.conf';
+file_put_contents(
+  $config_file,
+  Template::get($options['config_template'], $options)
+);
+echo "lighttpd started on http://localhost:${options['port']}/\n";
+passthru($options['lighttpd_cmd'].' -D -f '.$config_file);
 
-echo $template;
