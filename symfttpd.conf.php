@@ -1,7 +1,4 @@
 <?php
-
-// {{{ mksymlinks configuration
-
 /**
  * Default configuration options
  *
@@ -11,6 +8,8 @@
  *
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
+
+// {{{ mksymlinks configuration
 
 /**
  * Path to symfttpd files
@@ -92,9 +91,35 @@ $options['sf_path'] = array(
 
 // {{{ spawn configuration
 
+/**
+ * symfttpd will try to find the executables by using the PATH environment
+ * variable, then by using this variable.
+ * @var array List of directories
+ */
 $options['custom_path'] = array('/usr/sbin');
-$options['lighttpd_cmd'] = null;
-$options['php_cmd'] = null;
-$options['php-cgi_cmd'] = null;
+
+/**
+ * Absolute path to the lighttpd server executable
+ * @var string|boolean false to autodetect (try to find "lighttpd" in the path)
+ */
+$options['lighttpd_cmd'] = false;
+
+/**
+ * Absolute path to the CLI PHP executable
+ * @var string|boolean false to autodetect (try to find "php" in the path)
+ */
+$options['php_cmd'] = realpath(PHP_BINDIR.'/php');
+
+/**
+ * Absolute path to the CGI PHP executable
+ * @var string|boolean false to autodetect (try to find "php-cgi" in the path)
+ */
+$options['php-cgi_cmd'] = realpath(PHP_BINDIR.'/php-cgi');
+
+/**
+ * Default server template path
+ * @var string|null null to autodetect (try to find "php-cgi" in the path)
+ */
+$options['config_template'] = dirname(__FILE__).'/data/lighttpd.conf.php';
 
 // }}}
