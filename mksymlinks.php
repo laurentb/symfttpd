@@ -2,13 +2,18 @@
 <?php
 /**
  * Create the necessary symlinks to setup a symfony project
+ * Command-line options:
+ *   --path=<path> Use a different project path (default is current dir)
  *
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
 
 error_reporting(E_ALL|E_STRICT);
+
 require(dirname(__FILE__).'/lib/FileTools.php');
 require(dirname(__FILE__).'/lib/MultiConfig.php');
+require(dirname(__FILE__).'/lib/Symfony.php');
+require(dirname(__FILE__).'/lib/Argument.php');
 
 /**
  * @pram string $project_path Absolute project path
@@ -69,11 +74,7 @@ function find_plugins($project_path)
 
 $options = MultiConfig::get();
 
-$project_path = getcwd();
-if (!is_file($project_path.'/symfony'))
-{
-  throw new Exception('Not in a symfony project');
-}
+$project_path = Symfony::getProjectPath();
 
 log_message("Using symfony version ".$options['want']);
 $symlinks = array();

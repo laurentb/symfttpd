@@ -7,20 +7,17 @@ require dirname(__FILE__).'/lib/Template.php';
 require dirname(__FILE__).'/lib/FileTools.php';
 require dirname(__FILE__).'/lib/PosixTools.php';
 require dirname(__FILE__).'/lib/MultiConfig.php';
+require dirname(__FILE__).'/lib/Symfony.php';
 
 $options = MultiConfig::get();
 $arguments = array(
   'port' => intval(Argument::get('p', 'port', 4042)),
-  'project_path' => realpath(Argument::get('P', 'path', getcwd())),
 );
 
-if (!is_file($arguments['project_path'].'/symfony'))
-{
-  throw new Exception('Not in a symfony project');
-}
+$project_path = Symfony::getProjectPath();
 
-FileTools::mkdirs($arguments['project_path'].'/cache/lighttpd');
-FileTools::mkdirs($arguments['project_path'].'/logs/lighttpd');
+FileTools::mkdirs($project_path.'/cache/lighttpd');
+FileTools::mkdirs($project_path.'/logs/lighttpd');
 
 PosixTools::setCustomPath($options['custom_path']);
 if (empty($options['lighttpd_cmd']))
