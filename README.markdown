@@ -4,6 +4,9 @@ symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.
 
 
+`spawn` will configure and start a lighttpd server with a minimal configuration to serve one symfony project.
+
+
 `mksymlinks` will help you create all the necessary symbolik links to setup a project. It handles:
 
  * symfony symlinks (configurable)
@@ -18,7 +21,38 @@ Once configured (which is straightforward), it will take only one command to cre
 
 
 
+## spawn.php
+
+If you don't want to configure a full-blown webserver, edit your host
+file, edit the configuration, have a web server running even when you don't
+need it, or deal with permissions, then this tool it for you.
+
+
+### Quick start
+
+First, make sure that all symbolic links are created.
+You can use mksymlinks to help you with that.
+
+    cd /path/to/your-project
+    php /path/to/symfttpd/spawn.php
+
+It will display something like that:
+
+    lighttpd started on http://localhost:4042/
+
+All done!
+
+
+### Available options
+
+You can alter the default lighttpd.conf template and the default paths,
+by using the symfttpd.conf.php mechanism.
+
+
+
 ## mksymlinks.php
+
+If you don't want to spend time with repetive symlink creation each time you set up a new project, then this tool is for you.
 
 
 ### Quick start
@@ -38,6 +72,7 @@ Create a `config/symfttpd.conf.php` file with the following contents:
     php /path/to/symfttpd/mksymlinks.php
 
 All done!
+
 You should ignore all the symlinks in your version control system, but commit `config/symfttpd.conf.php` so other developers can use it if they wish to do so.
 
 
@@ -125,7 +160,6 @@ others for you (including the symlink for `genconf.php`!).
 
 ## FAQ
 
-
 ### How do I pronounce it?!
 
 lighttpd being pronounced lighty, I recommend symfy.
@@ -140,4 +174,15 @@ No, and it probably never will be.
 
 Yes. I’d say you _should_, since the command line options of `genconf.php` are
 thought for that particular use. genconf does not run symfony or any other
-external files, nor writes anything anywhere, so it’s pretty secure.
+external files, nor writes anything anywhere, so it is very little risk.
+
+
+### Can I use mksymlinks in production?
+
+Yes.
+
+
+### Can I use spawn in production?
+
+No!
+
