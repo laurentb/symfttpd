@@ -1,5 +1,9 @@
 #!/usr/bin/env php
 <?php
+/**
+ * @author Laurent Bachelier <laurent@bachelier.name>
+ */
+
 error_reporting(E_ALL|E_STRICT);
 
 require dirname(__FILE__).'/lib/Argument.php';

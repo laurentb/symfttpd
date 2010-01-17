@@ -1,10 +1,6 @@
 #!/usr/bin/env php
 <?php
 /**
- * Create the necessary symlinks to setup a symfony project
- * Command-line options:
- *   --path=<path> Use a different project path (default is current dir)
- *
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
 

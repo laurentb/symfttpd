@@ -1,11 +1,6 @@
 #!/usr/bin/env php
 <?php
 /**
- * Command-line options:
- *   --default=<app>: change default application
- *   --only: do not allow other applications automatically
- *   --allow=<app1,app2>: allow the following apps
- *
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
 

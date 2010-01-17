@@ -4,20 +4,25 @@ symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.
 
 
-`spawn` will configure and start a lighttpd server with a minimal configuration to serve one symfony project.
+`spawn` will setup and start a lighttpd server with a minimal
+configuration to serve one symfony project.
 
 
-`mksymlinks` will help you create all the necessary symbolik links to setup a project. It handles:
+`mksymlinks` will help you create all the necessary symbolic links
+to setup a project. It handles:
 
  * symfony symlinks (configurable)
  * web/sf (was done as an alias in Apache config examples)
  * publish-assets, even for symfony 1.0 and 1.1
  * genconf.php (see below)
 
-Once configured (which is straightforward), it will take only one command to create all the symlinks.
+Once configured (which is straightforward), it will take only one command
+to create all the symlinks.
 
 
-`genconf` will generate all the rules necessary to setup a vhost in lighttpd. It leverages the `include_shell` directive which means no endless copy/pasting and easy updates (only restarting lighttpd is necessary).
+`genconf` will generate all the rules necessary to setup a vhost in lighttpd.
+It leverages the `include_shell` directive which means no endless
+copy/pasting and easy updates (only restarting lighttpd is necessary).
 
 
 
@@ -43,10 +48,16 @@ It will display something like that:
 All done!
 
 
-### Available options
+### Configuration
 
 You can alter the default lighttpd.conf template and the default paths,
 by using the symfttpd.conf.php mechanism.
+
+
+### Available options
+
+* `--path=<path>` : Use a different project path (default is current dir)
+* `--port=<port>` or `-p<port>` : Use a different port (default is 4042)
 
 
 
@@ -110,6 +121,11 @@ As a rule, user-level config is for things that only concern your computer,
 while project-level config is for things that only concern your project.
 
 
+### Available options
+
+* `--path=<path>` : Use a different project path (default is current dir)
+
+
 
 ## genconf.php
 
@@ -143,9 +159,9 @@ root. Hopefully it doesn’t happen often. Also, don’t forget to run
 
 ### Available options
 
- `--default=<app>` Change the default application (default being index)
- `--only` Do not allow any other application
- `--allow=<app1,app2>` Useful with --only, allow some applications
+* `--default=<app>` Change the default application (default being index)
+* `--only` Do not allow any other application
+* `--allow=<app1,app2>` Useful with --only, allow some applications
     (useful for allowing a `_dev` alternative, for example)
 
 
