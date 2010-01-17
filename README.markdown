@@ -5,7 +5,9 @@ aimed at lazy developers and sysadmins.
 
 
 `spawn` will setup and start a lighttpd server with a minimal
-configuration to serve one symfony project.
+configuration to serve one symfony project. The server will not be run as
+a separate user, which is ideal for developers; also, the server logs
+will be written in the project's "log" directory.
 
 
 `mksymlinks` will help you create all the necessary symbolic links
@@ -63,7 +65,7 @@ by using the symfttpd.conf.php mechanism.
 
 ## mksymlinks.php
 
-If you don't want to spend time with repetive symlink creation each time you set up a new project, then this tool is for you.
+If you don't want to spend time with repetitive symlink creation each time you set up a new project, then this tool is for you.
 
 
 ### Quick start
@@ -129,7 +131,7 @@ while project-level config is for things that only concern your project.
 
 ## genconf.php
 
-If you don’t want to copy/paste lighttpd configs, handle regexps when
+If you don't want to copy/paste lighttpd configs, handle regexps when
 you add files, or fight rewriting issues (which can often happen
 considering that most available examples are badly written),
 then this tool is for you.
@@ -153,7 +155,7 @@ or if you want a different default application:
     }
 
 You have to restart lighttpd each time you add a file the the web/
-root. Hopefully it doesn’t happen often. Also, don’t forget to run
+root. Hopefully it doesn't happen often. Also, don't forget to run
 `php symfony plugin:publish-assets`, or even better, `mksymlinks.php` before.
 
 
@@ -167,8 +169,8 @@ root. Hopefully it doesn’t happen often. Also, don’t forget to run
 
 ### How is the /sf/ alias handled?
 
-Since now plugins’ web dirs are handled by symbolic links,
-using an alias in the server config for /sf doesn’t make sense.
+Since now plugins' web dirs are handled by symbolic links,
+using an alias in the server config for /sf doesn't make sense.
 You can use `mksymlinks.php` to create this symlink and many
 others for you (including the symlink for `genconf.php`!).
 
@@ -188,7 +190,7 @@ No, and it probably never will be.
 
 ### Can I use genconf in production?
 
-Yes. I’d say you _should_, since the command line options of `genconf.php` are
+Yes. I'd say you _should_, since the command line options of `genconf.php` are
 thought for that particular use. genconf does not run symfony or any other
 external files, nor writes anything anywhere, so it is very little risk.
 
