@@ -12,7 +12,7 @@ fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
       "socket" => "<?php echo $config_dir ?>/php-" + PID + ".socket",
-      "bin-path" => "<?php echo $php_cgi_cmd ?> ",
+      "bin-path" => "<?php echo $php_cgi_cmd ?> -d error_log=/dev/stderr'",
       "max-procs" => 1,
       "max-load-per-proc" => 1,
       "idle-timeout" => 120,
@@ -40,5 +40,5 @@ accesslog.filename    = "<?php echo $log_dir ?>/access.log"
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"
 
-include_shell "<?php echo $php_cmd ?> <?php echo $project_path ?>/<?php echo $genconf ?>"
+include_shell "<?php echo $php_cmd ?> <?php echo escapeshellarg($project_path.'/'.$genconf) ?>"
 

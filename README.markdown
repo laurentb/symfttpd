@@ -7,7 +7,7 @@ aimed at lazy developers and sysadmins.
 `spawn` will setup and start a lighttpd server with a minimal
 configuration to serve one symfony project. The server will not be run as
 a separate user, which is ideal for developers; also, the server logs
-will be written in the project's "log" directory.
+will be written in the project's "log" directory and will include PHP errors.
 
 
 `mksymlinks` will help you create all the necessary symbolic links

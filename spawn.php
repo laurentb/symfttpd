@@ -46,5 +46,5 @@ file_put_contents(
   Template::get($options['config_template'], $options)
 );
 echo "lighttpd started on http://localhost:${options['port']}/\n";
-passthru($options['lighttpd_cmd'].' -D -f '.$config_file);
+passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
 
