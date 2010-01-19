@@ -11,7 +11,7 @@ server.port           = <?php echo $port ?>
 fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
-      "socket" => "<?php echo $config_dir ?>/php-" + PID + ".socket",
+      "socket" => "<?php echo sys_get_temp_dir() ?>/symfttpd-php-" + PID + ".socket",
       "bin-path" => "<?php echo $php_cgi_cmd ?> -d error_log=/dev/stderr'",
       "max-procs" => 1,
       "max-load-per-proc" => 1,
