@@ -7,13 +7,16 @@
 error_reporting(E_ALL|E_STRICT);
 
 $options = array_merge(
-  array('default'=>'index', 'allow'=>false),
-  getopt('', array('default:', 'only', 'allow:'))
+  array('default'=>'index', 'allow'=>false, 'nophp'=>false),
+  getopt('', array('default:', 'only', 'allow:', 'nophp:'))
 );
 $options['only'] = isset($options['only']);
 $options['allow'] = $options['allow']
                   ? explode(',', $options['allow'])
                   : array();
+$options['nophp'] = $options['nophp']
+                  ? explode(',', $options['nophp'])
+                  : array('uploads');
 
 // Not using __FILE__ since it resolves symlinks
 $path = realpath(dirname($argv[0]).'/../web');
@@ -59,3 +62,12 @@ url.rewrite-once = (
 
   "^(/[^\?]*)(\?.*)?" => "/<?php echo $options['default'] ?>.php$1$2"
 )
+
+<?php foreach ($options['nophp'] as $name): ?>
+<?php if (in_array($name, $files['dir'])): ?>
+$HTTP["url"] =~ "^/<?php echo $name ?>/" {
+  url.access-deny = (".php")
+}
+<?php endif ?>
+<?php endforeach ?>
+
