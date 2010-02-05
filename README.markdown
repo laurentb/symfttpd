@@ -79,7 +79,7 @@ Create a `config/symfttpd.conf.php` file with the following contents:
 
     <?php
     $options['want'] = '1.2'; // The version of symfony used by your project
-    $options['lib_symlink'] = 'lib/vendor/symfony'; // lib/symfony will lead to the "lib" directory of symfony
+    $options['lib_symlink'] = 'lib/vendor/symfony'; // lib/vendor/symfony will lead to the "lib" directory of symfony
 
     cd /path/to/your-project
     php /path/to/symfttpd/mksymlinks.php
