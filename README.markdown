@@ -179,6 +179,12 @@ others for you (including the symlink for `genconf.php`!).
 
 ## FAQ
 
+### Why do I get a warning about long options?
+
+Long options (starting with `--`) are only available on few systems prior
+to PHP 5.3.0.
+
+
 ### How do I pronounce it?!
 
 lighttpd being pronounced lighty, I recommend symfy.
