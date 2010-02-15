@@ -114,7 +114,7 @@ For example, putting this in `~/.symfttpd.conf.php` will change the path
 of symfony 1.0 to `~/symfony-1.0` for all of your projects.
 
     <?php
-    $options['sf_path']['1.0]'=>getenv('HOME').'/symfony-1.0'
+    $options['sf_path']['1.0'] = getenv('HOME').'/symfony-1.0';
 
 If you want to know all available options and their use,
 you can open `symfttpd.conf.php` in symfttpd directory.
