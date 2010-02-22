@@ -27,6 +27,7 @@ function replace_symlink($project_path, $target, $link, $relative = true)
     $target = FileTools::calculateRelativeDir($project_path.'/'.$link, $target);
   }
 
+  FileTools::mkdirs(dirname($project_path.'/'.$link));
   $success = FileTools::symlink($target, $project_path.'/'.$link);
 
   log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'));

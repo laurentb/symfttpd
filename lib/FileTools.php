@@ -1,6 +1,7 @@
 <?php
 /**
  * Various functions, usually trimmed down, from symfony
+ * and with less insane defaults
  */
 
 /*
