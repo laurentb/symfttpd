@@ -101,6 +101,10 @@ foreach (array(
   }
 }
 
+log_message('Creating required directories...');
+FileTools::mkdirs($project_path.'/cache');
+FileTools::mkdirs($project_path.'/log');
+
 log_message('Creating symbolic links...');
 foreach ($symlinks as $link => $target)
 {
