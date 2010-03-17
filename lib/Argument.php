@@ -1,4 +1,9 @@
 <?php
+if (version_compare(PHP_VERSION, '5.3.0') < 0)
+{
+  require dirname(__FILE__).'/getopt.php';
+}
+
 class Argument
 {
   /**
@@ -19,7 +24,9 @@ class Argument
   {
     $addon = $default === false ? '' : ':';
 
-    $options = getopt($short.$addon, array($long.$addon));
+    $options = (version_compare(PHP_VERSION, '5.3.0') < 0)
+      ? getopt($short.$addon, array($long.$addon))
+      : _getopt($short.$addon, array($long.$addon));
 
     $value = $default;
     if (isset($options[$short]))
