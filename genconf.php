@@ -6,10 +6,18 @@
 
 error_reporting(E_ALL|E_STRICT);
 
-$options = array_merge(
-  array('default'=>'index', 'allow'=>false, 'nophp'=>false),
-  getopt('', array('default:', 'only', 'allow:', 'nophp:'))
+$opts = getopt('d:oa:n:');
+$opt_keys = array(
+  'd'=>'default',
+  'o'=>'only',
+  'a'=>'allow',
+  'n'=>'nophp',
 );
+$options = array('default'=>'index', 'allow'=>false, 'nophp'=>false);
+foreach ($opts as $kopt => $opt)
+{
+  $options[$opt_keys[$kopt]] = $opt;
+}
 $options['only'] = isset($options['only']);
 $options['allow'] = $options['allow']
                   ? explode(',', $options['allow'])

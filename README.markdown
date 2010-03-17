@@ -161,12 +161,14 @@ root. Hopefully it doesn't happen often. Also, don't forget to run
 
 ### Available options
 
-* `--default=<app>` Change the default application (default being `index`)
-* `--only` Do not allow any other application
-* `--allow=<app1,app2>` Useful with --only, allow some applications
+* `-d <app>` (default) Change the default application (default being `index`)
+* `-o` (only) Do not allow any other application
+* `-a <app1,app2>` (allow) Useful with `-o`, allow some other applications
     (useful for allowing a `_dev` alternative, for example)
-* `--nophp=<dir1,dir2>` Deny PHP execution in the specified directories
+* `-n <dir1,dir2>` (nophp) Deny PHP execution in the specified directories
     (default being `uploads`).
+
+For portability reasons, only short options (one letter) are used.
 
 ### How is the /sf/ alias handled?
 
