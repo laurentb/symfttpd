@@ -1,6 +1,9 @@
 <?php
 function _getopt ( ) {
 
+$er = error_reporting();
+error_reporting(0);
+
 /* _getopt(): Ver. 1.3      2009/05/30
    My page: http://www.ntu.beautifulworldco.com/weblog/?p=526
 
@@ -223,6 +226,7 @@ So there are four ways to work with _getopt(),
 
   return $options;
 
+error_reporting($er);
 }
 
 function split_para ( $pattern ) {
