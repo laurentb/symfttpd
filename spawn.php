@@ -45,6 +45,25 @@ file_put_contents(
   $config_file,
   Template::get($options['config_template'], $options)
 );
-echo "lighttpd started on http://localhost:${options['port']}/\n";
+
+// Pretty information. Nothing interesting code-wise.
+echo "lighttpd started on port ${options['port']}, all interfaces.\n\n";
+echo "Available applications:\n";
+$apps = array();
+foreach (new DirectoryIterator($project_path.'/web') as $file)
+{
+  if ($file->isFile() && preg_match('/\.php$/', $file->getFilename()))
+  {
+    $apps[] = $file->getFilename();
+  }
+}
+sort($apps);
+foreach ($apps as $app)
+{
+  echo " http://localhost:${options['port']}/".$app."\n";
+}
+echo "\nPress Ctrl+C to stop serving.\n";
+flush();
+
 passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
 
