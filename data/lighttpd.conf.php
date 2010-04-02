@@ -31,6 +31,8 @@ server.indexfiles     = ("index.php", "index.html",
 server.follow-symlink = "enable"
 static-file.exclude-extensions = (".php")
 
+# http://redmine.lighttpd.net/issues/406
+server.force-lowercase-filenames = "disable"
 
 server.pid-file       = "<?php echo $config_dir ?>/lighttpd.pid"
 
