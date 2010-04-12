@@ -77,7 +77,7 @@ log_message("Using symfony version ".$options['want']);
 $symlinks = array();
 if ($options['genconf'])
 {
-  $symlinks[$options['genconf']] = $options['path'].'/genconf.php';
+  $symlinks[$options['genconf']] = $options['path'].'/genconf';
 }
 
 $sf_path = $options['sf_path'][$options['want']];

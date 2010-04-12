@@ -16,7 +16,7 @@ to setup a project. It handles:
  * symfony symlinks (configurable)
  * web/sf (was done as an alias in Apache config examples)
  * publish-assets, even for symfony 1.0 and 1.1
- * genconf.php (see below)
+ * genconf (see below)
 
 Once configured (which is straightforward), it will take only one command
 to create all the symlinks.
@@ -28,7 +28,7 @@ copy/pasting and easy updates (only restarting lighttpd is necessary).
 
 
 
-## spawn.php
+## spawn
 
 If you don't want to configure a full-blown webserver, edit your host
 file, edit the configuration, have a web server running even when you don't
@@ -41,7 +41,7 @@ First, make sure that all symbolic links are created.
 You can use mksymlinks to help you with that.
 
     cd /path/to/your-project
-    php /path/to/symfttpd/spawn.php
+    /path/to/symfttpd/spawn
 
 It will display something like that:
 
@@ -66,7 +66,7 @@ by using the symfttpd.conf.php mechanism.
 
 
 
-## mksymlinks.php
+## mksymlinks
 
 If you don't want to spend time with repetitive symlink creation each time you set up a new project, then this tool is for you.
 
@@ -85,7 +85,7 @@ Create a `config/symfttpd.conf.php` file with the following contents:
     $options['lib_symlink'] = 'lib/vendor/symfony'; // lib/vendor/symfony will lead to the "lib" directory of symfony
 
     cd /path/to/your-project
-    php /path/to/symfttpd/mksymlinks.php
+    /path/to/symfttpd/mksymlinks
 
 All done!
 
@@ -120,7 +120,7 @@ of symfony 1.0 to `~/symfony-1.0` for all of your projects.
     $options['sf_path']['1.0'] = getenv('HOME').'/symfony-1.0';
 
 If you want to know all available options and their use,
-you can open `symfttpd.conf.php` in symfttpd directory.
+you can open `symfttpd.conf.php` in the symfttpd directory.
 
 As a rule, user-level config is for things that only concern your computer,
 while project-level config is for things that only concern your project.
@@ -132,18 +132,20 @@ while project-level config is for things that only concern your project.
 
 
 
-## genconf.php
+## genconf
 
 If you don't want to copy/paste lighttpd configs, handle regexps when
 you add files, or fight rewriting issues (which can often happen
 considering that most available examples are badly written),
-then this tool is for you.
+then this tool is for you. It is also used internally by `spawn`.
 
 
 ### Quick start
 
+This first part is unnecessary if you used `mksymlinks`:
+
     cd /path/to/example.com/config
-    ln -s /path/to/symfttpd/genconf.php ./lighttpd.php
+    ln -s /path/to/symfttpd/genconf ./lighttpd.php
 
 lighttpd config:
 
@@ -159,7 +161,7 @@ or if you want a different default application:
 
 You have to restart lighttpd each time you add a file the the web/
 root. Hopefully it doesn't happen often. Also, don't forget to run
-`php symfony plugin:publish-assets`, or even better, `mksymlinks.php` before.
+`php symfony plugin:publish-assets`, or even better, `mksymlinks` before.
 
 
 ### Available options
@@ -177,8 +179,8 @@ For portability reasons, only short options (one letter) are used.
 
 Since now plugins' web dirs are handled by symbolic links,
 using an alias in the server config for /sf doesn't make sense.
-You can use `mksymlinks.php` to create this symlink and many
-others for you (including the symlink for `genconf.php`!).
+You can use `mksymlinks` to create this symlink and many
+others for you (including the symlink for `genconf`!).
 
 
 
@@ -202,7 +204,7 @@ No, and it probably never will be.
 
 ### Can I use genconf in production?
 
-Yes. I'd say you _should_, since the command line options of `genconf.php` are
+Yes. I'd say you _should_, since the command line options of `genconf` are
 thought for that particular use. genconf does not run symfony or any other
 external files, nor writes anything anywhere, so it is very little risk.
 
