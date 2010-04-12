@@ -228,5 +228,5 @@ Yes, just add `&` after your command.
 
 To stop a running symfttpd (backgrounding or not), just run:
 
-    /path/to/symfttpd/spawn --kill &
+    /path/to/symfttpd/spawn --kill
 
