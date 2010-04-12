@@ -37,15 +37,23 @@ need it, or deal with permissions, then this tool it for you.
 
 ### Quick start
 
-First, make sure that all symbolic links are created.
-You can use mksymlinks to help you with that.
+First, make sure that all required symbolic links are created.
+You can use `mksymlinks` (see below) to help you with that.
 
     cd /path/to/your-project
     /path/to/symfttpd/spawn
 
 It will display something like that:
 
-    lighttpd started on http://localhost:4042/
+    lighttpd started on 127.0.0.1, port 4042.
+
+    Available applications:
+     http://127.0.0.1:4042/backend.php
+     http://127.0.0.1:4042/backend_dev.php
+     http://127.0.0.1:4042/frontend_dev.php
+     http://127.0.0.1:4042/index.php
+
+    Press Ctrl+C to stop serving.
 
 All done!
 
@@ -58,11 +66,11 @@ by using the symfttpd.conf.php mechanism.
 
 ### Available options
 
-* `--path=<path>`: Use a different project path (default is current dir)
 * `--port=<port>` or `-p<port>`: Use a different port (default is `4042`)
     (useful for running multiple projects at the same time)
-* `--bind=<port>` or `-b<ip>`: Listen on a specific IP (default is `127.0.0.1`)
 * `--all` or `-A`: Listen on all interfaces (overrides `--bind`)
+* `--bind=<port>` or `-b<ip>`: Listen on a specific IP (default is `127.0.0.1`)
+* `--path=<path>`: Use a different project path (default is current dir)
 
 
 
@@ -89,7 +97,7 @@ Create a `config/symfttpd.conf.php` file with the following contents:
 
 All done!
 
-You should ignore all the symlinks in your version control system, but commit `config/symfttpd.conf.php` so other developers can use it if they wish to do so.
+You should ignore all the symlinks in your version control system, but commit `config/symfttpd.conf.php` so other developers can use symfttpd instantly if they wish to do so.
 
 
 ### Other typical setups
@@ -160,7 +168,7 @@ or if you want a different default application:
     }
 
 You have to restart lighttpd each time you add a file the the web/
-root. Hopefully it doesn't happen often. Also, don't forget to run
+root. Hopefully, it doesn't happen often. Also, don't forget to run
 `php symfony plugin:publish-assets`, or even better, `mksymlinks` before.
 
 
@@ -178,19 +186,13 @@ For portability reasons, only short options (one letter) are used.
 ### How is the /sf/ alias handled?
 
 Since now plugins' web dirs are handled by symbolic links,
-using an alias in the server config for /sf doesn't make sense.
+using an alias in the server config for /sf/ doesn't make sense.
 You can use `mksymlinks` to create this symlink and many
 others for you (including the symlink for `genconf`!).
 
 
 
 ## FAQ
-
-### Why do I get a warning about long options?
-
-Long options (starting with `--`) are only available on few systems prior
-to PHP 5.3.0.
-
 
 ### How do I pronounce it?!
 
@@ -205,7 +207,7 @@ No, and it probably never will be.
 ### Can I use genconf in production?
 
 Yes. I'd say you _should_, since the command line options of `genconf` are
-thought for that particular use. genconf does not run symfony or any other
+thought for that particular use. `genconf` does not run symfony or any other
 external files, nor writes anything anywhere, so it is very little risk.
 
 
