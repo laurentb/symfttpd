@@ -23,6 +23,24 @@ $options['bind'] = Argument::get('A', 'all', false)
 $options['project_path'] = $project_path;
 $options['config_dir'] = $project_path.'/cache/lighttpd';
 $options['log_dir'] = $project_path.'/log/lighttpd';
+// hack: .sf files are not removed by symfony cc
+$options['pidfile'] = $options['config_dir'].'/.sf';
+
+if (Argument::get('K', 'kill', false))
+{
+  if (file_exists($options['pidfile']))
+  {
+    $pid = trim(file_get_contents($options['pidfile']));
+    posix_kill($pid, SIGTERM);
+    echo 'Process '.$pid." killed\n";
+    exit(0);
+  }
+  else
+  {
+    echo "No running process found\n";
+    exit(1);
+  }
+}
 
 FileTools::mkdirs($options['config_dir']);
 FileTools::mkdirs($options['log_dir']);
@@ -89,3 +107,4 @@ flush();
 
 passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
 
+echo "Terminated\n";

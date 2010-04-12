@@ -220,3 +220,13 @@ Yes.
 
 No!
 
+### Can I start spawn in the background?
+
+Yes, just add `&` after your command.
+
+    /path/to/symfttpd/spawn &
+
+To stop a running symfttpd (backgrounding or not), just run:
+
+    /path/to/symfttpd/spawn --kill &
+

@@ -37,7 +37,7 @@ static-file.exclude-extensions = (".php")
 # http://redmine.lighttpd.net/issues/406
 server.force-lowercase-filenames = "disable"
 
-server.pid-file       = "<?php echo $config_dir ?>/lighttpd.pid"
+server.pid-file       = "<?php echo $pidfile ?>"
 
 server.errorlog       = "<?php echo $log_dir ?>/error.log"
 accesslog.filename    = "<?php echo $log_dir ?>/access.log"
