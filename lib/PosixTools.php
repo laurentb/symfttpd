@@ -1,15 +1,7 @@
 <?php
 
-class ExecutableNotFoundException extends Exception
+class ExecutableNotFoundError extends Exception
 {
-  protected $executable;
-
-  public function __construct(
-    $executable, $code = 0, Exception $previous = null)
-  {
-    $this->executable = $executable;
-    $this->message = $executable.' not found in path';
-  }
 }
 
 class PosixTools
@@ -26,16 +18,15 @@ class PosixTools
   {
     foreach (self::getPaths() as $dir)
     {
-      $path = $dir.'/'.$command;
-      if (is_executable($path))
+      $path = realpath($dir.'/'.$command);
+      if (!is_dir($path) && is_executable($path))
       {
 
-        return realpath($path);
+        return $path;
       }
-
     }
 
-    throw new ExecutableNotFoundException($command);
+    throw new ExecutableNotFoundError($command);
   }
 
   /**
@@ -47,7 +38,7 @@ class PosixTools
    *
    * @author Laurent Bachelier <laurent@bachelier.name>
    */
-  static protected function getPaths()
+  static public function getPaths()
   {
 
     return array_merge(

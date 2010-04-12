@@ -25,19 +25,33 @@ FileTools::mkdirs($options['config_dir']);
 FileTools::mkdirs($options['log_dir']);
 
 PosixTools::setCustomPath($options['custom_path']);
-if (empty($options['lighttpd_cmd']))
+try
 {
-  $options['lighttpd_cmd'] = PosixTools::which('lighttpd');
-}
+  if (empty($options['lighttpd_cmd']))
+  {
+    $options['lighttpd_cmd'] = PosixTools::which('lighttpd');
+  }
 
-if (empty($options['php_cgi_cmd']))
-{
-  $options['php_cgi_cmd'] = PosixTools::which('php-cgi');
-}
+  if (empty($options['php_cgi_cmd']))
+  {
+    $options['php_cgi_cmd'] = PosixTools::which('php-cgi');
+  }
 
-if (empty($options['php_cmd']))
+  if (empty($options['php_cmd']))
+  {
+    $options['php_cmd'] = PosixTools::which('php');
+  }
+}
+catch (ExecutableNotFoundError $e)
 {
-  $options['php_cmd'] = PosixTools::which('php');
+  /* Weird and ugly, sadly necessary to be sure
+   * something will be shown to the user */
+  echo "Required executable not found.\n ";
+  echo $e->getMessage();
+  echo ' not found in the specified paths: ';
+  echo implode(', ', PosixTools::getPaths());
+  echo "\n";
+  exit(1);
 }
 
 $config_file = $options['config_dir'].'/lighttpd.conf';
