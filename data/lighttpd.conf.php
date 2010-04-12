@@ -25,7 +25,7 @@ fastcgi.server = ( ".php" =>
   )
 )
 
-include "<?php echo dirname(__FILE__) ?>/mime-types.conf"
+include_shell "cat <?php echo escapeshellarg(dirname(__FILE__).'/mime-types.conf') ?>"
 server.indexfiles     = ("index.php", "index.html",
                         "index.htm", "default.htm")
 server.follow-symlink = "enable"
