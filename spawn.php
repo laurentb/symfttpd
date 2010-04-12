@@ -17,6 +17,9 @@ $project_path = Symfony::getProjectPath();
 $options = MultiConfig::get();
 
 $options['port'] = intval(Argument::get('p', 'port', 4042));
+$options['bind'] = Argument::get('A', 'all', false)
+                 ? false
+                 : Argument::get('b', 'bind', '127.0.0.1');
 $options['project_path'] = $project_path;
 $options['config_dir'] = $project_path.'/cache/lighttpd';
 $options['log_dir'] = $project_path.'/log/lighttpd';
@@ -61,8 +64,10 @@ file_put_contents(
 );
 
 // Pretty information. Nothing interesting code-wise.
-echo "lighttpd started on port ${options['port']}, all interfaces.\n\n";
-echo "Available applications:\n";
+echo 'lighttpd started on ';
+echo strlen($options['bind']) ? $options['bind'] : 'all interfaces';
+echo ', port '.$options['port'].'.';
+echo "\n\nAvailable applications:\n";
 $apps = array();
 foreach (new DirectoryIterator($project_path.'/web') as $file)
 {
@@ -71,10 +76,13 @@ foreach (new DirectoryIterator($project_path.'/web') as $file)
     $apps[] = $file->getFilename();
   }
 }
+$host = in_array($options['bind'], array(false, '0.0.0.0', '::'), true)
+      ? 'localhost'
+      : $options['bind'];
 sort($apps);
 foreach ($apps as $app)
 {
-  echo " http://localhost:${options['port']}/".$app."\n";
+  echo ' http://'.$host.':'.$options['port'].'/'.$app."\n";
 }
 echo "\nPress Ctrl+C to stop serving.\n";
 flush();

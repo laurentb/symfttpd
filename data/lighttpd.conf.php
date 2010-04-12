@@ -6,7 +6,10 @@ server.modules = (
 )
 
 server.port           = <?php echo $port ?>
-#server.bind          = "127.0.0.1"
+
+<?php if ($bind !== null): ?>
+server.bind          = "<?php echo $bind ?>"
+<?php endif ?>
 
 fastcgi.server = ( ".php" =>
   ( "localhost" =>

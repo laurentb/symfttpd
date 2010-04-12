@@ -58,8 +58,11 @@ by using the symfttpd.conf.php mechanism.
 
 ### Available options
 
-* `--path=<path>` : Use a different project path (default is current dir)
-* `--port=<port>` or `-p<port>` : Use a different port (default is 4042)
+* `--path=<path>`: Use a different project path (default is current dir)
+* `--port=<port>` or `-p<port>`: Use a different port (default is `4042`)
+    (useful for running multiple projects at the same time)
+* `--bind=<port>` or `-b<ip>`: Listen on a specific IP (default is `127.0.0.1`)
+* `--all` or `-A`: Listen on all interfaces (overrides `--bind`)
 
 
 
@@ -125,7 +128,7 @@ while project-level config is for things that only concern your project.
 
 ### Available options
 
-* `--path=<path>` : Use a different project path (default is current dir)
+* `--path=<path>`: Use a different project path (default is current dir)
 
 
 
@@ -161,11 +164,11 @@ root. Hopefully it doesn't happen often. Also, don't forget to run
 
 ### Available options
 
-* `-d <app>` (default) Change the default application (default being `index`)
-* `-o` (only) Do not allow any other application
-* `-a <app1,app2>` (allow) Useful with `-o`, allow some other applications
+* `-d <app>` (default): Change the default application (default being `index`)
+* `-o` (only): Do not allow any other application
+* `-a <app1,app2>` (allow): Useful with `-o`, allow some other applications
     (useful for allowing a `_dev` alternative, for example)
-* `-n <dir1,dir2>` (nophp) Deny PHP execution in the specified directories
+* `-n <dir1,dir2>` (nophp): Deny PHP execution in the specified directories
     (default being `uploads`).
 
 For portability reasons, only short options (one letter) are used.
