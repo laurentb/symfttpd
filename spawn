@@ -3,9 +3,7 @@
 /**
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
-
-error_reporting(E_ALL|E_STRICT);
-
+require dirname(__FILE__).'/lib/bootstrap.php';
 require dirname(__FILE__).'/lib/Argument.php';
 require dirname(__FILE__).'/lib/Template.php';
 require dirname(__FILE__).'/lib/FileTools.php';
