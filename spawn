@@ -28,10 +28,13 @@ if (Argument::get('K', 'kill', false))
 {
   if (file_exists($options['pidfile']))
   {
-    $pid = trim(file_get_contents($options['pidfile']));
-    posix_kill($pid, SIGTERM);
-    echo 'Process '.$pid." killed\n";
-    exit(0);
+    $pid = intval(trim(file_get_contents($options['pidfile'])));
+    if ($pid)
+    {
+      posix_kill($pid, SIGTERM);
+      echo 'Process '.$pid." killed\n";
+      exit(0);
+    }
   }
   else
   {
