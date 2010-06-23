@@ -29,6 +29,7 @@ if (Argument::get('K', 'kill', false))
   if (file_exists($options['pidfile']))
   {
     $pid = intval(trim(file_get_contents($options['pidfile'])));
+    unlink($options['pidfile']);
     if ($pid)
     {
       posix_kill($pid, SIGTERM);
@@ -36,11 +37,8 @@ if (Argument::get('K', 'kill', false))
       exit(0);
     }
   }
-  else
-  {
-    echo "No running process found\n";
-    exit(1);
-  }
+  echo "No running process found\n";
+  exit(1);
 }
 
 FileTools::mkdirs($options['config_dir']);
