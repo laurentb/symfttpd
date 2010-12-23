@@ -23,6 +23,13 @@ $options['config_dir'] = $project_path.'/cache/lighttpd';
 $options['log_dir'] = $project_path.'/log/lighttpd';
 // hack: .sf files are not removed by symfony cc
 $options['pidfile'] = $options['config_dir'].'/.sf';
+$options['fork'] = !Argument::get('s', '--single-process', false);
+if ($options['fork'] && !function_exists('pcntl_fork'))
+{
+  log_message('Warning: No fork() support.'
+      . 'symfttpd will run in single-process mode.');
+  $options['fork'] = false;
+}
 
 if (Argument::get('K', 'kill', false))
 {
