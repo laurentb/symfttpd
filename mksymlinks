@@ -28,17 +28,7 @@ function replace_symlink($project_path, $target, $link, $relative = true)
   FileTools::mkdirs(dirname($project_path.'/'.$link));
   $success = FileTools::symlink($target, $project_path.'/'.$link);
 
-  log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'));
-}
-
-/**
- * @param string $message
- *
- * @author Laurent Bachelier <laurent@bachelier.name>
- */
-function log_message($message)
-{
-  echo $message."\n";
+  log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'), !$success);
 }
 
 /**

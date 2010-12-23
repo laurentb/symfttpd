@@ -33,11 +33,11 @@ if (Argument::get('K', 'kill', false))
     if ($pid)
     {
       posix_kill($pid, SIGTERM);
-      echo 'Process '.$pid." killed\n";
+      log_message('Process '.$pid.' killed');
       exit(0);
     }
   }
-  echo "No running process found\n";
+  log_message('No running process found', true);
   exit(1);
 }
 
@@ -64,13 +64,10 @@ try
 }
 catch (ExecutableNotFoundError $e)
 {
-  /* Weird and ugly, sadly necessary to be sure
-   * something will be shown to the user */
-  echo "Required executable not found.\n ";
-  echo $e->getMessage();
-  echo ' not found in the specified paths: ';
-  echo implode(', ', PosixTools::getPaths());
-  echo "\n";
+  log_message("Required executable not found.", false);
+  log_message($e->getMessage()
+    . ' not found in the specified paths: '
+    . implode(', ', PosixTools::getPaths()), false);
   exit(1);
 }
 
@@ -81,10 +78,10 @@ file_put_contents(
 );
 
 // Pretty information. Nothing interesting code-wise.
-echo 'lighttpd started on ';
-echo strlen($options['bind']) ? $options['bind'] : 'all interfaces';
-echo ', port '.$options['port'].'.';
-echo "\n\nAvailable applications:\n";
+log_message('lighttpd started on '
+  . (strlen($options['bind']) ? $options['bind'] : 'all interfaces')
+  . ', port '.$options['port'].'.');
+log_message("\nAvailable applications");
 $apps = array();
 foreach (new DirectoryIterator($project_path.'/web') as $file)
 {
@@ -99,11 +96,11 @@ $host = in_array($options['bind'], array(false, '0.0.0.0', '::'), true)
 sort($apps);
 foreach ($apps as $app)
 {
-  echo ' http://'.$host.':'.$options['port'].'/'.$app."\n";
+  log_message(' http://'.$host.':'.$options['port'].'/'.$app);
 }
-echo "\nPress Ctrl+C to stop serving.\n";
+log_message("\nPress Ctrl+C to stop serving.");
 flush();
 
 passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
 
-echo "Terminated\n";
+log_message('Terminated');
