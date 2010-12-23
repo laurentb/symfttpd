@@ -108,6 +108,32 @@ foreach ($apps as $app)
 log_message("\nPress Ctrl+C to stop serving.");
 flush();
 
-passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
-
-log_message('Terminated');
+if (!$options['fork'])
+{
+  passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
+  log_message('Terminated');
+}
+else
+{
+  $pid = pcntl_fork();
+  if ($pid)
+  {
+    // Parent process
+    while (true)
+    {
+      sleep(1);
+      // TODO will do magical and revolutionary stuff
+    }
+  }
+  elseif ($pid == 0)
+  {
+    // Child process
+    passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
+    log_message('Terminated');
+  }
+  else
+  {
+    log_message('Unable to fork!');
+    exit(1);
+  }
+}
