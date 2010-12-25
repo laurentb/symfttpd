@@ -119,10 +119,18 @@ else
   if ($pid)
   {
     // Parent process
+    $prev_genconf = null;
     while (true)
     {
       sleep(1);
-      // TODO will do magical and revolutionary stuff
+      $handle = popen($options['php_cmd'].' '.$project_path.'/config/lighttpd.php', 'r');
+      $genconf = stream_get_contents($handle);
+      pclose($handle);
+      if ($prev_genconf !== null && $prev_genconf !== $genconf)
+      {
+        log_message('TODO restart lighttpd');
+      }
+      $prev_genconf = $genconf;
     }
   }
   elseif ($pid == 0)
