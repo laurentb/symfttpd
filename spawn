@@ -33,19 +33,7 @@ if ($options['fork'] && !function_exists('pcntl_fork'))
 
 if (Argument::get('K', 'kill', false))
 {
-  if (file_exists($options['pidfile']))
-  {
-    $pid = intval(trim(file_get_contents($options['pidfile'])));
-    unlink($options['pidfile']);
-    if ($pid)
-    {
-      posix_kill($pid, SIGTERM);
-      log_message('Process '.$pid.' killed');
-      exit(0);
-    }
-  }
-  log_message('No running process found', true);
-  exit(1);
+  exit(!PosixTools::killPid($options['pidfile']));
 }
 
 FileTools::mkdirs($options['config_dir']);
