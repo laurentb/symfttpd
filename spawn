@@ -23,6 +23,7 @@ $options['config_dir'] = $project_path.'/cache/lighttpd';
 $options['log_dir'] = $project_path.'/log/lighttpd';
 // hack: .sf files are not removed by symfony cc
 $options['pidfile'] = $options['config_dir'].'/.sf';
+$options['restartfile'] = $options['config_dir'].'/.symfttpd_restart';
 $options['fork'] = !Argument::get('s', '--single-process', false);
 if ($options['fork'] && !function_exists('pcntl_fork'))
 {
@@ -33,6 +34,10 @@ if ($options['fork'] && !function_exists('pcntl_fork'))
 
 if (Argument::get('K', 'kill', false))
 {
+  if (file_exists($options['restartfile']))
+  {
+    unlink($options['restartfile']);
+  }
   exit(!PosixTools::killPid($options['pidfile']));
 }
 
@@ -108,6 +113,7 @@ else
   {
     // Parent process
     $prev_genconf = null;
+    // TODO exit if lighttpd is properly killed (with -K for instance)
     while (true)
     {
       sleep(1);
@@ -116,7 +122,8 @@ else
       pclose($handle);
       if ($prev_genconf !== null && $prev_genconf !== $genconf)
       {
-        log_message('TODO restart lighttpd');
+        touch($options['restartfile']);
+        !PosixTools::killPid($options['pidfile']);
       }
       $prev_genconf = $genconf;
     }
@@ -124,8 +131,22 @@ else
   elseif ($pid == 0)
   {
     // Child process
-    passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
-    log_message('Terminated');
+    do
+    {
+      if (file_exists($options['restartfile']))
+      {
+        unlink($options['restartfile']);
+      }
+      passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
+      if (!file_exists($options['restartfile']))
+      {
+        log_message('Terminated.');
+      }
+      else
+      {
+        log_message('Restarting lighttpd.');
+      }
+    } while (file_exists($options['restartfile']));
   }
   else
   {
