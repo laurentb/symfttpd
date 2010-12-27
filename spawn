@@ -113,8 +113,8 @@ else
   if ($options['tail'])
   {
     $multitail = new MultiTail();
-    $multitail->add('lighttpd-access', new Tail($project_path.'/log/lighttpd/access.log'));
-    $multitail->add('lighttpd-error', new Tail($project_path.'/log/lighttpd/error.log'));
+    $multitail->add('lighttpd-access', new Tail($options['log_dir'].'/access.log'));
+    $multitail->add('lighttpd-error', new Tail($options['log_dir'].'/error.log'));
     // We have to do it before the fork to capture the startup messages
     $multitail->consume();
   }
