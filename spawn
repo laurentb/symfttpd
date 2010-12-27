@@ -113,9 +113,8 @@ else
   {
     // Parent process
     $prev_genconf = null;
-    while (true)
+    while (false !== sleep(1))
     {
-      sleep(1);
       $handle = popen($options['php_cmd'].' '.$project_path.'/config/lighttpd.php', 'r');
       $genconf = stream_get_contents($handle);
       pclose($handle);
