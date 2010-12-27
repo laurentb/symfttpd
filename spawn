@@ -26,7 +26,7 @@ $options['log_dir'] = $project_path.'/log/lighttpd';
 $options['pidfile'] = $options['config_dir'].'/.sf';
 $options['restartfile'] = $options['config_dir'].'/.symfttpd_restart';
 $options['tail'] = Argument::get('t', 'tail', false);
-$options['fork'] = !Argument::get('s', '--single-process', false);
+$options['fork'] = !Argument::get('s', 'single-process', false);
 if ($options['fork'] && !function_exists('pcntl_fork'))
 {
   log_message('Warning: No fork() support.'
