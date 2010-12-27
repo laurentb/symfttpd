@@ -104,7 +104,7 @@ flush();
 if (!$options['fork'])
 {
   passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
-  log_message('Terminated');
+  log_message('Terminated.');
 }
 else
 {
@@ -144,13 +144,13 @@ else
       }
       else
       {
-        log_message('Restarting lighttpd.');
+        log_message('Something in web/ changed. Restarting lighttpd.');
       }
     } while (file_exists($options['restartfile']));
   }
   else
   {
-    log_message('Unable to fork!');
+    log_message('Unable to fork!', true);
     exit(1);
   }
 }

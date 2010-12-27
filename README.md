@@ -167,9 +167,10 @@ or if you want a different default application:
       include_shell "/path/to/example.com/config/lighttpd.php --default=mobile"
     }
 
-You have to restart lighttpd each time you add a file the the web/
-root. Hopefully, it doesn't happen often. Also, don't forget to run
-`php symfony plugin:publish-assets`, or even better, `mksymlinks` before.
+If symfttpd is running in single-process mode, you have to restart lighttpd
+each time you add a file the the web/ root. Hopefully, it doesn't happen often.
+Also, don't forget to run `php symfony plugin:publish-assets`, or even better,
+`mksymlinks` before.
 
 
 ### Available options
