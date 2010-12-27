@@ -113,7 +113,6 @@ else
   {
     // Parent process
     $prev_genconf = null;
-    // TODO exit if lighttpd is properly killed (with -K for instance)
     while (true)
     {
       sleep(1);
@@ -126,6 +125,12 @@ else
         !PosixTools::killPid($options['pidfile']);
       }
       $prev_genconf = $genconf;
+
+      // If the children is defunct, we are finished here
+      if (pcntl_waitpid($pid, $status, WNOHANG))
+      {
+        exit(0);
+      }
     }
   }
   elseif ($pid == 0)
