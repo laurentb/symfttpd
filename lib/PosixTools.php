@@ -59,7 +59,7 @@ class PosixTools
 
   /**
    * Get a process ID from a file, and kill it, and remove the file either way.
-   * @param $pidfile Path to PID file
+   * @param string $pidfile Path to PID file
    * @return boolean Success
    *
    * @author Laurent Bachelier <laurent@bachelier.name>
