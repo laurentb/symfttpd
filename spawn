@@ -10,6 +10,7 @@ require dirname(__FILE__).'/lib/FileTools.php';
 require dirname(__FILE__).'/lib/PosixTools.php';
 require dirname(__FILE__).'/lib/MultiConfig.php';
 require dirname(__FILE__).'/lib/Symfony.php';
+require dirname(__FILE__).'/lib/Tail.php';
 
 $project_path = Symfony::getProjectPath();
 $options = MultiConfig::get();
@@ -24,6 +25,7 @@ $options['log_dir'] = $project_path.'/log/lighttpd';
 // hack: .sf files are not removed by symfony cc
 $options['pidfile'] = $options['config_dir'].'/.sf';
 $options['restartfile'] = $options['config_dir'].'/.symfttpd_restart';
+$options['tail'] = Argument::get('t', 'tail', false);
 $options['fork'] = !Argument::get('s', '--single-process', false);
 if ($options['fork'] && !function_exists('pcntl_fork'))
 {
@@ -108,6 +110,14 @@ if (!$options['fork'])
 }
 else
 {
+  if ($options['tail'])
+  {
+    $multitail = new MultiTail();
+    $multitail->add('lighttpd-access', new Tail($project_path.'/log/lighttpd/access.log'));
+    $multitail->add('lighttpd-error', new Tail($project_path.'/log/lighttpd/error.log'));
+    // We have to do it before the fork to capture the startup messages
+    $multitail->consume();
+  }
   $pid = pcntl_fork();
   if ($pid)
   {
@@ -124,6 +134,11 @@ else
         !PosixTools::killPid($options['pidfile']);
       }
       $prev_genconf = $genconf;
+
+      if ($options['tail'])
+      {
+        $multitail->consume();
+      }
 
       // If the children is defunct, we are finished here
       if (pcntl_waitpid($pid, $status, WNOHANG))
