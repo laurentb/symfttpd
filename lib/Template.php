@@ -19,4 +19,22 @@ class Template
 
     return ob_get_clean();
   }
+
+  /**
+   * Write the main lighttpd config file
+   * @param array $options
+   * @return boolean|integer Failure or number of bytes written
+   *
+   * @author Laurent Bachelier <laurent@bachelier.name>
+   */
+  static public function writeConfig($options)
+  {
+    $config_file = $options['config_dir'].'/lighttpd.conf';
+
+    return file_put_contents(
+      $config_file,
+      Template::get($options['config_template'], $options)
+    );
+  }
+
 }

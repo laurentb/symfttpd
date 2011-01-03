@@ -21,6 +21,7 @@ $options['bind'] = Argument::get('A', 'all', false)
                  : Argument::get('b', 'bind', '127.0.0.1');
 $options['project_path'] = $project_path;
 $options['config_dir'] = $project_path.'/cache/lighttpd';
+$options['config_file'] = $options['config_dir'].'/lighttpd.conf';
 $options['log_dir'] = $project_path.'/log/lighttpd';
 // hack: .sf files are not removed by symfony cc
 $options['pidfile'] = $options['config_dir'].'/.sf';
@@ -73,11 +74,7 @@ catch (ExecutableNotFoundError $e)
   exit(1);
 }
 
-$config_file = $options['config_dir'].'/lighttpd.conf';
-file_put_contents(
-  $config_file,
-  Template::get($options['config_template'], $options)
-);
+Template::writeConfig($options);
 
 // Pretty information. Nothing interesting code-wise.
 log_message('lighttpd started on '
@@ -105,7 +102,7 @@ flush();
 
 if (!$options['fork'])
 {
-  passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
+  passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($options['config_file']));
   log_message('Terminated.');
 }
 else
@@ -156,7 +153,7 @@ else
       {
         unlink($options['restartfile']);
       }
-      passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
+      passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($options['config_file']));
       if (!file_exists($options['restartfile']))
       {
         log_message('Terminated.');
@@ -164,6 +161,7 @@ else
       else
       {
         log_message('Something in web/ changed. Restarting lighttpd.');
+        Template::writeConfig($options);
       }
     } while (file_exists($options['restartfile']));
   }
