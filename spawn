@@ -11,6 +11,7 @@ require dirname(__FILE__).'/lib/PosixTools.php';
 require dirname(__FILE__).'/lib/MultiConfig.php';
 require dirname(__FILE__).'/lib/Symfony.php';
 require dirname(__FILE__).'/lib/Tail.php';
+require dirname(__FILE__).'/lib/Color.php';
 
 $project_path = Symfony::getProjectPath();
 $options = MultiConfig::get();
@@ -33,6 +34,11 @@ if ($options['fork'] && !function_exists('pcntl_fork'))
   log_message('Warning: No fork() support.'
       . 'symfttpd will run in single-process mode.');
   $options['fork'] = false;
+}
+$options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);
+if ($options['color'])
+{
+  Color::enable();
 }
 
 if (Argument::get('K', 'kill', false))
@@ -67,7 +73,7 @@ try
 }
 catch (ExecutableNotFoundError $e)
 {
-  log_message("Required executable not found.", false);
+  log_message('Required executable not found.', false);
   log_message($e->getMessage()
     . ' not found in the specified paths: '
     . implode(', ', PosixTools::getPaths()), false);
@@ -80,7 +86,7 @@ Template::writeConfig($options);
 log_message('lighttpd started on '
   . (strlen($options['bind']) ? $options['bind'] : 'all interfaces')
   . ', port '.$options['port'].'.');
-log_message("\nAvailable applications");
+log_message("\nAvailable applications:");
 $apps = array();
 foreach (new DirectoryIterator($project_path.'/web') as $file)
 {
@@ -110,8 +116,8 @@ else
   if ($options['tail'])
   {
     $multitail = new MultiTail();
-    $multitail->add('lighttpd-access', new Tail($options['log_dir'].'/access.log'));
-    $multitail->add('lighttpd-error', new Tail($options['log_dir'].'/error.log'));
+    $multitail->add(Color::fgColor('blue').'lighttpd-access'.Color::style('normal'), new Tail($options['log_dir'].'/access.log'));
+    $multitail->add(Color::fgColor('red').'lighttpd-error'.Color::style('normal'), new Tail($options['log_dir'].'/error.log'));
     // We have to do it before the fork to capture the startup messages
     $multitail->consume();
   }
@@ -160,7 +166,7 @@ else
       }
       else
       {
-        log_message('Something in web/ changed. Restarting lighttpd.');
+        log_message(Color::style('bright').'Something in web/ changed. Restarting lighttpd.'.Color::style('normal'));
         Template::writeConfig($options);
       }
     } while (file_exists($options['restartfile']));
