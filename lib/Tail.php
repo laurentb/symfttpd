@@ -40,10 +40,23 @@ class Tail
     else
     {
       fseek($fd, $this->pos, SEEK_SET);
-      // TODO handle file truncation
     }
     $line = fgets($fd);
     $this->pos = ftell($fd);
+
+    if ($line === false)
+    {
+      /* Detect file truncation.
+       * There seem to be no better way, as fseek will accept
+       * to go over EOF and fgets will not handle it differently either.
+       */
+      $stat = fstat($fd);
+      if ($stat['size'] < $this->pos)
+      {
+        // rewind
+        $this->pos = 0;
+      }
+    }
     fclose($fd);
 
     return $line;
