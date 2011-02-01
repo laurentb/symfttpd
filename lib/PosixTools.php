@@ -57,5 +57,30 @@ class PosixTools
     self::$custom_path = $custom_path;
   }
 
+  /**
+   * Get a process ID from a file, and kill it, and remove the file either way.
+   * @param string $pidfile Path to PID file
+   * @return boolean Success
+   *
+   * @author Laurent Bachelier <laurent@bachelier.name>
+   */
+  static public function killPid($pidfile)
+  {
+    if (file_exists($pidfile))
+    {
+      $pid = intval(trim(file_get_contents($pidfile)));
+      unlink($pidfile);
+      if ($pid)
+      {
+        posix_kill($pid, SIGTERM);
+        log_message('Process '.$pid.' killed');
+
+        return true;
+      }
+    }
+    log_message('No running process found', true);
+
+    return false;
+  }
 }
 
