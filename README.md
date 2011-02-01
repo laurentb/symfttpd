@@ -71,12 +71,19 @@ by using the symfttpd.conf.php mechanism.
 * `--all` or `-A`: Listen on all interfaces (overrides `--bind`)
 * `--bind=<port>` or `-b<ip>`: Listen on a specific IP (default is `127.0.0.1`)
 * `--path=<path>`: Use a different project path (default is current dir)
+* `--tail` or `t`: Display server logs in the console
+    (like the UNIX `tail` command would do)
+* `--no-color` or `C`: Disable colored output
+    (also automatically disabled if the output is piped)
+* `--single-process` or `-s`: Do not try to run lighttpd in another process
+    (not recommended, you will lose auto-reloading of the rewriting rules)
 
 
 
 ## mksymlinks
 
-If you don't want to spend time with repetitive symlink creation each time you set up a new project, then this tool is for you.
+If you don't want to spend time with repetitive symlink creation each time
+you set up a new project, then this tool is for you.
 
 
 ### Quick start
@@ -167,8 +174,9 @@ or if you want a different default application:
       include_shell "/path/to/example.com/config/lighttpd.php --default=mobile"
     }
 
-If symfttpd is running in single-process mode, you have to restart lighttpd
-each time you add a file the the web/ root. Hopefully, it doesn't happen often.
+If symfttpd is running in single-process mode, or you only running an independent
+lighttpd, you have to restart it each time you add a file the the web/ root.
+Hopefully, it doesn't happen often.
 Also, don't forget to run `php symfony plugin:publish-assets`, or even better,
 `mksymlinks` before.
 
