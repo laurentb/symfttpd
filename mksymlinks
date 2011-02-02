@@ -103,7 +103,11 @@ if ($options['do_plugins'])
   if (version_compare($options['want'], '1.2') >= 0)
   {
     log_message('Creating symbolic links for plugins... (calling symfony)');
-    system('/usr/bin/env php symfony plugin:publish-assets');
+    if (empty($options['php_cmd']))
+    {
+      $options['php_cmd'] = PosixTools::which('php');
+    }
+    system(trim($options['php_cmd'].' symfony plugin:publish-assets'));
   }
   else
   {
