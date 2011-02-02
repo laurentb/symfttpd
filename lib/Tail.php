@@ -66,6 +66,8 @@ class Tail
 class MultiTail
 {
   protected $tails = array();
+  protected $prefixes = array();
+  protected $postfixes = array();
 
   /**
    * Adds a Tail to watch
@@ -74,9 +76,11 @@ class MultiTail
    *
    * @author Laurent Bachelier <laurent@bachelier.name>
    */
-  public function add($name, $tail)
+  public function add($name, $tail, $prefix = '', $postfix = '')
   {
     $this->tails[$name] = $tail;
+    $this->prefixes[$name] = $prefix;
+    $this->postfixes[$name] = $postfix;
   }
 
   /**
@@ -104,7 +108,7 @@ class MultiTail
   {
     if (is_string($line))
     {
-      echo $name.': '.$line;
+      echo $this->prefixes[$name].$name.': '.$line.$this->postfixes[$name];
 
       return true;
     }

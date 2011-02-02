@@ -84,8 +84,12 @@ Template::writeConfig($options);
 
 // Pretty information. Nothing interesting code-wise.
 log_message('lighttpd started on '
+  . Color::style('bright')
   . (strlen($options['bind']) ? $options['bind'] : 'all interfaces')
-  . ', port '.$options['port'].'.');
+  . Color::style('normal')
+  . ', port '
+  . Color::style('bright') . $options['port'] . Color::style('normal')
+  . '.');
 log_message("\nAvailable applications:");
 $apps = array();
 foreach (new DirectoryIterator($project_path.'/web') as $file)
@@ -101,7 +105,8 @@ $host = in_array($options['bind'], array(false, '0.0.0.0', '::'), true)
 sort($apps);
 foreach ($apps as $app)
 {
-  log_message(' http://'.$host.':'.$options['port'].'/'.$app);
+  log_message(' http://'.$host.':'.$options['port']
+      .'/'.Color::style('bright').$app.Color::style('normal'));
 }
 log_message("\nPress Ctrl+C to stop serving.");
 flush();
@@ -116,8 +121,10 @@ else
   if ($options['tail'])
   {
     $multitail = new MultiTail();
-    $multitail->add(Color::fgColor('blue').'lighttpd-access'.Color::style('normal'), new Tail($options['log_dir'].'/access.log'));
-    $multitail->add(Color::fgColor('red').'lighttpd-error'.Color::style('normal'), new Tail($options['log_dir'].'/error.log'));
+    $multitail->add('access', new Tail($options['log_dir'].'/access.log'),
+      Color::fgColor('blue'), Color::style('normal'));
+    $multitail->add(' error', new Tail($options['log_dir'].'/error.log'),
+      Color::style('bright').Color::fgColor('red'), Color::style('normal'));
     // We have to do it before the fork to capture the startup messages
     $multitail->consume();
   }
