@@ -7,7 +7,7 @@ server.modules = (
 
 server.port           = <?php echo $port ?>
 
-<?php if ($bind !== null): ?>
+<?php if (isset($bind) && $bind !== null): ?>
 server.bind          = "<?php echo $bind ?>"
 <?php endif ?>
 
@@ -37,7 +37,9 @@ static-file.exclude-extensions = (".php")
 # http://redmine.lighttpd.net/issues/406
 server.force-lowercase-filenames = "disable"
 
+<?php if (isset($pidfile) && $pidfile): ?>
 server.pid-file       = "<?php echo $pidfile ?>"
+<?php endif; ?>
 
 server.errorlog       = "<?php echo $log_dir ?>/error.log"
 accesslog.filename    = "<?php echo $log_dir ?>/access.log"
