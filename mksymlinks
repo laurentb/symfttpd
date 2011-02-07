@@ -8,6 +8,7 @@ require(dirname(__FILE__).'/lib/FileTools.php');
 require(dirname(__FILE__).'/lib/MultiConfig.php');
 require(dirname(__FILE__).'/lib/Symfony.php');
 require(dirname(__FILE__).'/lib/Argument.php');
+require(dirname(__FILE__).'/lib/Color.php');
 
 /**
  * @pram string $project_path Absolute project path
@@ -28,17 +29,7 @@ function replace_symlink($project_path, $target, $link, $relative = true)
   FileTools::mkdirs(dirname($project_path.'/'.$link));
   $success = FileTools::symlink($target, $project_path.'/'.$link);
 
-  log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'));
-}
-
-/**
- * @param string $message
- *
- * @author Laurent Bachelier <laurent@bachelier.name>
- */
-function log_message($message)
-{
-  echo $message."\n";
+  log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'), !$success);
 }
 
 /**
@@ -68,10 +59,18 @@ function find_plugins($project_path)
 
 
 $options = MultiConfig::get();
+$options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);
+if ($options['color'])
+{
+  Color::enable();
+}
 
 $project_path = Symfony::getProjectPath();
 
-log_message("Using symfony version ".$options['want']);
+log_message(Color::style('bright') . Color::fgColor('green')
+  . 'Using symfony version ' . Color::style('normal')
+  . Color::fgColor('yellow') . $options['want'] . Color::style('normal'));
+
 $symlinks = array();
 if ($options['genconf'])
 {
@@ -99,11 +98,13 @@ foreach (array(
   }
 }
 
-log_message('Creating required directories...');
+log_message(Color::style('bright') . Color::fgColor('green')
+  . 'Creating required directories...' . Color::style('normal'));
 FileTools::mkdirs($project_path.'/cache');
 FileTools::mkdirs($project_path.'/log');
 
-log_message('Creating symbolic links...');
+log_message(Color::style('bright') . Color::fgColor('green')
+  . 'Creating symbolic links...' . Color::style('normal'));
 foreach ($symlinks as $link => $target)
 {
   replace_symlink($project_path, $target, $link, $options['relative']);
@@ -112,12 +113,20 @@ if ($options['do_plugins'])
 {
   if (version_compare($options['want'], '1.2') >= 0)
   {
-    log_message('Creating symbolic links for plugins... (calling symfony)');
-    system('/usr/bin/env php symfony plugin:publish-assets');
+    log_message(Color::style('bright') . Color::fgColor('green')
+      . 'Creating symbolic links for plugins... (calling symfony)'
+      . Color::style('normal'));
+    if (empty($options['php_cmd']))
+    {
+      $options['php_cmd'] = PosixTools::which('php');
+    }
+    system(trim($options['php_cmd'].' symfony plugin:publish-assets'));
   }
   else
   {
-    log_message('Creating symbolic links for plugins... (internal method)');
+    log_message(Color::style('bright') . Color::fgColor('green')
+      . 'Creating symbolic links for plugins... (internal method)'
+      . Color::style('normal'));
     foreach (find_plugins($project_path) as $name)
     {
       $link = 'web/'.$name;

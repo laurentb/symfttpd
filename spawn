@@ -10,6 +10,8 @@ require dirname(__FILE__).'/lib/FileTools.php';
 require dirname(__FILE__).'/lib/PosixTools.php';
 require dirname(__FILE__).'/lib/MultiConfig.php';
 require dirname(__FILE__).'/lib/Symfony.php';
+require dirname(__FILE__).'/lib/Tail.php';
+require dirname(__FILE__).'/lib/Color.php';
 
 $project_path = Symfony::getProjectPath();
 $options = MultiConfig::get();
@@ -20,25 +22,32 @@ $options['bind'] = Argument::get('A', 'all', false)
                  : Argument::get('b', 'bind', '127.0.0.1');
 $options['project_path'] = $project_path;
 $options['config_dir'] = $project_path.'/cache/lighttpd';
+$options['config_file'] = $options['config_dir'].'/lighttpd.conf';
 $options['log_dir'] = $project_path.'/log/lighttpd';
 // hack: .sf files are not removed by symfony cc
 $options['pidfile'] = $options['config_dir'].'/.sf';
+$options['restartfile'] = $options['config_dir'].'/.symfttpd_restart';
+$options['tail'] = Argument::get('t', 'tail', false);
+$options['fork'] = !Argument::get('s', 'single-process', false);
+if ($options['fork'] && !function_exists('pcntl_fork'))
+{
+  log_message('Warning: No fork() support.'
+      . 'symfttpd will run in single-process mode.');
+  $options['fork'] = false;
+}
+$options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);
+if ($options['color'])
+{
+  Color::enable();
+}
 
 if (Argument::get('K', 'kill', false))
 {
-  if (file_exists($options['pidfile']))
+  if (file_exists($options['restartfile']))
   {
-    $pid = intval(trim(file_get_contents($options['pidfile'])));
-    unlink($options['pidfile']);
-    if ($pid)
-    {
-      posix_kill($pid, SIGTERM);
-      echo 'Process '.$pid." killed\n";
-      exit(0);
-    }
+    unlink($options['restartfile']);
   }
-  echo "No running process found\n";
-  exit(1);
+  exit(!PosixTools::killPid($options['pidfile']));
 }
 
 FileTools::mkdirs($options['config_dir']);
@@ -64,27 +73,24 @@ try
 }
 catch (ExecutableNotFoundError $e)
 {
-  /* Weird and ugly, sadly necessary to be sure
-   * something will be shown to the user */
-  echo "Required executable not found.\n ";
-  echo $e->getMessage();
-  echo ' not found in the specified paths: ';
-  echo implode(', ', PosixTools::getPaths());
-  echo "\n";
+  log_message('Required executable not found.', false);
+  log_message($e->getMessage()
+    . ' not found in the specified paths: '
+    . implode(', ', PosixTools::getPaths()), false);
   exit(1);
 }
 
-$config_file = $options['config_dir'].'/lighttpd.conf';
-file_put_contents(
-  $config_file,
-  Template::get($options['config_template'], $options)
-);
+Template::writeConfig($options);
 
 // Pretty information. Nothing interesting code-wise.
-echo 'lighttpd started on ';
-echo strlen($options['bind']) ? $options['bind'] : 'all interfaces';
-echo ', port '.$options['port'].'.';
-echo "\n\nAvailable applications:\n";
+log_message('lighttpd started on '
+  . Color::style('bright')
+  . (strlen($options['bind']) ? $options['bind'] : 'all interfaces')
+  . Color::style('normal')
+  . ', port '
+  . Color::style('bright') . $options['port'] . Color::style('normal')
+  . '.');
+log_message("\nAvailable applications:");
 $apps = array();
 foreach (new DirectoryIterator($project_path.'/web') as $file)
 {
@@ -99,11 +105,82 @@ $host = in_array($options['bind'], array(false, '0.0.0.0', '::'), true)
 sort($apps);
 foreach ($apps as $app)
 {
-  echo ' http://'.$host.':'.$options['port'].'/'.$app."\n";
+  log_message(' http://'.$host.':'.$options['port']
+      .'/'.Color::style('bright').$app.Color::style('normal'));
 }
-echo "\nPress Ctrl+C to stop serving.\n";
+log_message("\nPress Ctrl+C to stop serving.");
 flush();
 
-passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($config_file));
+if (!$options['fork'])
+{
+  passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($options['config_file']));
+  log_message('Terminated.');
+}
+else
+{
+  if ($options['tail'])
+  {
+    $multitail = new MultiTail();
+    $multitail->add('access', new Tail($options['log_dir'].'/access.log'),
+      Color::fgColor('blue'), Color::style('normal'));
+    $multitail->add(' error', new Tail($options['log_dir'].'/error.log'),
+      Color::style('bright').Color::fgColor('red'), Color::style('normal'));
+    // We have to do it before the fork to capture the startup messages
+    $multitail->consume();
+  }
+  $pid = pcntl_fork();
+  if ($pid)
+  {
+    // Parent process
+    $prev_genconf = null;
+    while (false !== sleep(1))
+    {
+      $handle = popen($options['php_cmd'].' '.$project_path.'/config/lighttpd.php', 'r');
+      $genconf = stream_get_contents($handle);
+      pclose($handle);
+      if ($prev_genconf !== null && $prev_genconf !== $genconf)
+      {
+        touch($options['restartfile']);
+        !PosixTools::killPid($options['pidfile']);
+      }
+      $prev_genconf = $genconf;
 
-echo "Terminated\n";
+      if ($options['tail'])
+      {
+        $multitail->consume();
+      }
+
+      // If the children is defunct, we are finished here
+      if (pcntl_waitpid($pid, $status, WNOHANG))
+      {
+        exit(0);
+      }
+    }
+  }
+  elseif ($pid == 0)
+  {
+    // Child process
+    do
+    {
+      if (file_exists($options['restartfile']))
+      {
+        unlink($options['restartfile']);
+      }
+      passthru($options['lighttpd_cmd'].' -D -f '.escapeshellarg($options['config_file']));
+      if (!file_exists($options['restartfile']))
+      {
+        log_message('Terminated.');
+      }
+      else
+      {
+        log_message(Color::style('bright').'Something in web/ changed. Restarting lighttpd.'.Color::style('normal'));
+        Template::writeConfig($options);
+      }
+    } while (file_exists($options['restartfile']));
+  }
+  else
+  {
+    log_message('Unable to fork!', true);
+    exit(1);
+  }
+}
