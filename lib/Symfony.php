@@ -12,9 +12,9 @@ class Symfony
   static public function getProjectPath()
   {
     $project_path = realpath(Argument::get('P', 'path', getcwd()));
-    if (!is_file($project_path.'/symfony'))
+    if (!is_file($project_path.'/app/console'))
     {
-      throw new Exception('Not in a symfony project');
+      throw new Exception('Not in a Symfony2 project');
     }
 
     return $project_path;

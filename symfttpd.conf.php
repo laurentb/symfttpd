@@ -23,7 +23,7 @@ $options['path'] = dirname(__FILE__);
  * Create the symlink to genconf
  * @var string|boolean false or path relative to the project root
  */
-$options['genconf'] = 'config/lighttpd.php';
+$options['genconf'] = 'symfttpd/lighttpd.php';
 
 /**
  * Create the symlink to the symfony data directory
@@ -71,7 +71,7 @@ $options['relative'] = true;
  * You should override this in the project-level config
  * @var string
  */
-$options['want'] = '1.4';
+$options['want'] = '2.0';
 
 
 /**

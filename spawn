@@ -21,9 +21,9 @@ $options['bind'] = Argument::get('A', 'all', false)
                  ? false
                  : Argument::get('b', 'bind', '127.0.0.1');
 $options['project_path'] = $project_path;
-$options['config_dir'] = $project_path.'/cache/lighttpd';
+$options['config_dir'] = $project_path.'/symfttpd';
 $options['config_file'] = $options['config_dir'].'/lighttpd.conf';
-$options['log_dir'] = $project_path.'/log/lighttpd';
+$options['log_dir'] = $project_path.'/symfttpd/log';
 // hack: .sf files are not removed by symfony cc
 $options['pidfile'] = $options['config_dir'].'/.sf';
 $options['restartfile'] = $options['config_dir'].'/.symfttpd_restart';
@@ -135,7 +135,7 @@ else
     $prev_genconf = null;
     while (false !== sleep(1))
     {
-      $handle = popen($options['php_cmd'].' '.$project_path.'/config/lighttpd.php', 'r');
+      $handle = popen($options['php_cmd'].' '.$options['config_dir'].'/lighttpd.php', 'r');
       $genconf = stream_get_contents($handle);
       pclose($handle);
       if ($prev_genconf !== null && $prev_genconf !== $genconf)
