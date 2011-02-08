@@ -9,11 +9,13 @@ require dirname(__FILE__).'/lib/Template.php';
 require dirname(__FILE__).'/lib/FileTools.php';
 require dirname(__FILE__).'/lib/PosixTools.php';
 require dirname(__FILE__).'/lib/MultiConfig.php';
-require dirname(__FILE__).'/lib/Symfony.php';
+require dirname(__FILE__).'/lib/Application.php';
+require dirname(__FILE__).'/lib/Symfony1.php';
 require dirname(__FILE__).'/lib/Tail.php';
 require dirname(__FILE__).'/lib/Color.php';
 
-$project_path = Symfony::getProjectPath();
+$application = new Symfony1(Argument::get('P', 'path', null));
+$project_path = $application->getProjectPath();
 $options = MultiConfig::get();
 
 $options['port'] = intval(Argument::get('p', 'port', 4042));

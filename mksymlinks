@@ -6,7 +6,8 @@
 require(dirname(__FILE__).'/lib/bootstrap.php');
 require(dirname(__FILE__).'/lib/FileTools.php');
 require(dirname(__FILE__).'/lib/MultiConfig.php');
-require(dirname(__FILE__).'/lib/Symfony.php');
+require(dirname(__FILE__).'/lib/Application.php');
+require(dirname(__FILE__).'/lib/Symfony1.php');
 require(dirname(__FILE__).'/lib/Argument.php');
 require(dirname(__FILE__).'/lib/Color.php');
 
@@ -65,7 +66,8 @@ if ($options['color'])
   Color::enable();
 }
 
-$project_path = Symfony::getProjectPath();
+$application = new Symfony1(Argument::get('P', 'path', null));
+$project_path = $application->getProjectPath();
 
 log_message(Color::style('bright') . Color::fgColor('green')
   . 'Using symfony version ' . Color::style('normal')
