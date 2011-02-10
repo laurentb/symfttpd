@@ -135,7 +135,7 @@ else
     $prev_genconf = null;
     while (false !== sleep(1))
     {
-      $handle = popen($options['php_cmd'].' '.$project_path.'/config/lighttpd.php', 'r');
+      $handle = popen($options['php_cmd'].' '.escapeshellarg($project_path.'/config/lighttpd.php'), 'r');
       $genconf = stream_get_contents($handle);
       pclose($handle);
       if ($prev_genconf !== null && $prev_genconf !== $genconf)
