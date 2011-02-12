@@ -33,31 +33,6 @@ function replace_symlink($project_path, $target, $link, $relative = true)
   log_message('  '.$link.' => '.$target.($success ? '' : ' ...FAILED!'), !$success);
 }
 
-/**
- * Find plugins with a "web" directory
- * @param string $project_path
- * @return array Plugin names
- *
- * @author Laurent Bachelier <laurent@bachelier.name>
- */
-function find_plugins($project_path)
-{
-  $plugins = array();
-  foreach (new DirectoryIterator($project_path."/plugins") as $file)
-  {
-    $name = $file->getFilename();
-    if ($file->isDir()
-        && preg_match('/^[^\.].+Plugin$/', $name)
-        && is_dir($project_path.'/plugins/'.$name.'/web')
-    )
-    {
-      $plugins[] = $name;
-    }
-  }
-
-  return $plugins;
-}
-
 
 $options = MultiConfig::get();
 $options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);
@@ -66,7 +41,7 @@ if ($options['color'])
   Color::enable();
 }
 
-$application = new Symfony1(Argument::get('P', 'path', null));
+$application = new Symfony1(Argument::get('P', 'path', null), $options['want']);
 $project_path = $application->getProjectPath();
 
 log_message(Color::style('bright') . Color::fgColor('green')
@@ -80,13 +55,7 @@ if ($options['genconf'])
 }
 
 $sf_path = $options['sf_path'][$options['want']];
-foreach (array(
-    'symfony_symlink' => '',
-    'lib_symlink' => 'lib',
-    'data_symlink' => 'data',
-    'web_symlink' => 'data/web/sf',
-  )
-  as $option => $relpath)
+foreach ($application->getAvailableLinks() as $option => $relpath)
 {
   $link = $options[$option];
   if ($link)
@@ -129,7 +98,7 @@ if ($options['do_plugins'])
     log_message(Color::style('bright') . Color::fgColor('green')
       . 'Creating symbolic links for plugins... (internal method)'
       . Color::style('normal'));
-    foreach (find_plugins($project_path) as $name)
+    foreach ($application->findPlugins() as $name)
     {
       $link = 'web/'.$name;
       $target = $project_path.'/plugins/'.$name.'/web';
