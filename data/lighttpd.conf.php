@@ -2,6 +2,7 @@ server.modules = (
     "mod_rewrite",
     "mod_access",
     "mod_accesslog",
+    "mod_setenv",
     "mod_fastcgi"
 )
 
