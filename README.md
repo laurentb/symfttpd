@@ -71,9 +71,9 @@ by using the symfttpd.conf.php mechanism.
 * `--all` or `-A`: Listen on all interfaces (overrides `--bind`)
 * `--bind=<port>` or `-b<ip>`: Listen on a specific IP (default is `127.0.0.1`)
 * `--path=<path>`: Use a different project path (default is current dir)
-* `--tail` or `t`: Display server logs in the console
+* `--tail` or `-t`: Display server logs in the console
     (like the UNIX `tail` command would do)
-* `--no-color` or `C`: Disable colored output
+* `--no-color` or `-C`: Disable colored output
     (also automatically disabled if the output is piped)
 * `--single-process` or `-s`: Do not try to run lighttpd in another process
     (not recommended, you will lose auto-reloading of the rewriting rules)
