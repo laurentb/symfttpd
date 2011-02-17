@@ -117,6 +117,12 @@ $options['php_cmd'] = realpath(PHP_BINDIR.'/php');
 $options['php_cgi_cmd'] = realpath(PHP_BINDIR.'/php-cgi');
 
 /**
+ * Command to generate the docroot and rewriting config.
+ * @var string|false false to use included genconf tool with default parametrs
+ */
+$options['genconf_cmd'] = false;
+
+/**
  * Default server template path
  * @var string|null null to autodetect (try to find "php-cgi" in the path)
  */
