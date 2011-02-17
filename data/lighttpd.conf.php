@@ -46,5 +46,5 @@ accesslog.filename    = "<?php echo $log_dir ?>/access.log"
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"
 
-include_shell "<?php echo $php_cmd ?> <?php echo escapeshellarg($project_path.'/'.$genconf) ?>"
+include_shell "<?php echo $genconf_cmd ?>"
 

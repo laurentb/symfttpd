@@ -82,6 +82,10 @@ catch (ExecutableNotFoundError $e)
   exit(1);
 }
 
+if ($options['genconf_cmd'] === false)
+{
+  $options['genconf_cmd'] = $options['php_cmd'].' '.escapeshellarg(realpath(dirname(__FILE__)).'/genconf').' -p '.escapeshellarg($options['project_path'].'/web');
+}
 Template::writeConfig($options);
 
 // Pretty information. Nothing interesting code-wise.
@@ -137,7 +141,7 @@ else
     $prev_genconf = null;
     while (false !== sleep(1))
     {
-      $handle = popen($options['php_cmd'].' '.$project_path.'/config/lighttpd.php', 'r');
+      $handle = popen($options['genconf_cmd'], 'r');
       $genconf = stream_get_contents($handle);
       pclose($handle);
       if ($prev_genconf !== null && $prev_genconf !== $genconf)

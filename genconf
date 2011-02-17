@@ -6,14 +6,15 @@
 
 error_reporting(E_ALL|E_STRICT);
 
-$opts = getopt('d:oa:n:');
+$opts = getopt('d:oa:n:p:');
 $opt_keys = array(
   'd'=>'default',
   'o'=>'only',
   'a'=>'allow',
   'n'=>'nophp',
+  'p'=>'path',
 );
-$options = array('default'=>'index', 'allow'=>false, 'nophp'=>false);
+$options = array('default'=>'index', 'allow'=>false, 'nophp'=>false, 'path'=>null);
 foreach ($opts as $kopt => $opt)
 {
   $options[$opt_keys[$kopt]] = $opt;
@@ -25,11 +26,13 @@ $options['allow'] = $options['allow']
 $options['nophp'] = $options['nophp']
                   ? explode(',', $options['nophp'])
                   : array('uploads');
+$options['path'] = $options['path']
+                  ? realpath($options['path'])
+                  // Not using __FILE__ since it resolves symlinks
+                  : realpath(dirname($argv[0]).'/../web');
 
-// Not using __FILE__ since it resolves symlinks
-$path = realpath(dirname($argv[0]).'/../web');
 $files = array('dir'=>array(), 'php'=>array(), 'file'=>array());
-foreach (new DirectoryIterator($path) as $file)
+foreach (new DirectoryIterator($options['path']) as $file)
 {
   $name = $file->getFilename();
   if ($name[0] != '.')
@@ -53,7 +56,7 @@ foreach ($options['allow'] as $name)
   $files['php'][] = $name.'.php';
 }
 ?>
-server.document-root = "<?php echo $path ?>"
+server.document-root = "<?php echo $options['path'] ?>"
 
 url.rewrite-once = (
 <?php foreach ($files['dir'] as $name): ?>

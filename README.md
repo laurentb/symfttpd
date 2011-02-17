@@ -149,14 +149,38 @@ while project-level config is for things that only concern your project.
 
 ## genconf
 
-If you don't want to copy/paste lighttpd configs, handle regexps when
-you add files, or fight rewriting issues (which can often happen
+If you don't want to copy/paste lighttpd configs, handle regular expressions
+when you add files, or fight rewriting issues (which can often happen
 considering that most available examples are badly written),
 then this tool is for you. It is also used internally by `spawn`.
 
 
 ### Quick start
 
+lighttpd config:
+
+    $HTTP["host"] == "example.com" {
+      include_shell "/path/to/symfttpd/genconf -p /path/to/example.com/web"
+    }
+
+or if you want a different default application:
+
+    $HTTP["host"] == "mobile.example.com" {
+      include_shell "/path/to/symfttpd/genconf -p /path/to/example.com/web -d mobile"
+    }
+
+If symfttpd is running in single-process mode, or you only running an independent
+lighttpd, you have to restart it each time you add a file in the `web/` root.
+Hopefully, it doesn't happen often.
+Also, don't forget to run `php symfony plugin:publish-assets`, or even better,
+`mksymlinks` before.
+
+
+### Alternative
+
+The web directory can be omitted if genconf is present in the project directory.
+It can either be a symbolic link, or a copy shipped with the project
+(it is designed to be independent).
 This first part is unnecessary if you used `mksymlinks`:
 
     cd /path/to/example.com/config
@@ -168,18 +192,6 @@ lighttpd config:
       include_shell "/path/to/example.com/config/lighttpd.php"
     }
 
-or if you want a different default application:
-
-    $HTTP["host"] == "mobile.example.com" {
-      include_shell "/path/to/example.com/config/lighttpd.php --default=mobile"
-    }
-
-If symfttpd is running in single-process mode, or you only running an independent
-lighttpd, you have to restart it each time you add a file the the web/ root.
-Hopefully, it doesn't happen often.
-Also, don't forget to run `php symfony plugin:publish-assets`, or even better,
-`mksymlinks` before.
-
 
 ### Available options
 
@@ -189,6 +201,7 @@ Also, don't forget to run `php symfony plugin:publish-assets`, or even better,
     (useful for allowing a `_dev` alternative, for example)
 * `-n <dir1,dir2>` (nophp): Deny PHP execution in the specified directories
     (default being `uploads`).
+* `-p <path>` (path): Path of the `web` directory. Autodected to ../web if not present.
 
 For portability reasons, only short options (one letter) are used.
 
