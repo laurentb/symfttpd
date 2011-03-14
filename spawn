@@ -170,7 +170,7 @@ else
       }
       else
       {
-        log_message(Color::style('bright').'Something in web/ changed. Restarting lighttpd.'.Color::style('normal'));
+        log_message(Color::style('bright').'Rewrite rules changed. Restarting lighttpd.'.Color::style('normal'));
         Template::writeConfig($options);
       }
     } while (file_exists($options['restartfile']));
