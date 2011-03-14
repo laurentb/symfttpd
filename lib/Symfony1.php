@@ -68,4 +68,23 @@ class Symfony1 extends Application
     );
   }
 
+  /**
+   * @return array Filenames of the apps, e.g. array('frontend.php', 'backend.php')
+   *
+   * @author Laurent Bachelier <laurent@bachelier.name>
+   */
+  public function getApps()
+  {
+    $applications = array();
+    foreach (new DirectoryIterator($this->project_path.'/web') as $file)
+    {
+      if ($file->isFile() && preg_match('/\.php$/', $file->getFilename()))
+      {
+        $apps[] = $file->getFilename();
+      }
+    }
+    sort($apps);
+
+    return $apps;
+  }
 }
