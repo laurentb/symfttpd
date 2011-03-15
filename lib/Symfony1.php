@@ -76,7 +76,7 @@ class Symfony1 extends Application
   public function getApps()
   {
     $applications = array();
-    foreach (new DirectoryIterator($this->project_path.'/web') as $file)
+    foreach (new DirectoryIterator($this->getWebPath()) as $file)
     {
       if ($file->isFile() && preg_match('/\.php$/', $file->getFilename()))
       {
@@ -86,5 +86,16 @@ class Symfony1 extends Application
     sort($apps);
 
     return $apps;
+  }
+
+  /**
+   * @return string Path of the public files
+   *
+   * @author Laurent Bachelier <laurent@bachelier.name>
+   */
+  public function getWebPath()
+  {
+
+    return $this->project_path.'/web';
   }
 }

@@ -84,7 +84,7 @@ catch (ExecutableNotFoundError $e)
 
 if ($options['genconf_cmd'] === false)
 {
-  $options['genconf_cmd'] = $options['php_cmd'].' '.escapeshellarg(realpath(dirname(__FILE__)).'/genconf').' -p '.escapeshellarg($options['project_path'].'/web');
+  $options['genconf_cmd'] = $options['php_cmd'].' '.escapeshellarg(realpath(dirname(__FILE__)).'/genconf').' -p '.escapeshellarg($application->getWebPath());
 }
 Template::writeConfig($options);
 
