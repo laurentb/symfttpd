@@ -19,4 +19,14 @@ abstract class Application
 
     return $this->project_path;
   }
+
+  /**
+   * Get the command to launch to get the rewriting rules.
+   * The PHP executable should be %PHP%, and be replaced at runtime.
+   *
+   * @return string Command
+   *
+   * @author Laurent Bachelier <laurent@bachelier.name>
+   */
+  abstract public function getGenconfCmd();
 }

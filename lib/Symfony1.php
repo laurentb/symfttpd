@@ -98,4 +98,15 @@ class Symfony1 extends Application
 
     return $this->project_path.'/web';
   }
+
+  /**
+   * @see Application::getGenconfCmd
+   *
+   * @author Laurent Bachelier <laurent@bachelier.name>
+   */
+  public function getGenconfCmd()
+  {
+
+    return '%PHP% '.escapeshellarg(realpath(dirname(__FILE__)).'/../genconf').' -p '.escapeshellarg($this->getWebPath());
+  }
 }
