@@ -3,14 +3,16 @@ class MultiConfig
 {
   /**
    * Get config options from multiple files
+   * @param $project_path Path of the current project
+   * @param $cfgname Base name of the configuration file.
    * @return array
    *
    * @author Laurent Bachelier <laurent@bachelier.name>
    */
-  static public function get($cfgname = 'symfttpd.conf.php')
+  static public function get($project_path, $cfgname = 'symfttpd.conf.php')
   {
     $options = array();
-    if (file_exists(getcwd().'/symfttpd') && is_dir(getcwd().'/symfttpd'))
+    if (file_exists($project_path.'/symfttpd') && is_dir($project_path.'/symfttpd'))
     {
       $options['has_symfttpd_dir'] = true;
     }
@@ -18,8 +20,8 @@ class MultiConfig
     $configs = array(
       dirname(__FILE__).'/../'.$cfgname, // defaults
       getenv('HOME').'/.'.$cfgname, // user configuration
-      getcwd().'/config/'.$cfgname, // project configuration
-      getcwd().'/symfttpd/'.$cfgname, // project configuration, new style
+      $project_path.'/config/'.$cfgname, // project configuration
+      $project_path.'/symfttpd/'.$cfgname, // project configuration, new style
     );
 
     foreach ($configs as $config)

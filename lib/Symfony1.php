@@ -11,12 +11,8 @@ class Symfony1 extends Application
    *
    * @author Laurent Bachelier <laurent@bachelier.name>
    */
-  public function __construct($project_path = null, $version)
+  public function __construct($project_path, $version)
   {
-    if ($project_path === null)
-    {
-      $project_path == getcwd();
-    }
     $project_path = realpath($project_path);
     if (!is_file($project_path.'/symfony'))
     {

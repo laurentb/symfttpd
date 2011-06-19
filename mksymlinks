@@ -34,14 +34,14 @@ function replace_symlink($project_path, $target, $link, $relative = true)
 }
 
 
-$options = MultiConfig::get();
+$options = MultiConfig::get(Argument::get('P', 'path', getcwd()));
 $options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);
 if ($options['color'])
 {
   Color::enable();
 }
 
-$application = new Symfony1(Argument::get('P', 'path', null), $options['want']);
+$application = new Symfony1(Argument::get('P', 'path', getcwd()), $options['want']);
 $project_path = $application->getProjectPath();
 
 log_message(Color::style('bright') . Color::fgColor('green')

@@ -14,8 +14,8 @@ require dirname(__FILE__).'/lib/Symfony1.php';
 require dirname(__FILE__).'/lib/Tail.php';
 require dirname(__FILE__).'/lib/Color.php';
 
-$options = MultiConfig::get();
-$application = new Symfony1(Argument::get('P', 'path', null), $options['want']);
+$options = MultiConfig::get(Argument::get('P', 'path', getcwd()));
+$application = new Symfony1(Argument::get('P', 'path', getcwd()), $options['want']);
 $project_path = $application->getProjectPath();
 
 $options['port'] = intval(Argument::get('p', 'port', 4042));
