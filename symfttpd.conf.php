@@ -12,6 +12,11 @@
 // {{{ mksymlinks configuration
 
 /**
+ * Is there or should there be a "symfttpd" directory in the project?
+ */
+$options['has_symfttpd_dir'] = false;
+
+/**
  * Path to symfttpd files
  * Useful for creating the link to genconf.
  * Do not change/copy it unless you know what you are doing.
@@ -23,7 +28,8 @@ $options['path'] = dirname(__FILE__);
  * Create the symlink to genconf
  * @var string|boolean false or path relative to the project root
  */
-$options['genconf'] = 'config/lighttpd.php';
+$options['genconf'] = $options['has_symfttpd_dir']
+  ? 'symfttpd/lighttpd.php' : 'config/lighttpd.php';
 
 /**
  * Create the symlink to the symfony data directory
