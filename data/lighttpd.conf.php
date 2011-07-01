@@ -3,7 +3,7 @@ server.modules = (
     "mod_access",
     "mod_accesslog",
     "mod_setenv",
-    "mod_fastcgi"
+    "mod_fastcgi",
 )
 
 server.port           = <?php echo $port ?>
@@ -28,6 +28,9 @@ fastcgi.server = ( ".php" =>
     )
   )
 )
+
+setenv.add-response-header = ( "X-Symfttpd" => "1",
+    "Expires" => "Sun, 17 Mar 1985 00:42:00 GMT" )
 
 include_shell "cat <?php echo escapeshellarg(dirname(__FILE__).'/mime-types.conf') ?>"
 server.indexfiles     = ("index.php", "index.html",

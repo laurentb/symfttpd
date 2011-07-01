@@ -141,6 +141,9 @@ else
       pclose($handle);
       if ($prev_genconf !== null && $prev_genconf !== $genconf)
       {
+        // This sleep() is so that if a HTTP request just created a file in web/,
+        // the web server isn't restarted right away.
+        sleep(1);
         touch($options['restartfile']);
         !PosixTools::killPid($options['pidfile']);
       }
