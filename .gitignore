@@ -1,0 +1,6 @@
+# IDE files
+/.idea
+/.nbproject
+
+# Systems
+/.DS_Store
