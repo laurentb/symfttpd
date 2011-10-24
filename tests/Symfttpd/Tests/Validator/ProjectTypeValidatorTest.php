@@ -37,6 +37,8 @@ class ProjectTypeValidatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->validator->isValid('symfony', '1.4'));
         $this->assertTrue($this->validator->isValid('symfony', '2.0'));
         $this->assertTrue($this->validator->isValid('Symfony', '2.0'));
+        $this->assertTrue($this->validator->isValid('Symfony'));
         $this->assertFalse($this->validator->isValid('zend', '2.0'));
+        $this->assertFalse($this->validator->isValid('zend'));
     }
 }
