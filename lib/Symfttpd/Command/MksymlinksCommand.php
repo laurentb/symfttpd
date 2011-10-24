@@ -16,6 +16,8 @@ use Symfttpd\Argument;
 use Symfttpd\MultiConfig;
 use Symfttpd\PosixTools;
 use Symfttpd\Symfony;
+use Symfttpd\Validator\ProjectTypeValidator;
+use Symfttpd\Exception\NotSupportedProjectException;
 
 use Symfony\Component\Console\Application;
 
@@ -31,10 +33,20 @@ class MksymlinksCommand extends Command
     {
         $this->setName('mksymlinks');
         $this->setDescription('Generates Symfony 1.x plugins symbolic links to the web folder');
+        $this->addArgument('type', InputArgument::REQUIRED, 'Type of project you want to setup.', 'Symfony');
+        $this->addOption('version', 'v', InputOption::VALUE_OPTIONAL, 'The version of the project type.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $type = $input->getArgument('type');
+        $version = $input->getOption('version');
+
+        if (!ProjectTypeValidator::isValid($type, $version)) {
+            throw new NotSupportedProjectException(sprintf('Symfttp does not support %s with the version yet.', $type, $version));
+        }
+
+
         $options = MultiConfig::get();
         $options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);
         if ($options['color'])
