@@ -17,7 +17,8 @@ use Symfttpd\MultiConfig;
 use Symfttpd\PosixTools;
 use Symfttpd\Symfony;
 use Symfttpd\Validator\ProjectTypeValidator;
-use Symfttpd\Exception\NotSupportedProjectException;
+use Symfttpd\Validator\Exception\NotSupportedProjectException;
+use Symfttpd\Configurator\Exception\ConfiguratorNotFoundException;
 
 use Symfony\Component\Console\Application;
 
@@ -39,13 +40,20 @@ class MksymlinksCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $type = $input->getArgument('type');
+        $type    = $input->getArgument('type');
         $version = $input->getOption('version');
 
         if (!ProjectTypeValidator::isValid($type, $version)) {
-            throw new NotSupportedProjectException(sprintf('Symfttp does not support %s with the version yet.', $type, $version));
+            throw new ConfiguratorNotFoundException(sprintf('Symfttp does not support %s with the version yet.', $type, $version));
         }
 
+        $class = ucfirst($type).'Configurator';
+
+        if (!class_exists($class)) {
+            throw new ConfiguratorNotFound(sprintf('"%s" configurator not found', $type));
+        }
+
+        $configurator = new $class($version);
 
         $options = MultiConfig::get();
         $options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);

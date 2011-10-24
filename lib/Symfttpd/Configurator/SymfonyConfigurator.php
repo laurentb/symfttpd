@@ -1,13 +1,4 @@
 <?php
-/*
- * This file is part of the Symfony package.
- *
- * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 /**
  * SymfonyMaker class.
  * 
@@ -15,7 +6,10 @@
  * @since 25/10/11
  */
  
-class SymfonyMaker
+class SymfonyConfigurator implements Configurator
 {
-
+    public function __construct($version = '2.0')
+    {
+        
+    }
 }

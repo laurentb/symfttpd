@@ -6,7 +6,7 @@
  * @since 25/10/11
  */
 
-namespace Symfttpd\Exception;
+namespace Symfttpd\Validator\Exception;
 
 class NotSupportedProjectException extends \Exception
 {
