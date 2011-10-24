@@ -8,37 +8,9 @@
 
 namespace Symfttpd\Configurator;
 
-use Symfttpd\Configurator\Symfony2Configurator;
-use Symfttpd\Configurator\Symfony14Configurator;
-
-class SymfonyConfigurator implements Configurator
+class Symfony14Configurator implements Configurator
 {
-    protected $version = '2.0';
-
-    public function __construct($version = '2.0')
-    {
-        $this->version = $version;
-    }
-
     public function configure()
-    {
-        switch ($this->version) {
-            case '1.4':
-                throw new \Exception('symfony 1.4 configurator not implemented yet');
-                break;
-            case '2.0':
-            default:
-                $configurator = new Symfony2Configurator();
-                break;
-        }
-    }
-
-    private function configureSymfony2()
-    {
-        echo 'Symfony 2 configuration';
-    }
-
-    private function configureSymfony14()
     {
         $options = MultiConfig::get();
         $options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);

@@ -8,5 +8,10 @@
 
 interface Configurator
 {
-
+    /**
+     * @abstract
+     * @throw Symfttpd\Configurator\Exception\ConfiguratorException
+     * @return void
+     */
+    function configure();
 }
