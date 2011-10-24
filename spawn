@@ -3,15 +3,15 @@
 /**
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
-require dirname(__FILE__).'/lib/bootstrap.php';
-require dirname(__FILE__).'/lib/Argument.php';
-require dirname(__FILE__).'/lib/Template.php';
-require dirname(__FILE__).'/lib/FileTools.php';
-require dirname(__FILE__).'/lib/PosixTools.php';
-require dirname(__FILE__).'/lib/MultiConfig.php';
-require dirname(__FILE__).'/lib/Symfony.php';
-require dirname(__FILE__).'/lib/Tail.php';
-require dirname(__FILE__).'/lib/Color.php';
+require dirname(__FILE__) . '/lib/bootstrap.php';
+require dirname(__FILE__) . '/lib/Argument.php';
+require dirname(__FILE__) . '/lib/Template.php';
+require dirname(__FILE__) . '/lib/FileTools.php';
+require dirname(__FILE__) . '/lib/PosixTools.php';
+require dirname(__FILE__) . '/lib/MultiConfig.php';
+require dirname(__FILE__) . '/lib/Symfony.php';
+require dirname(__FILE__) . '/lib/Tail.php';
+require dirname(__FILE__) . '/lib/Color.php';
 
 $project_path = Symfony::getProjectPath();
 $options = MultiConfig::get();

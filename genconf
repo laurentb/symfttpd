@@ -4,6 +4,7 @@
  * @author Laurent Bachelier <laurent@bachelier.name>
  */
 
+
 error_reporting(E_ALL|E_STRICT);
 
 $opts = getopt('d:oa:n:p:');
