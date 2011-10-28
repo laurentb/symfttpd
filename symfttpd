@@ -8,6 +8,8 @@ use Symfttpd\Command\MksymlinksCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application('symfttpd', '2.0.0');
-$application->add(new ConfigurationGeneratorCommand());
-$application->add(new MksymlinksCommand());
+$application->addCommands(array(
+    new ConfigurationGeneratorCommand(),
+    new MksymlinksCommand()
+));
 $application->run();

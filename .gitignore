@@ -4,3 +4,6 @@
 
 # Systems
 /.DS_Store
+
+# Build
+/build

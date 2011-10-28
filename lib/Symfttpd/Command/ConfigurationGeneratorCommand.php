@@ -8,7 +8,6 @@
 
 namespace Symfttpd\Command;
 
-use Symfttpd\Util\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,13 +22,12 @@ class ConfigurationGeneratorCommand extends Command
     public function configure()
     {
         $this->setName('genconf');
-        $this->setDescription('Generates symfttpd configuration file.');
-        //$this->addArgument('type', InputArgument::REQUIRED, 'Type of project you want to setup.', 'Symfony');
-        $this->addOption('default', 'd', InputOption::VALUE_OPTIONAL, 'Change the default application.', 'index');
-        $this->addOption('only',    'o', InputOption::VALUE_OPTIONAL, 'Do not allow any other application.', false);
-        $this->addOption('allow',   'a', InputOption::VALUE_OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false);
-        $this->addOption('nophp',   'n', InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', 'uploads');
-        $this->addOption('path',    'p', InputOption::VALUE_OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', getcwd().'/../web');
+        $this->setDescription('Generates symfttpd configuration file (lighttpd format).');
+        $this->addArgument('default', InputArgument::OPTIONAL, 'Change the default application.', 'index');
+        $this->addArgument('only',    InputArgument::OPTIONAL, 'Do not allow any other application.', false);
+        $this->addArgument('allow',   InputArgument::OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false);
+        $this->addArgument('nophp',   InputArgument::OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', 'uploads');
+        $this->addArgument('path',    InputArgument::OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', getcwd().'/../web');
     }
 
     /**
@@ -39,9 +37,12 @@ class ConfigurationGeneratorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $allow = explode(',', $input->getOption('allow'));
-        $nophp = explode(',', $input->getOption('nophp'));
-        $path  = realpath($input->getOption('path'));
+        $output->writeln('Starting generating symfttp configuration.');
+
+        $fileName = 'symfttpd.conf.php';
+        $allow    = explode(',', $input->getArgument('allow'));
+        $nophp    = explode(',', $input->getArgument('nophp'));
+        $path     = realpath($input->getArgument('path'));
 
         $files = array(
             'dir'  => array(),
@@ -50,7 +51,7 @@ class ConfigurationGeneratorCommand extends Command
         );
 
         if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $input->getOption('path')));
+            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $input->getArgument('path')));
         }
 
         foreach (new \DirectoryIterator($path) as $file)
@@ -78,14 +79,22 @@ class ConfigurationGeneratorCommand extends Command
           $files['php'][] = $name.'.php';
         }
 
-        $this->generateConfiguration($input->getOption('path'), array(
+        $output->writeln(sprintf('Generate %s in "%s".', $fileName, $path));
+
+        $generated = $this->generateConfiguration($fileName, $path, array(
             'path'    => $path,
             'nophp'   => $nophp,
-            'default' => $input->getOption('default'),
+            'default' => $input->getArgument('default'),
             'php'     => $files['php'],
             'file'    => $files['file'],
             'dir'     => $files['dir'],
         ));
+
+        if ($generated) {
+            $output->writeln('The configuration file has been well generated.');
+        } else {
+            $output->writeln('An error occured while file generation.');
+        }
     }
 
     /**
@@ -93,12 +102,12 @@ class ConfigurationGeneratorCommand extends Command
      *
      * @param $path
      * @param array $parameters
-     * @return void
+     * @return boolean
      */
-    protected function generateConfiguration($path, $parameters = array())
+    protected function generateConfiguration($file, $path, $parameters = array())
     {
-        $fileName = 'symfttpd.conf.php';
-        $template = __DIR__.'/../Resources/templates/'.$fileName;
-        file_put_contents($fileName, require $template);
+        $template = require __DIR__.'/../Resources/templates/'.$file;
+
+        return file_put_contents($path.'/'.$file, $template, null, stream_context_create()) > 0;
     }
 }
