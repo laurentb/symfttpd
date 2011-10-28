@@ -1,14 +1,12 @@
 <?php
 /**
  * MksymlinksCommand class.
- * 
+ *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  * @since 24/10/11
  */
- 
-namespace Symfttpd\Command;
 
-require_once __DIR__.'/../bootstrap.php';
+namespace Symfttpd\Command;
 
 use Symfttpd\FileTools;
 use Symfttpd\Color;
@@ -33,9 +31,9 @@ class MksymlinksCommand extends Command
     public function configure()
     {
         $this->setName('mksymlinks');
-        $this->setDescription('Generates Symfony 1.x plugins symbolic links to the web folder');
-        $this->addArgument('type', InputArgument::REQUIRED, 'Type of project you want to setup.', 'Symfony');
-        $this->addOption('version', 'v', InputOption::VALUE_OPTIONAL, 'The version of the project type.');
+        $this->setDescription('Generates project symbolic links to the web folder');
+        $this->addArgument('type', InputArgument::OPTIONAL, 'Type of project you want to setup.', 'symfony');
+        $this->addOption('version', 'v', InputOption::VALUE_OPTIONAL, 'The version of the project type.', null);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
