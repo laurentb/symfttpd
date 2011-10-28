@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__.'/autoload.php';
+
+use Symfttpd\Command\ConfigurationGeneratorCommand;
+use Symfttpd\Command\MksymlinksCommand;
+use Symfony\Component\Console\Application;
+
+$application = new Application('symfttpd', '2.0.0');
+$application->add(new ConfigurationGeneratorCommand());
+$application->add(new MksymlinksCommand());
+$application->run();
