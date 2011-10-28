@@ -7,79 +7,11 @@
 
 error_reporting(E_ALL|E_STRICT);
 
-$opts = getopt('d:oa:n:p:');
-$opt_keys = array(
-  'd'=>'default',
-  'o'=>'only',
-  'a'=>'allow',
-  'n'=>'nophp',
-  'p'=>'path',
-);
-$options = array('default'=>'index', 'allow'=>false, 'nophp'=>false, 'path'=>null);
-foreach ($opts as $kopt => $opt)
-{
-  $options[$opt_keys[$kopt]] = $opt;
-}
-$options['only'] = isset($options['only']);
-$options['allow'] = $options['allow']
-                  ? explode(',', $options['allow'])
-                  : array();
-$options['nophp'] = $options['nophp']
-                  ? explode(',', $options['nophp'])
-                  : array('uploads');
-$options['path'] = $options['path']
-                  ? realpath($options['path'])
-                  // Not using __FILE__ since it resolves symlinks
-                  : realpath(dirname($argv[0]).'/../web');
+require_once __DIR__.'/autoload.php';
 
-$files = array('dir'=>array(), 'php'=>array(), 'file'=>array());
-foreach (new DirectoryIterator($options['path']) as $file)
-{
-  $name = $file->getFilename();
-  if ($name[0] != '.')
-  {
-    if ($file->isDir())
-    {
-      $files['dir'][] = $name;
-    }
-    elseif (!preg_match('/\.php$/', $name))
-    {
-      $files['file'][] = $name;
-    }
-    elseif (empty($options['only']))
-    {
-        $files['php'][] = $name;
-    }
-  }
-}
-foreach ($options['allow'] as $name)
-{
-  $files['php'][] = $name.'.php';
-}
-?>
-server.document-root = "<?php echo $options['path'] ?>"
+use Symfttpd\Command\ConfigurationGeneratorCommand;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
-url.rewrite-once = (
-<?php foreach ($files['dir'] as $name): ?>
-  "^/<?php echo preg_quote($name) ?>/.+" => "$0",
-<?php endforeach ?>
-
-<?php foreach ($files['file'] as $name): ?>
-  "^/<?php echo preg_quote($name) ?>$" => "$0",
-<?php endforeach ?>
-
-<?php foreach ($files['php'] as $name): ?>
-  "^/<?php echo preg_quote($name) ?>(/[^\?]*)?(\?.*)?" => "/<?php echo $name ?>$1$2",
-<?php endforeach ?>
-
-  "^(/[^\?]*)(\?.*)?" => "/<?php echo $options['default'] ?>.php$1$2"
-)
-
-<?php foreach ($options['nophp'] as $name): ?>
-<?php if (in_array($name, $files['dir'])): ?>
-$HTTP["url"] =~ "^/<?php echo $name ?>/" {
-  url.access-deny = (".php")
-}
-<?php endif ?>
-<?php endforeach ?>
-
+$command = new \Symfttpd\Command\ConfigurationGeneratorCommand();
+$command->run(new ArgvInput(), new ConsoleOutput());

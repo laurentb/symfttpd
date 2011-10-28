@@ -32,8 +32,8 @@ class MksymlinksCommand extends Command
     {
         $this->setName('mksymlinks');
         $this->setDescription('Generates project symbolic links to the web folder');
-        $this->addArgument('type', InputArgument::OPTIONAL, 'Type of project you want to setup.', 'symfony');
-        $this->addOption('version', 'v', InputOption::VALUE_OPTIONAL, 'The version of the project type.', null);
+        $this->addArgument('type', InputArgument::REQUIRED, 'Type of project you want to setup (symfony for example).');
+        $this->addOption('ver', null, InputOption::VALUE_OPTIONAL, 'The version of the project type.', null);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -41,7 +41,7 @@ class MksymlinksCommand extends Command
         $type    = $input->getArgument('type');
         $version = $input->getOption('version');
 
-        if (!ProjectTypeValidator::isValid($type, $version)) {
+        if (!ProjectTypeValidator::getInstance()->isValid($type, $version)) {
             throw new ConfiguratorNotFoundException(sprintf('Symfttp does not support %s with the version yet.', $type, $version));
         }
 
