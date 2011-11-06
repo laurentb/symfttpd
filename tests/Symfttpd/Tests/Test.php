@@ -14,6 +14,6 @@ class Test extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->fixtures = __DIR__.'/../../fixtures/';
+        $this->fixtures = __DIR__.'/../../fixtures';
     }
 }

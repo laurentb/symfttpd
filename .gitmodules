@@ -4,3 +4,9 @@
 [submodule "lib/vendor/Symfony/Component/Console"]
 	path = lib/vendor/Symfony/Component/Console
 	url = https://github.com/symfony/Console.git
+[submodule "lib/vendor/Monolog"]
+	path = lib/vendor/Monolog
+	url = https://github.com/Seldaek/monolog.git
+[submodule "lib/vendor/Symfony/Component/Process"]
+	path = lib/vendor/Symfony/Component/Process
+	url = https://github.com/symfony/Process.git

@@ -57,7 +57,7 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
 
     public function testExecute()
     {
-        $fixtures = $this->fixtures.'symfony-1.4/config';
+        $fixtures = $this->fixtures.'/symfony-1.4/config';
         $this->tester->execute(array('path' => $fixtures), array('interactive' => false));
 
         $this->assertContains('The configuration file has been well generated.', $this->tester->getDisplay());

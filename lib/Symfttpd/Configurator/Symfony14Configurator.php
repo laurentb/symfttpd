@@ -1,102 +1,103 @@
 <?php
 /**
  * SymfonyMaker class.
- * 
+ *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  * @since 25/10/11
  */
 
 namespace Symfttpd\Configurator;
 
-class Symfony14Configurator implements Configurator
+use \Symfttpd\Configurator\ConfiguratorInterface;
+use \Symfttpd\Util\Filesystem;
+use \Symfttpd\FileTools;
+use \Symfttpd\PosixTools;
+use \Symfony\Component\Process\Process;
+
+class Symfony14Configurator implements ConfiguratorInterface
 {
-    public function configure()
+    protected $filesystem;
+
+    public function __construct()
     {
-        $options = MultiConfig::get();
-        $options['color'] = !Argument::get('C', 'no-color', false) && posix_isatty(STDOUT);
-        if ($options['color'])
-        {
-          Color::enable();
-        }
+        $this->filesystem = new Filesystem();
+    }
 
-        $project_path = Symfony::getProjectPath();
+    /**
+     * Configure the project.
+     * Creates cache and log directories, add symbolic links for
+     * plugins web assets.
+     *
+     * @throws \Exception
+     * @param string $path
+     * @param array $options
+     * @return void
+     */
+    public function configure($path, array $options)
+    {
+        // Creates cache and log folders
+        $this->filesystem->mkdir(array($path . '/cache', $path . '/log'));
 
-        log_message(Color::style('bright') . Color::fgColor('green')
-          . 'Using symfony version ' . Color::style('normal')
-          . Color::fgColor('yellow') . $options['want'] . Color::style('normal'));
-
+        // Creates symlinks to lighttpd.conf
         $symlinks = array();
-        if ($options['genconf'])
-        {
-          $symlinks[$options['genconf']] = $options['path'].'/genconf';
+        if ($options['genconf']) {
+            $symlinks[$options['genconf']] = $options['path'] . '/genconf';
         }
 
-        $sf_path = $options['sf_path'][$options['want']];
-        foreach (array(
+        $sfPath = $options['sf_path'][$options['want']];
+        $sfSymlinks = array(
             'symfony_symlink' => '',
-            'lib_symlink' => 'lib',
-            'data_symlink' => 'data',
-            'web_symlink' => 'data/web/sf',
-          )
-          as $option => $relpath)
-        {
-          $link = $options[$option];
-          if ($link)
-          {
-            $target = $sf_path.'/'.$relpath;
-            if (!is_dir($target))
-            {
-              throw new \Exception($target.' is not a directory');
+            'lib_symlink'     => 'lib',
+            'data_symlink'    => 'data',
+            'web_symlink'     => 'data/web/sf',
+        );
+
+        // Add symfony's symlink to the $symlinks array
+        foreach ($sfSymlinks as $option => $relpath) {
+            $link = $options[$option];
+            if ($link) {
+                $target = $sfPath . '/' . $relpath;
+                if (!is_dir($target)) {
+                    throw new \Exception($target . ' is not a directory');
+                }
+                $symlinks[$link] = $target;
             }
-            $symlinks[$link] = $target;
-          }
         }
 
-        log_message(Color::style('bright') . Color::fgColor('green')
-          . 'Creating required directories...' . Color::style('normal'));
-        FileTools::mkdirs($project_path.'/cache');
-        FileTools::mkdirs($project_path.'/log');
-
-        log_message(Color::style('bright') . Color::fgColor('green')
-          . 'Creating symbolic links...' . Color::style('normal'));
         foreach ($symlinks as $link => $target)
         {
-          $this->replaceSymlink($project_path, $target, $link, $options['relative']);
+            $this->replaceSymlink($path, $target, $link, $options['relative']);
         }
-        if ($options['do_plugins'])
-        {
-          if (version_compare($options['want'], '1.2') >= 0)
-          {
-            log_message(Color::style('bright') . Color::fgColor('green')
-              . 'Creating symbolic links for plugins... (calling symfony)'
-              . Color::style('normal'));
-            if (empty($options['php_cmd']))
-            {
-              $options['php_cmd'] = PosixTools::which('php');
+
+        // Generates
+        if ($options['do_plugins']) {
+            if (version_compare($options['want'], '1.2') >= 0) {
+                if (empty($options['php_cmd'])) {
+                    $options['php_cmd'] = PosixTools::which('php');
+                }
+
+                $process = new Process(trim($options['php_cmd'] . ' symfony plugin:publish-assets'), realpath($path));
+                $process->setTimeout(5);
+                $process->run();
+
+                if (!$process->isSuccessful()) {
+                    throw new \RuntimeException($process->getErrorOutput());
+                }
+            } else {
+                foreach ($this->findPlugins($path) as $name) {
+                    $link = 'web/' . $name;
+                    $target = $path . '/plugins/' . $name . '/web';
+                    // Ignore if there is a real directory with this name
+                    if (is_link($path . '/' . $link) || !is_dir($path . '/' . $link)) {
+                        $this->replaceSymlink($path, $target, $link, $options['relative']);
+                    }
+                }
             }
-            system(trim($options['php_cmd'].' symfony plugin:publish-assets'));
-          }
-          else
-          {
-            log_message(Color::style('bright') . Color::fgColor('green')
-              . 'Creating symbolic links for plugins... (internal method)'
-              . Color::style('normal'));
-            foreach ($this->findPlugins($project_path) as $name)
-            {
-              $link = 'web/'.$name;
-              $target = $project_path.'/plugins/'.$name.'/web';
-              // Ignore if there is a real directory with this name
-              if (is_link($project_path.'/'.$link) || !is_dir($project_path.'/'.$link))
-              {
-                $this->replaceSymlink($project_path, $target, $link, $options['relative']);
-              }
-            }
-          }
         }
     }
 
     /**
-     * @pram string $project_path Absolute project path
+     * @pram string $projectPath Absolute project path
      * @param string $target The destination of the symlink
      * @param string $link The relative path of the symlink to create
      * @param boolean $relative Try to use a relative destination
@@ -104,34 +105,32 @@ class Symfony14Configurator implements Configurator
      *
      * @author Laurent Bachelier <laurent@bachelier.name>
      */
-    public function replaceSymlink($project_path, $target, $link, $relative = true)
+    public function replaceSymlink($projectPath, $target, $link, $relative = true)
     {
         if ($relative) {
-            $target = FileTools::calculateRelativeDir($project_path . '/' . $link, $target);
+            $target = FileTools::calculateRelativeDir($projectPath . '/' . $link, $target);
         }
 
-        FileTools::mkdirs(dirname($project_path . '/' . $link));
-        $success = FileTools::symlink($target, $project_path . '/' . $link);
-
-        log_message('  ' . $link . ' => ' . $target . ($success ? '' : ' ...FAILED!'), !$success);
+        FileTools::mkdirs(dirname($projectPath . '/' . $link));
+        $success = FileTools::symlink($target, $projectPath . '/' . $link);
     }
 
     /**
      * Find plugins with a "web" directory
-     * @param string $project_path
+     * @param string $projectPath
      * @return array Plugin names
      *
      * @author Laurent Bachelier <laurent@bachelier.name>
      */
-    public function findPlugins($project_path)
+    public function findPlugins($projectPath)
     {
         $plugins = array();
-        foreach (new \DirectoryIterator($project_path . "/plugins") as $file)
+        foreach (new \DirectoryIterator($projectPath . "/plugins") as $file)
         {
             $name = $file->getFilename();
             if ($file->isDir()
                 && preg_match('/^[^\.].+Plugin$/', $name)
-                && is_dir($project_path . '/plugins/' . $name . '/web')
+                && is_dir($projectPath . '/plugins/' . $name . '/web')
             ) {
                 $plugins[] = $name;
             }
