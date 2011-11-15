@@ -8,17 +8,18 @@
 
 namespace Symfttpd\Tests\Command;
 
+use Symfttpd\Tests\Test;
 use Symfttpd\Command\MksymlinksCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-class MksymlinksCommandTest extends \PHPUnit_Framework_TestCase
+class MksymlinksCommandTest extends Test
 {
     public function testExecute()
     {
         $command = new MksymlinksCommand();
         $tester  = new CommandTester($command);
-        $tester->execute(array('type' => 'symfony', '--ver' => '1.4'), array('interactive' => false));
+        $tester->execute(array('type' => 'symfony', '--ver' => '1.4', '-p' => $this->fixtures.'/symfony-1.4'), array('interactive' => false));
     }
 
     /**
