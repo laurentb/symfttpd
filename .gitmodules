@@ -10,3 +10,9 @@
 [submodule "lib/vendor/Symfony/Component/Process"]
 	path = lib/vendor/Symfony/Component/Process
 	url = https://github.com/symfony/Process.git
+[submodule "tests/fixtures/Dev/symfony1"]
+	path = tests/fixtures/Dev/symfony1
+	url = https://github.com/symfony/symfony1.git
+[submodule "tests/fixtures/Dev/symfony2"]
+	path = tests/fixtures/Dev/symfony2
+	url = https://github.com/symfony/symfony.git

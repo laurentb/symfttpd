@@ -1,4 +1,4 @@
-# symfttpd
+# symfttpd - [![Build Status](https://secure.travis-ci.org/benja-M-1/symfttpd.png?branch=refactoring)](http://travis-ci.org/benja-M-1/symfttpd)
 
 symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.

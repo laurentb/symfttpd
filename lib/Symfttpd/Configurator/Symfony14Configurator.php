@@ -57,10 +57,9 @@ class Symfony14Configurator implements ConfiguratorInterface
             $link = $options[$option];
             if ($link) {
                 $target = $sfPath . '/' . $relpath;
-                if (!is_dir($target)) {
-                    throw new \Exception($target . ' is not a directory');
+                if (file_exists($target) && is_dir($target)) {
+                    $symlinks[$link] = $target;
                 }
-                $symlinks[$link] = $target;
             }
         }
 
