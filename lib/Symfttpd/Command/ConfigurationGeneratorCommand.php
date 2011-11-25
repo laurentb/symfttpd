@@ -37,7 +37,7 @@ class ConfigurationGeneratorCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Starting generating symfttp configuration.');
+        $output->writeln('Starting generating symfttpd configuration.');
 
         $fileName = 'symfttpd.conf.php';
         $allow    = explode(',', $input->getArgument('allow'));
@@ -108,6 +108,6 @@ class ConfigurationGeneratorCommand extends Command
     {
         $template = require __DIR__.'/../Resources/templates/'.$file;
 
-        return file_put_contents($path.'/'.$file, $template, null, stream_context_create()) > 0;
+        return file_put_contents($path.'/'.$file, $template) > 0;
     }
 }

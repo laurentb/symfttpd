@@ -47,6 +47,9 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
     }
 
     /**
+     * As the command requires a path in arguments
+     * an InvalidArgumentException will be thrown.
+     *
      * @expectedException InvalidArgumentException
      * @return void
      */
