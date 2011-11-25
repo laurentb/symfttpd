@@ -8,17 +8,31 @@
 
 namespace Symfttpd\Tests\Command;
 
-use Symfttpd\Command\MksymlinksCommand;
-use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Tester\ApplicationTester;
+use \Symfttpd\Tests\Test;
+use \Symfttpd\Command\MksymlinksCommand;
+use \Symfttpd\Util\Filesystem;
+use \Symfony\Component\Console\Tester\CommandTester;
+use \Symfony\Component\Console\Tester\ApplicationTester;
 
-class MksymlinksCommandTest extends \PHPUnit_Framework_TestCase
+class MksymlinksCommandTest extends Test
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->filesystem = new Filesystem();
+        $this->command = new MksymlinksCommand();
+        $this->tester  = new CommandTester($this->command);
+    }
+
+    public function tearDown()
+    {
+        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/symfttpd.conf.php');
+    }
+
     public function testExecute()
     {
-        $command = new MksymlinksCommand();
-        $tester  = new CommandTester($command);
-        $tester->execute(array('type' => 'symfony', '--ver' => '1.4'), array('interactive' => false));
+        $this->tester->execute(array('type' => 'symfony', '--ver' => '1.4', '-p' => $this->fixtures.'/symfony-1.4'), array('interactive' => false));
     }
 
     /**
@@ -27,8 +41,6 @@ class MksymlinksCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteException()
     {
-        $command = new MksymlinksCommand();
-        $tester  = new CommandTester($command);
-        $tester->execute(array(), array());
+        $this->tester->execute(array(), array());
     }
 }

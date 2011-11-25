@@ -108,11 +108,11 @@ class Symfony14Configurator implements ConfiguratorInterface
     public function replaceSymlink($projectPath, $target, $link, $relative = true)
     {
         if ($relative) {
-            $target = FileTools::calculateRelativeDir($projectPath . '/' . $link, $target);
+            $target = $this->filesystem->calculateRelativeDir($projectPath . '/' . $link, $target);
         }
 
-        FileTools::mkdirs(dirname($projectPath . '/' . $link));
-        $success = FileTools::symlink($target, $projectPath . '/' . $link);
+        $this->filesystem->mkdir(dirname($projectPath . '/' . $link));
+        $this->filesystem->symlink($target, $projectPath . '/' . $link);
     }
 
     /**

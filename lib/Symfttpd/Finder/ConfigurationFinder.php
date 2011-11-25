@@ -32,7 +32,7 @@ class ConfigurationFinder
         $options = array();
 
         foreach ($this->paths as $path) {
-            $config = $path.'/'.$filename;
+            $config = strpos($path, $filename) === false ? $path.$filename : $path;
 
             if (file_exists($config)) {
                 require $config;
