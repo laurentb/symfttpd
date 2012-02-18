@@ -57,10 +57,10 @@ class Symfony1 extends Application
   {
 
     return array(
-      'symfony_symlink' => '',
-      'lib_symlink' => 'lib',
-      'data_symlink' => 'data',
-      'web_symlink' => 'data/web/sf',
+      'symfony_symlink' => '%sf_path%',
+      'lib_symlink' => '%sf_path%/lib',
+      'data_symlink' => '%sf_data_path%',
+      'web_symlink' => '%sf_data_path%/web/sf',
     );
   }
 

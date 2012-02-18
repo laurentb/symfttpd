@@ -55,12 +55,18 @@ if ($options['genconf'])
 }
 
 $sf_path = $options['sf_path'][$options['want']];
+$sf_data_path = $options['sf_data_path'][$options['want']]
+  ? $options['sf_data_path'][$options['want']]
+  : $options['sf_path'][$options['want']].'/data';
 foreach ($application->getAvailableLinks() as $option => $relpath)
 {
   $link = $options[$option];
   if ($link)
   {
-    $target = $sf_path.'/'.$relpath;
+    $target = str_replace(
+      array('%sf_path%', '%sf_data_path%'),
+      array($sf_path, $sf_data_path),
+      $relpath);
     if (!is_dir($target))
     {
       throw new Exception($target.' is not a directory');
