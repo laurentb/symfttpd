@@ -78,18 +78,24 @@ if ($options['genconf'])
 }
 
 $sf_path = $options['sf_path'][$options['want']];
+$sf_data_path = $options['sf_data_path'][$options['want']]
+  ? $options['sf_data_path'][$options['want']]
+  : $options['sf_path'][$options['want']].'/data';
 foreach (array(
-    'symfony_symlink' => '',
-    'lib_symlink' => 'lib',
-    'data_symlink' => 'data',
-    'web_symlink' => 'data/web/sf',
+    'symfony_symlink' => '%sf_path%',
+    'lib_symlink' => '%sf_path%/lib',
+    'data_symlink' => '%sf_data_path%',
+    'web_symlink' => '%sf_data_path%/web/sf',
   )
   as $option => $relpath)
 {
   $link = $options[$option];
   if ($link)
   {
-    $target = $sf_path.'/'.$relpath;
+    $target = str_replace(
+      array('%sf_path%', '%sf_data_path%'),
+      array($sf_path, $sf_data_path),
+      $relpath);
     if (!is_dir($target))
     {
       throw new Exception($target.' is not a directory');

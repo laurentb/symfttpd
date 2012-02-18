@@ -87,6 +87,19 @@ $options['sf_path'] = array(
     '1.4'=>getenv('HOME').'/Dev/symfony/1.4',
 );
 
+/**
+ * symfony data paths
+ * If not provided, it will be based on the data dir of sf_path
+ * @var array version=>path
+ */
+$options['sf_data_path'] = array(
+    '1.0'=>false,
+    '1.1'=>false,
+    '1.2'=>false,
+    '1.3'=>false,
+    '1.4'=>false,
+);
+
 // }}}
 
 // {{{ spawn configuration
