@@ -1,0 +1,22 @@
+{
+    "hash": "1d52bde2a01ad0fba2728e7ae8d071bc",
+    "packages": [
+        {
+            "package": "monolog/monolog",
+            "version": "dev-master",
+            "source-reference": "1.1.0"
+        },
+        {
+            "package": "symfony/console",
+            "version": "dev-master",
+            "source-reference": "8c69d3a3e26885cad132a38ab0d7f287fb975296"
+        },
+        {
+            "package": "symfony/process",
+            "version": "dev-master",
+            "source-reference": "3f95a0126588f00d70e745c1ef96631fb10c3a8e"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": []
+}

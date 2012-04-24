@@ -1,0 +1,36 @@
+{
+    "name": "laurentb/symfttpd",
+    "description": "Symfony webserver",
+    "keywords": [
+        "symfony",
+        "server",
+        "webserver"
+    ],
+    "type": "project",
+    "authors": [
+        {
+            "name": "Laurent Bachelier",
+            "email": "aurent@bachelier.name",
+            "homepage": "http://laurent.bachelier.name"
+        },
+        {
+            "name": "Benjamin Grandfond",
+            "email": "benjamin.grandfond@gmail.com",
+            "homepage": "http://benjamingrandfond.fr"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/console": "dev-master",
+        "symfony/process": "dev-master",
+        "monolog/monolog": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Symfttpd": "lib/"
+        }
+    },
+    "bin": [
+        "bin/symfttpd"
+    ]
+}
