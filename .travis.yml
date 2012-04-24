@@ -1,10 +1,11 @@
 language: php
 php:
-  - 5.3.6
   - 5.3
   - 5.4
 before_script:
   - git submodule update --init
+  - curl -s http://getcomposer.org/installer | php
+  - php composer.phar install
 branches:
   only:
     - refactoring
