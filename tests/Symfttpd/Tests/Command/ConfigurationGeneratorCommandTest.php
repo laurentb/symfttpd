@@ -10,13 +10,13 @@ namespace Symfttpd\Tests\Command;
 
 use Symfttpd\Tests\Test as BaseTestCase;
 use Symfttpd\Command\ConfigurationGeneratorCommand;
-use Symfttpd\Util\Filesystem;
+use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class ConfigurationGeneratorCommandTest extends BaseTestCase
 {
     /**
-     * @var Symfttpd\Util\Filesystem $filesystem
+     * @var Symfttpd\Filesystem\Filesystem $filesystem
      */
     protected $filesystem;
 

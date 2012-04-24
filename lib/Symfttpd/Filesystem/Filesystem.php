@@ -16,7 +16,7 @@ namespace Symfttpd\Filesystem;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Filesystem extends Symfony\Component\Filesystem\Filesystem
+class Filesystem extends \Symfony\Component\Filesystem\Filesystem
 {
 
     /**

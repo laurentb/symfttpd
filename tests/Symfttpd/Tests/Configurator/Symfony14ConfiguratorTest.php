@@ -8,10 +8,10 @@
 
 namespace Symfttpd\Tests\Configurator;
 
-use \Symfttpd\Tests\Test as BasetestCase;
-use \Symfttpd\Configurator\Symfony14Configurator;
-use \Symfttpd\Finder\ConfigurationFinder;
-use \Symfttpd\Util\Filesystem;
+use Symfttpd\Tests\Test as BasetestCase;
+use Symfttpd\Configurator\Symfony14Configurator;
+use Symfttpd\Finder\ConfigurationFinder;
+use Symfttpd\Filesystem\Filesystem;
 
 class Symfony14ConfiguratorTest extends BaseTestCase
 {

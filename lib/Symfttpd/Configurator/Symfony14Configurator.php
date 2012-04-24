@@ -8,11 +8,11 @@
 
 namespace Symfttpd\Configurator;
 
-use \Symfttpd\Configurator\ConfiguratorInterface;
-use \Symfttpd\Util\Filesystem;
-use \Symfttpd\FileTools;
-use \Symfttpd\PosixTools;
-use \Symfony\Component\Process\Process;
+use Symfttpd\Configurator\ConfiguratorInterface;
+use Symfttpd\Filesystem\Filesystem;
+use Symfttpd\FileTools;
+use Symfttpd\PosixTools;
+use Symfony\Component\Process\Process;
 
 class Symfony14Configurator implements ConfiguratorInterface
 {

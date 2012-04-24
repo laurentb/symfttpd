@@ -1,5 +1,5 @@
 {
-    "hash": "1d52bde2a01ad0fba2728e7ae8d071bc",
+    "hash": "e48f5c4ca245f8e35fca7aed0e43d39f",
     "packages": [
         {
             "package": "monolog/monolog",
@@ -10,6 +10,11 @@
             "package": "symfony/console",
             "version": "dev-master",
             "source-reference": "8c69d3a3e26885cad132a38ab0d7f287fb975296"
+        },
+        {
+            "package": "symfony/filesystem",
+            "version": "dev-master",
+            "source-reference": "f5a2dcc6621c9dba4390195697f941db294813fd"
         },
         {
             "package": "symfony/process",

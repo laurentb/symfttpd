@@ -8,11 +8,11 @@
 
 namespace Symfttpd\Tests\Command;
 
-use \Symfttpd\Tests\Test;
-use \Symfttpd\Command\MksymlinksCommand;
-use \Symfttpd\Util\Filesystem;
-use \Symfony\Component\Console\Tester\CommandTester;
-use \Symfony\Component\Console\Tester\ApplicationTester;
+use Symfttpd\Tests\Test;
+use Symfttpd\Command\MksymlinksCommand;
+use Symfttpd\Filesystem\Filesystem;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
 class MksymlinksCommandTest extends Test
 {
