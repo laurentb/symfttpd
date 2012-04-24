@@ -1,5 +1,12 @@
 #!/usr/bin/env php
 <?php
+/**
+ * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ */
+
+error_reporting(E_ALL|E_STRICT);
+ini_set('display_errors', true);
+set_time_limit(0);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
