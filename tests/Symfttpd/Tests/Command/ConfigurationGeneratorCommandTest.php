@@ -35,7 +35,7 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
         parent::setUp();
 
         $this->filesystem = new Filesystem();
-        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/symfttpd.conf.php');
+        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/lighttpd.php');
 
         $this->command = new ConfigurationGeneratorCommand();
         $this->tester  = new CommandTester($this->command);
@@ -43,7 +43,7 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
 
     public function tearDown()
     {
-        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/symfttpd.conf.php');
+        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/lighttpd.php');
     }
 
     /**
@@ -60,10 +60,10 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
 
     public function testExecute()
     {
-        $fixtures = $this->fixtures.'/symfony-1.4/config';
-        $this->tester->execute(array('path' => $fixtures), array('interactive' => false));
+        $fixtures = $this->fixtures.'/symfony-1.4/web';
+        $this->tester->execute(array('--path' => $fixtures), array('interactive' => false));
 
         $this->assertContains('The configuration file has been well generated.', $this->tester->getDisplay());
-        $this->assertTrue(file_exists($fixtures.'/symfttpd.conf.php'));
+        $this->assertTrue(file_exists($fixtures.'/lighttpd.php'));
     }
 }

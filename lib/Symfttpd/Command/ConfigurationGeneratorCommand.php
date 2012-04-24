@@ -23,11 +23,11 @@ class ConfigurationGeneratorCommand extends Command
     {
         $this->setName('genconf');
         $this->setDescription('Generates symfttpd configuration file (lighttpd format).');
-        $this->addArgument('default', InputArgument::OPTIONAL, 'Change the default application.', 'index');
-        $this->addArgument('only',    InputArgument::OPTIONAL, 'Do not allow any other application.', false);
-        $this->addArgument('allow',   InputArgument::OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false);
-        $this->addArgument('nophp',   InputArgument::OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', 'uploads');
-        $this->addArgument('path',    InputArgument::OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', getcwd().'/../web');
+        $this->addOption('default', null, InputOption::VALUE_OPTIONAL, 'Change the default application.', 'index');
+        $this->addOption('only',    null, InputOption::VALUE_OPTIONAL, 'Do not allow any other application.', false);
+        $this->addOption('allow',   null, InputOption::VALUE_OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false);
+        $this->addOption('nophp',   null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', 'uploads');
+        $this->addOption('path',    null, InputOption::VALUE_OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', getcwd().'/../web');
     }
 
     /**
@@ -39,10 +39,10 @@ class ConfigurationGeneratorCommand extends Command
     {
         $output->writeln('Starting generating symfttpd configuration.');
 
-        $fileName = 'symfttpd.conf.php';
-        $allow    = explode(',', $input->getArgument('allow'));
-        $nophp    = explode(',', $input->getArgument('nophp'));
-        $path     = realpath($input->getArgument('path'));
+        $fileName = 'lighttpd.php';
+        $allow    = explode(',', $input->getOption('allow'));
+        $nophp    = explode(',', $input->getOption('nophp'));
+        $path     = realpath($input->getOption('path'));
 
         $files = array(
             'dir'  => array(),
@@ -51,7 +51,7 @@ class ConfigurationGeneratorCommand extends Command
         );
 
         if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $input->getArgument('path')));
+            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $input->getOption('path')));
         }
 
         foreach (new \DirectoryIterator($path) as $file)
@@ -84,7 +84,7 @@ class ConfigurationGeneratorCommand extends Command
         $generated = $this->generateConfiguration($fileName, $path, array(
             'path'    => $path,
             'nophp'   => $nophp,
-            'default' => $input->getArgument('default'),
+            'default' => $input->getOption('default'),
             'php'     => $files['php'],
             'file'    => $files['file'],
             'dir'     => $files['dir'],
@@ -101,12 +101,14 @@ class ConfigurationGeneratorCommand extends Command
      * Generates the symfttpd configuration file.
      *
      * @param $path
-     * @param array $parameters
+     * @param array $parameters Parameters are used in the template.
      * @return boolean
      */
     protected function generateConfiguration($file, $path, $parameters = array())
     {
-        $template = require __DIR__.'/../Resources/templates/'.$file;
+        ob_start();
+        require __DIR__.'/../Resources/templates/'.$file;
+        $template = ob_get_clean();
 
         return file_put_contents($path.'/'.$file, $template) > 0;
     }
