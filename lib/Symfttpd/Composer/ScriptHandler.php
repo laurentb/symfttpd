@@ -23,15 +23,36 @@ use Composer\Json\JsonFile;
 
 class ScriptHandler
 {
+    /**
+     * Setup the fixtures for the testing.
+     *
+     * @static
+     * @param \Composer\Script\Event $event
+     * @return mixed
+     */
     public static function setupFixtures(Event $event)
     {
-        $composer = $event->getComposer();
+        // Ask the user if he wants to install fixtures.
+        $continue = $event->getIO()->askConfirmation('Do you want to install fixtures for tests? [y/n]', false);
 
-        $event->getIO()->write('Setting up fixtures for tests');
+        if ($continue)
+        {
+            $event->getIO()->write('Setting up fixtures for tests');
 
-        self::installSymfony1($event->getIO());
+            // Inqtall symfony 1.4
+            self::installSymfony1($event->getIO());
+        }
+
+        return;
     }
 
+    /**
+     * Install symfony 1.4 in the Dev directory in fixtures.
+     *
+     * @static
+     * @param \Composer\IO\IOInterface $io
+     * @return int
+     */
     public static function installSymfony1(IOInterface $io)
     {
         $fixturesDir = __DIR__.'/../../tests/fixtures';
