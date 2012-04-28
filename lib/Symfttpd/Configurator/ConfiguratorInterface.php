@@ -19,5 +19,5 @@ interface ConfiguratorInterface
      * @param array $options
      * @return void
      */
-    function configure($path, array $options);
+    public function configure($path, array $options);
 }

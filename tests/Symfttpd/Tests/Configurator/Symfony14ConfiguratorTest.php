@@ -50,6 +50,12 @@ class Symfony14ConfiguratorTest extends BaseTestCase
         $this->assertTrue(is_link($this->projectPath.'/web/sfFormExtraPlugin'), $this->projectPath.'/web/sfFormExtraPlugin exists and is a symlink');
     }
 
+    public function testConfigureException()
+    {
+        $this->setExpectedException('Symfttpd\Configurator\Exception\ConfiguratorException');
+        $this->configurator->configure(__DIR__, $this->configuration->all());
+    }
+
     protected function cleanUp()
     {
         $this->filesystem->remove(array(

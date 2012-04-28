@@ -1,26 +1,44 @@
 <?php
 /**
- * SymfonyMaker class.
+ * This file is part of the Symfttpd Project
  *
- * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
- * @since 25/10/11
+ * (c) Laurent Bachelier <laurent@bachelier.name>
+ * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace Symfttpd\Configurator;
 
 use Symfttpd\Configurator\ConfiguratorInterface;
+use Symfttpd\Configurator\Exception\ConfiguratorException;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\FileTools;
 use Symfttpd\PosixTools;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpProcess;
 
+/**
+ * Symfony14Configurator class.
+ *
+ * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ * @since 25/10/11
+ */
 class Symfony14Configurator implements ConfiguratorInterface
 {
+    /**
+     * @var \Symfttpd\Filesystem\Filesystem
+     */
     protected $filesystem;
 
-    public function __construct()
+    /**
+     * Constructor
+     *
+     * @param null|\Symfttpd\Filesystem\Filesystem $filesystem
+     */
+    public function __construct(Filesystem $filesystem = null)
     {
-        $this->filesystem = new Filesystem();
+        $this->filesystem = $filesystem ?: new Filesystem();
     }
 
     /**
@@ -28,13 +46,18 @@ class Symfony14Configurator implements ConfiguratorInterface
      * Creates cache and log directories, add symbolic links for
      * plugins web assets.
      *
-     * @throws \Exception
-     * @param string $path
+     * @param $path
      * @param array $options
-     * @return void
+     * @throws \RuntimeException
+     * @throws ConfiguratorException
      */
     public function configure($path, array $options)
     {
+        // Try to find the symfony executable file.
+        if (false == file_exists($path.'/symfony') || false == is_executable($path.'/symfony')) {
+            throw new ConfiguratorException('This is not a symfony project.');
+        }
+
         // Creates cache and log folders
         $this->filesystem->mkdir(array($path . '/cache', $path . '/log'));
 
@@ -71,11 +94,7 @@ class Symfony14Configurator implements ConfiguratorInterface
         // Generates
         if ($options['do_plugins']) {
             if (version_compare($options['want'], '1.2') >= 0) {
-                if (empty($options['php_cmd'])) {
-                    $options['php_cmd'] = PosixTools::which('php');
-                }
-
-                $process = new Process(trim($options['php_cmd'] . ' symfony plugin:publish-assets'), realpath($path));
+                $process = new PhpProcess(' symfony plugin:publish-assets', realpath($path));
                 $process->setTimeout(5);
                 $process->run();
 
@@ -96,12 +115,12 @@ class Symfony14Configurator implements ConfiguratorInterface
     }
 
     /**
-     * @pram string $projectPath Absolute project path
-     * @param string $target The destination of the symlink
-     * @param string $link The relative path of the symlink to create
-     * @param boolean $relative Try to use a relative destination
-     * @return boolean Success
+     * Replace the existing symbolic links.
      *
+     * @param $projectPath
+     * @param $target
+     * @param $link
+     * @param bool $relative
      * @author Laurent Bachelier <laurent@bachelier.name>
      */
     public function replaceSymlink($projectPath, $target, $link, $relative = true)
@@ -116,9 +135,9 @@ class Symfony14Configurator implements ConfiguratorInterface
 
     /**
      * Find plugins with a "web" directory
+     *
      * @param string $projectPath
      * @return array Plugin names
-     *
      * @author Laurent Bachelier <laurent@bachelier.name>
      */
     public function findPlugins($projectPath)
