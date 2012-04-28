@@ -38,9 +38,12 @@ class SymfttpdConfiguration implements ConfigurationInterface, \IteratorAggregat
     /**
      * Constructor
      *
+     * @param array $options
      */
-    public function __construct()
+    public function __construct(array $options = array())
     {
+        $this->options = $options;
+
         $this->paths = array(
             __DIR__.'/../Resources/templates/', // Resource directory
             getenv('HOME').'/.',  // user configuration

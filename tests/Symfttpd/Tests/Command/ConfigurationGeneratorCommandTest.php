@@ -35,7 +35,7 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
         parent::setUp();
 
         $this->filesystem = new Filesystem();
-        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/lighttpd.php');
+        $this->filesystem->remove($this->fixtures.'/cache/lighttpd/lighttpd.conf');
 
         $this->command = new ConfigurationGeneratorCommand();
         $this->tester  = new CommandTester($this->command);
@@ -43,27 +43,22 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
 
     public function tearDown()
     {
-        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/lighttpd.php');
+        //$this->filesystem->remove($this->fixtures.'/cache/lighttpd/lighttpd.conf');
+        $this->filesystem->remove($this->fixtures.'/web');
     }
 
-    /**
-     * As the command requires a path in arguments
-     * an InvalidArgumentException will be thrown.
-     *
-     * @expectedException InvalidArgumentException
-     * @return void
-     */
     public function testExecuteException()
     {
-        $this->tester->execute(array(), array('interactive' => false));
+        $this->setExpectedException('\InvalidArgumentException');
+        $this->tester->execute(array('--path' => $this->fixtures.'/web'), array('interactive' => false));
     }
 
     public function testExecute()
     {
-        $fixtures = $this->fixtures.'/symfony-1.4/web';
-        $this->tester->execute(array('--path' => $fixtures), array('interactive' => false));
+        $this->filesystem->mkdir($this->fixtures.'/web');
+        $this->tester->execute(array('--path' => $this->fixtures.'/web', '--output-dir' => $this->fixtures), array('interactive' => false));
 
         $this->assertContains('The configuration file has been well generated.', $this->tester->getDisplay());
-        $this->assertTrue(file_exists($fixtures.'/lighttpd.php'));
+        $this->assertTrue(file_exists($this->fixtures.'/cache/lighttpd/lighttpd.conf'));
     }
 }
