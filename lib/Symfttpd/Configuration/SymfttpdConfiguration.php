@@ -42,7 +42,7 @@ class SymfttpdConfiguration implements ConfigurationInterface, \IteratorAggregat
     public function __construct()
     {
         $this->paths = array(
-            __DIR__.'/../../../', // default
+            __DIR__.'/../Resources/templates/', // Resource directory
             getenv('HOME').'/.',  // user configuration
             getcwd().'/config/',  // project configuration
         );

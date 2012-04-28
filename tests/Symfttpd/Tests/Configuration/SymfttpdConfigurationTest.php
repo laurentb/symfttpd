@@ -17,7 +17,6 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->configuration = new SymfttpdConfiguration();
-        $this->configuration->addPath(__DIR__.'/../../fixtures/');
     }
 
     public function testAll()
@@ -57,14 +56,14 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddPath()
     {
-        $this->assertEquals(4, count($this->configuration->getPaths()));
+        $this->assertEquals(3, count($this->configuration->getPaths()));
 
         $this->configuration->addPath(__DIR__.'/../../fixtures/');
 
         $this->assertEquals(4, count($this->configuration->getPaths()));
 
-        $this->configuration->addPath(__DIR__.'/toto/');
+        $this->configuration->addPath(__DIR__.'/../../fixtures/');
 
-        $this->assertEquals(5, count($this->configuration->getPaths()));
+        $this->assertEquals(4, count($this->configuration->getPaths()));
     }
 }
