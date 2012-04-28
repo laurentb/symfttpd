@@ -71,14 +71,12 @@ class LighttpdConfiguration implements ConfigurationInterface
      * Generate the lighttpd configuration file.
      *
      * @param SymfttpdConfiguration $configuration
-     * @param null $baseDir
      * @throws Exception\ConfigurationException
      */
-    public function generate(SymfttpdConfiguration $configuration, $baseDir = null)
+    public function generate(SymfttpdConfiguration $configuration)
     {
-        $parameters = $configuration->all();
-
         ob_start();
+        $parameters = $configuration->all();
         require $this->getTemplate();
 
         $this->configuration = ob_get_clean();
@@ -118,5 +116,15 @@ class LighttpdConfiguration implements ConfigurationInterface
     public function getFilename()
     {
         return $this->filename;
+    }
+
+    /**
+     * Return the configuration.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->configuration;
     }
 }

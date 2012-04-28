@@ -24,26 +24,96 @@ class LighttpdConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->createSymfonyProject();
+
         $this->configuration = new LighttpdConfiguration();
     }
 
     public function testGenerate()
     {
-        $this->configuration->generate($this->getSymfttpdConfiguration(), sys_get_temp_dir());
+        $this->configuration->generate($this->getSymfttpdConfiguration());
 
+        $conf = <<<CONF
+server.document-root = "%s/web"
+
+url.rewrite-once = (
+  "^/css/.+" => "$0",
+  "^/js/.+" => "$0",
+
+  "^/robots\.txt$" => "$0",
+
+  "^/index\.php(/[^\?]*)?(\?.*)?" => "/index.php$1$2",
+  "^/frontend_dev\.php(/[^\?]*)?(\?.*)?" => "/frontend_dev.php$1$2",
+  "^/backend_dev\.php(/[^\?]*)?(\?.*)?" => "/backend_dev.php$1$2",
+
+  "^(/[^\?]*)(\?.*)?" => "/index.php$1$2"
+)
+
+
+CONF;
+
+        $this->assertEquals(sprintf($conf, sys_get_temp_dir()), (string) $this->configuration);
     }
 
+    /**
+     * Create a symfony1 project architecture
+     *
+     * apps
+     * cache
+     * config
+     * lib
+     * web
+     *   index.php
+     *   frontend_dev.php
+     *   backend_dev.php
+     *
+     */
+    public function createSymfonyProject()
+    {
+        $baseDir = sys_get_temp_dir();
+
+        $projectTree = array(
+            $baseDir.DIRECTORY_SEPARATOR.'apps',
+            $baseDir.DIRECTORY_SEPARATOR.'cache',
+            $baseDir.DIRECTORY_SEPARATOR.'config',
+            $baseDir.DIRECTORY_SEPARATOR.'lib',
+            $baseDir.DIRECTORY_SEPARATOR.'log',
+            $baseDir.DIRECTORY_SEPARATOR.'web',
+            $baseDir.DIRECTORY_SEPARATOR.'web/css',
+            $baseDir.DIRECTORY_SEPARATOR.'web/js',
+        );
+
+        $files = array(
+            $baseDir.DIRECTORY_SEPARATOR.'web/index.php',
+            $baseDir.DIRECTORY_SEPARATOR.'web/frontend_dev.php',
+            $baseDir.DIRECTORY_SEPARATOR.'web/backend_dev.php',
+            $baseDir.DIRECTORY_SEPARATOR.'web/robots.txt',
+            $baseDir.DIRECTORY_SEPARATOR.'log/frontend.log',
+        );
+
+        $filesystem = new \Symfttpd\Filesystem\Filesystem();
+        $filesystem->remove($projectTree);
+        $filesystem->mkdir($projectTree);
+        $filesystem->touch($files);
+    }
+
+    /**
+     * Return a SymfttpdConfiguration mock.
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     public function getSymfttpdConfiguration()
     {
         $configuration = $this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration');
         $configuration->expects($this->once())
             ->method('all')
             ->will($this->returnValue(array(
-                'dir'     => 'test',
-                'file'    => 'testFile',
-                'php'     => 'testPhp',
-                'default' => 'testDefault',
-                'nophp'   => 'testNophp',
+                'path'    => sys_get_temp_dir().'/web',
+                'dir'     => array('css', 'js'),
+                'file'    => array('robots.txt'),
+                'php'     => array('index.php', 'frontend_dev.php', 'backend_dev.php'),
+                'default' => 'index',
+                'nophp'   => array('log'),
             )
         ));
 

@@ -33,6 +33,7 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
     public function setUp()
     {
         parent::setUp();
+        $this->fixtures = sys_get_temp_dir();
 
         $this->filesystem = new Filesystem();
         $this->filesystem->remove($this->fixtures.'/cache/lighttpd/lighttpd.conf');
