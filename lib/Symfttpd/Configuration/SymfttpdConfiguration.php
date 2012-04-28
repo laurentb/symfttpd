@@ -12,7 +12,6 @@
 namespace Symfttpd\Configuration;
 
 use Symfttpd\Configuration\ConfigurationInterface;
-use Symfttpd\Finder\ConfigurationFinder;
 
 /**
  * SymfttpdOption class

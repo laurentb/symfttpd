@@ -100,9 +100,9 @@ $options['custom_path'] = array('/usr/sbin');
 
 /**
  * Absolute path to the lighttpd server executable
- * @var string|boolean false to autodetect (try to find "lighttpd" in the path)
+ * @var string|null to autodetect (try to find "lighttpd" in the path)
  */
-$options['lighttpd_cmd'] = false;
+$options['lighttpd_cmd'] = null;
 
 /**
  * Absolute path to the CLI PHP executable
@@ -113,14 +113,15 @@ $options['php_cmd'] = realpath(PHP_BINDIR.'/php');
 /**
  * Absolute path to the CGI PHP executable
  * @var string|boolean false to autodetect (try to find "php-cgi" in the path)
+ * @deprecated
  */
 $options['php_cgi_cmd'] = realpath(PHP_BINDIR.'/php-cgi');
 
 /**
  * Command to generate the docroot and rewriting config.
- * @var string|false false to use included genconf tool with default parametrs
+ * @var string|null to use included genconf tool with default parametrs
  */
-$options['genconf_cmd'] = false;
+$options['genconf_cmd'] = null;
 
 /**
  * Default server template path
