@@ -9,13 +9,13 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Configuration;
+namespace Symfttpd\Server;
 
+use Symfttpd\Configuration\ServerInterface;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Configuration\ConfigurationBag;
 use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfttpd\Configuration\ConfigurationInterface;
-use Symfttpd\Configuration\ServerConfigurationInterface;
 use Symfttpd\Configuration\Exception\ConfigurationException;
 
 /**
@@ -23,7 +23,7 @@ use Symfttpd\Configuration\Exception\ConfigurationException;
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurationInterface, ConfigurationInterface
+class LighttpdConfiguration implements ServerInterface
 {
     /**
      * @var string
@@ -43,17 +43,17 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
     /**
      * @var string
      */
-    protected $hostFilename = 'host.conf';
+    protected $rulesFilename = 'host.conf';
 
     /**
      * @var string
      */
-    protected $host;
+    protected $rules;
 
     /**
      * @var string
      */
-    protected $hostFile;
+    protected $rulesFile;
 
     /**
      * @var string
@@ -81,7 +81,7 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
      */
     public function read()
     {
-        return $this->readConfiguration().PHP_EOL.$this->readHost();
+        return $this->readConfiguration().PHP_EOL.$this->readRules();
     }
 
     /**
@@ -104,22 +104,22 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
     }
 
     /**
-     * Return the host configuration content.
+     * Return the rules configuration content.
      *
      * @return string
      * @throws Exception\ConfigurationException
      */
-    public function readHost()
+    public function readRules()
     {
-        if (null !== $this->host) {
-            return $this->host;
+        if (null !== $this->rules) {
+            return $this->rules;
         }
 
-        if (false == file_exists($this->hostFile)) {
-            throw new ConfigurationException('The host configuration has not been generated.');
+        if (false == file_exists($this->rulesFile)) {
+            throw new ConfigurationException('The rules configuration has not been generated.');
         }
 
-        return file_get_contents($this->hostFile);
+        return file_get_contents($this->rulesFile);
     }
 
     /**
@@ -137,14 +137,14 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
                 $file = $this->configFile;
                 $content = $this->configuration;
                 break;
-            case 'host':
-                $file = $this->hostFile;
-                $content = $this->host;
+            case 'rules':
+                $file = $this->rulesFile;
+                $content = $this->rules;
                 break;
             case 'all':
             default:
                 $this->write('config');
-                $this->write('host');
+                $this->write('rules');
                 break;
         }
 
@@ -164,25 +164,25 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
     }
 
     /**
-     * Write the host configuration file.
+     * Write the rules configuration file.
      *
      * @throws Exception\ConfigurationException
      */
-    public function writeHost()
+    public function writeRules()
     {
-        $this->write('host');
+        $this->write('rules');
     }
 
     /**
      * Generate the whole configuration :
      * the server configuration based on the lighttpd.conf.php template
-     * the host configuration with the rewrite rules based on the host.conf.php template
+     * the rules configuration with the rewrite rules based on the rules.conf.php template
      *
      * @param SymfttpdConfiguration $configuration
      */
     public function generate(SymfttpdConfiguration $configuration)
     {
-        $this->generateHost($configuration);
+        $this->generateRules($configuration);
         $this->generateConfiguration($configuration);
     }
 
@@ -201,17 +201,17 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
     }
 
     /**
-     * Generate the lighttpd host configuration.
+     * Generate the lighttpd rules configuration.
      *
      * @param SymfttpdConfiguration $configuration
      */
-    public function generateHost(SymfttpdConfiguration $configuration)
+    public function generateRules(SymfttpdConfiguration $configuration)
     {
         ob_start();
-        require $this->getHostTemplate();
+        require $this->getRulesTemplate();
 
-        $this->host = ob_get_clean();
-        $this->hostFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->hostFilename;
+        $this->rules = ob_get_clean();
+        $this->rulesFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->rulesFilename;
     }
 
     /**
@@ -225,13 +225,13 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
     }
 
     /**
-     * Return the host template path.
+     * Return the rules template path.
      *
      * @return string
      */
-    public function getHostTemplate()
+    public function getRulesTemplate()
     {
-        return __DIR__ . sprintf('/../Resources/templates/%s.php', $this->hostFilename);
+        return __DIR__ . sprintf('/../Resources/templates/%s.php', $this->rulesFilename);
     }
 
     /**
@@ -283,12 +283,12 @@ class LighttpdConfiguration extends ConfigurationBag implements ServerConfigurat
     }
 
     /**
-     * Return the host config file path.
+     * Return the rules config file path.
      *
      * @return string
      */
-    public function getHostFile()
+    public function getRulesFile()
     {
-        return $this->hostFile;
+        return $this->rulesFile;
     }
 }
