@@ -9,14 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Configuration;
+namespace Symfttpd\Server;
+
+use Symfttpd\Configuration\SymfttpdConfiguration;
+use Symfttpd\Configuration\Exception\ConfigurationException;
 
 /**
- * ServerConfigurationInterface interface
+ * ServerInterface interface
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-interface ServerConfigurationInterface
+interface ServerInterface
 {
     /**
      * Read the configuration.

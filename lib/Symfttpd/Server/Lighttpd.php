@@ -11,7 +11,7 @@
 
 namespace Symfttpd\Server;
 
-use Symfttpd\Configuration\ServerInterface;
+use Symfttpd\Server\ServerInterface;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Configuration\ConfigurationBag;
 use Symfttpd\Configuration\SymfttpdConfiguration;
@@ -19,11 +19,11 @@ use Symfttpd\Configuration\ConfigurationInterface;
 use Symfttpd\Configuration\Exception\ConfigurationException;
 
 /**
- * LighttpdConfiguration class
+ * Lighttpd class
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class LighttpdConfiguration implements ServerInterface
+class Lighttpd implements ServerInterface
 {
     /**
      * @var string
@@ -33,7 +33,7 @@ class LighttpdConfiguration implements ServerInterface
     /**
      * @var string
      */
-    protected $configuration;
+    protected $lighttpdConfig;
 
     /**
      * @var string
@@ -61,17 +61,23 @@ class LighttpdConfiguration implements ServerInterface
     protected $workingDir;
 
     /**
+     * @var ConfigurationBag
+     */
+    protected $configuration;
+
+    /**
      * Constructor class
      *
      * @param null $workingDir
      */
-    public function __construct($workingDir = null)
+    public function __construct($workingDir = null, ConfigurationBag $configuration = null)
     {
         $this->workingDir = $workingDir;
+        $this->configuration = $configuration ?: new ConfigurationBag();
 
-        $this->set('log_dir', $this->workingDir . '/log/lighttpd');
-        $this->set('cache_dir', $this->workingDir . '/cache/lighttpd');
-        $this->set('pidfile', $this->getCacheDir().'/.sf');
+        $this->configuration->set('log_dir', $this->workingDir . '/log/lighttpd');
+        $this->configuration->set('cache_dir', $this->workingDir . '/cache/lighttpd');
+        $this->configuration->set('pidfile', $this->getCacheDir().'/.sf');
     }
 
     /**
@@ -92,8 +98,8 @@ class LighttpdConfiguration implements ServerInterface
      */
     public function readConfiguration()
     {
-        if (null !== $this->configuration) {
-            return $this->configuration;
+        if (null !== $this->lighttpdConfig) {
+            return $this->lighttpdConfig;
         }
 
         if (false == file_exists($this->getConfigFile())) {
@@ -135,7 +141,7 @@ class LighttpdConfiguration implements ServerInterface
             case 'config':
             case 'configuration':
                 $file = $this->configFile;
-                $content = $this->configuration;
+                $content = $this->lighttpdConfig;
                 break;
             case 'rules':
                 $file = $this->rulesFile;
@@ -196,7 +202,7 @@ class LighttpdConfiguration implements ServerInterface
         ob_start();
         require $this->getConfigurationTemplate();
 
-        $this->configuration = ob_get_clean();
+        $this->lighttpdConfig = ob_get_clean();
         $this->configFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->configFilename;
     }
 
@@ -241,7 +247,7 @@ class LighttpdConfiguration implements ServerInterface
      */
     public function getLogDir()
     {
-        return $this->get('log_dir');
+        return $this->configuration->get('log_dir');
 
     }
 
@@ -252,7 +258,7 @@ class LighttpdConfiguration implements ServerInterface
      */
     public function getCacheDir()
     {
-        return $this->get('cache_dir');
+        return $this->configuration->get('cache_dir');
     }
 
     /**
