@@ -43,7 +43,7 @@ class Lighttpd implements ServerInterface
     /**
      * @var string
      */
-    protected $rulesFilename = 'host.conf';
+    protected $rulesFilename = 'rules.conf';
 
     /**
      * @var string
