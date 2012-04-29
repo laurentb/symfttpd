@@ -34,9 +34,9 @@ class ConfigurationGeneratorCommand extends Command
     public function configure()
     {
         $this->setName('genconf')
-            ->setDescription('Generates the lighttpd configuration file.')
+            ->setDescription('Generates the host configuration file.')
             ->setHelp(<<<EOT
-The genconf command generates the lighttpd configuration file based on the provided options.
+The genconf command generates the host configuration for the server.
 EOT
         );
 
@@ -46,7 +46,7 @@ EOT
             ->addOption('allow',      null, InputOption::VALUE_OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false)
             ->addOption('nophp',      null, InputOption::VALUE_OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', 'uploads')
             ->addOption('path',       null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', getcwd() . '/../web')
-            ->addOption('output-dir', null, InputOption::VALUE_OPTIONAL, 'The path to generate the configuration.', getcwd());
+            ->addOption('output-dir', null, InputOption::VALUE_OPTIONAL, 'The path to generate the configuration.', getcwd().'/cache/lighttpd/');
     }
 
     /**
@@ -66,13 +66,19 @@ EOT
         try {
             $configDir = $input->getOption('output-dir');
 
-            $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.', $configuration->getFilename(), $configDir.$configuration->getCacheDir()));
+            $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.', $configuration->getFilename(), $configDir));
 
-            $configuration->generate($symfttpdConfig);
-            $configuration->write($configDir);
+            $configuration->generateHost($symfttpdConfig);
+
+            if (true == $input->getOption('quiet')) {
+                print $configuration->readHost();
+            } else {
+                $configuration->writeHost($configDir);
+            }
 
         } catch (ConfigurationException $e) {
             $output->writeln('<error>An error occured while file generation.</error>');
+            $output->writeln('<error>'.$e->getMessage().'</error>');
 
             return 1;
         }
@@ -126,7 +132,7 @@ EOT
         }
 
         $symfttpdConfig = new SymfttpdConfiguration(array(
-            'path'    => $path,
+            'document_root' => $path,
             'nophp'   => $nophp,
             'default' => $options['default'],
             'php'     => $files['php'],

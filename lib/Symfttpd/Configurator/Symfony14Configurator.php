@@ -63,9 +63,9 @@ class Symfony14Configurator implements ConfiguratorInterface
 
         // Creates symlinks to lighttpd.conf
         $symlinks = array();
-        if ($options['genconf']) {
-            $symlinks[$options['genconf']] = $options['path'] . '/genconf';
-        }
+        //if ($options['genconf']) {
+        //    $symlinks[$options['genconf']] = $options['path'] . '/genconf';
+        //}
 
         $sfPath = $options['sf_path'][$options['want']];
         $sfSymlinks = array(

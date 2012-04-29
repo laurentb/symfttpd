@@ -29,9 +29,9 @@ class LighttpdConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->configuration = new LighttpdConfiguration();
     }
 
-    public function testGenerate()
+    public function testGenerateAndReadHost()
     {
-        $this->configuration->generate($this->getSymfttpdConfiguration());
+        $this->configuration->generateHost($this->getSymfttpdConfiguration());
 
         $conf = <<<CONF
 server.document-root = "%s/web"
@@ -52,7 +52,7 @@ url.rewrite-once = (
 
 CONF;
 
-        $this->assertEquals(sprintf($conf, sys_get_temp_dir()), (string) $this->configuration);
+        $this->assertEquals(sprintf($conf, sys_get_temp_dir()), (string) $this->configuration->readHost());
     }
 
     /**
@@ -105,15 +105,15 @@ CONF;
     public function getSymfttpdConfiguration()
     {
         $configuration = $this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration');
-        $configuration->expects($this->once())
-            ->method('all')
-            ->will($this->returnValue(array(
-                'path'    => sys_get_temp_dir().'/web',
-                'dir'     => array('css', 'js'),
-                'file'    => array('robots.txt'),
-                'php'     => array('index.php', 'frontend_dev.php', 'backend_dev.php'),
-                'default' => 'index',
-                'nophp'   => array('log'),
+        $configuration->expects($this->any())
+            ->method('get')
+            ->will($this->returnValueMap(array(
+                array('path', null, sys_get_temp_dir().'/web'),
+                array('dir', null, array('css', 'js')),
+                array('file', null, array('robots.txt')),
+                array('php', null, array('index.php', 'frontend_dev.php', 'backend_dev.php')),
+                array('default', null, 'index'),
+                array('nophp', null, array('log')),
             )
         ));
 

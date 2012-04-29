@@ -11,14 +11,18 @@
 
 namespace Symfttpd\Configuration;
 
+use Symfttpd\Configuration\ConfigurationBag;
 use Symfttpd\Configuration\ConfigurationInterface;
+use Symfttpd\Exception\ExecutableNotFoundException;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
- * SymfttpdOption class
+ * SymfttpdConfiguration class
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class SymfttpdConfiguration implements ConfigurationInterface, \IteratorAggregate
+class SymfttpdConfiguration extends ConfigurationBag implements ConfigurationInterface
 {
     /**
      * @var string
@@ -29,11 +33,6 @@ class SymfttpdConfiguration implements ConfigurationInterface, \IteratorAggregat
      * @var array
      */
     protected $paths;
-
-    /**
-     * @var array
-     */
-    protected $options = array();
 
     /**
      * Constructor
@@ -72,64 +71,6 @@ class SymfttpdConfiguration implements ConfigurationInterface, \IteratorAggregat
     }
 
     /**
-     * Retrieve an iterator for options.
-     *
-     * @return \ArrayIterator
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->options);
-    }
-
-    /**
-     * Return every options.
-     *
-     * @return array
-     */
-    public function all()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Return an option.
-     *
-     * @param $name
-     * @param null $default
-     * @return null|mixed
-     */
-    public function get($name, $default = null)
-    {
-        if ($this->has($name)) {
-            return $this->options[$name];
-        }
-
-        return $default;
-    }
-
-    /**
-     * Check that an option exists.
-     *
-     * @param $name
-     * @return bool
-     */
-    public function has($name)
-    {
-        return array_key_exists($name, $this->options) && null !== $this->options[$name] ;
-    }
-
-    /**
-     * Set an option.
-     *
-     * @param $name
-     * @param $value
-     */
-    public function set($name, $value)
-    {
-        $this->options[$name] = $value;
-    }
-
-    /**
      * Add a path to search the symfttpd
      * configuration file if it is not already
      * registered.
@@ -159,5 +100,90 @@ class SymfttpdConfiguration implements ConfigurationInterface, \IteratorAggregat
     public function getPaths()
     {
         return $this->paths;
+    }
+
+    /**
+     * Find executables.
+     *
+     * @throws \Symfttpd\Exception\ExecutableNotFoundException
+     */
+    public function findExecutables()
+    {
+        $this->findServerCmd();
+        $this->findPhpCmd();
+        $this->findPhpcgiCmd();
+    }
+
+    /**
+     * Set the php command value in the Symfttpd option
+     * if it is not already set.
+     *
+     * @throws \Symfttpd\Exception\ExecutableNotFoundException
+     */
+    protected function findPhpCmd()
+    {
+        if (false === $this->has('php_cmd')) {
+            $phpFinder = new PhpExecutableFinder();
+            $cmd = $phpFinder->find();
+
+            if (null == $cmd) {
+                throw new ExecutableNotFoundException('php executable not found');
+            }
+
+            $this->set('php_cmd', $cmd);
+        }
+    }
+
+    /**
+     * Set the php-cgi command value in the Symfttpd option
+     * if it is not already set.
+     *
+     * @throws \Symfttpd\Exception\ExecutableNotFoundException
+     */
+    protected function findPhpcgiCmd()
+    {
+        if (false === $this->has('php_cgi_cmd')) {
+            $exeFinder = new ExecutableFinder();
+            $exeFinder->addSuffix('');
+            $cmd = $exeFinder->find('php-cgi');
+
+            if (null == $cmd) {
+                throw new ExecutableNotFoundException('php-cgi executable not found.');
+            }
+
+            $this->set('php_cgi_cmd', $cmd);
+        }
+    }
+
+    /**
+     * Set the server command value in the Symfttpd option
+     * if it is not already set.
+     *
+     * @throws \Symfttpd\Exception\ExecutableNotFoundException
+     */
+    protected function findServerCmd()
+    {
+        if (false === $this->has('lighttpd_cmd')) {
+            $exeFinder = new ExecutableFinder();
+            $exeFinder->addSuffix('');
+            $cmd = $exeFinder->find('lighttpd');
+
+            if (null == $cmd) {
+                throw new ExecutableNotFoundException('lighttpd executable not found.');
+            }
+
+            $this->set('lighttpd_cmd', $cmd);
+        }
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getServerCmd()
+    {
+        // Find the lighttpd command
+        $this->findServerCmd();
+
+        return $this->get('lighttpd_cmd');
     }
 }

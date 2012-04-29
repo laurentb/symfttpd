@@ -1,9 +1,6 @@
 <?php
 namespace Symfttpd;
 
-class ExecutableNotFoundError extends \Exception
-{
-}
 
 class PosixTools
 {
@@ -65,7 +62,7 @@ class PosixTools
    *
    * @author Laurent Bachelier <laurent@bachelier.name>
    */
-  static public function killPid($pidfile)
+  static public function killPid($pidfile, \Symfony\Component\Console\Output\OutputInterface $output)
   {
     if (file_exists($pidfile))
     {
@@ -74,12 +71,12 @@ class PosixTools
       if ($pid)
       {
         posix_kill($pid, SIGTERM);
-        log_message('Process '.$pid.' killed');
+        $output->writeln('<error>Process '.$pid.' killed</error>');
 
         return true;
       }
     }
-    log_message('No running process found', true);
+      $output->writeln('No running process found', true);
 
     return false;
   }
