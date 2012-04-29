@@ -9,29 +9,29 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Tests\Configuration;
+namespace Symfttpd\Tests\Server;
 
-use Symfttpd\Configuration\LighttpdConfiguration;
+use Symfttpd\Server\Lighttpd;
 
 /**
- * LighttpdConfigurationTest class
+ * LighttpdTest class
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class LighttpdConfigurationTest extends \PHPUnit_Framework_TestCase
+class LighttpdTest extends \PHPUnit_Framework_TestCase
 {
-    protected $configuration;
+    protected $server;
 
     public function setUp()
     {
         $this->createSymfonyProject();
 
-        $this->configuration = new LighttpdConfiguration();
+        $this->server = new Lighttpd(sys_get_temp_dir(), $this->getConfiguration());
     }
 
-    public function testGenerateAndReadHost()
+    public function testGenerateAndReadRule()
     {
-        $this->configuration->generateHost($this->getSymfttpdConfiguration());
+        $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
 
         $conf = <<<CONF
 server.document-root = "%s/web"
@@ -52,7 +52,7 @@ url.rewrite-once = (
 
 CONF;
 
-        $this->assertEquals(sprintf($conf, sys_get_temp_dir()), (string) $this->configuration->readHost());
+        $this->assertEquals(sprintf($conf, sys_get_temp_dir()), (string) $this->server->readRules());
     }
 
     /**
@@ -98,20 +98,20 @@ CONF;
     }
 
     /**
-     * Return a SymfttpdConfiguration mock.
+     * Return a ConfigurationBag mock.
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    public function getSymfttpdConfiguration()
+    public function getConfiguration()
     {
-        $configuration = $this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration');
+        $configuration = $this->getMock('\Symfttpd\Configuration\ConfigurationBag');
         $configuration->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap(array(
-                array('path', null, sys_get_temp_dir().'/web'),
-                array('dir', null, array('css', 'js')),
-                array('file', null, array('robots.txt')),
-                array('php', null, array('index.php', 'frontend_dev.php', 'backend_dev.php')),
+                array('document_root', null, sys_get_temp_dir().'/web'),
+                array('dirs', null, array('css', 'js')),
+                array('files', null, array('robots.txt')),
+                array('phps', null, array('index.php', 'frontend_dev.php', 'backend_dev.php')),
                 array('default', null, 'index'),
                 array('nophp', null, array('log')),
             )
