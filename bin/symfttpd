@@ -10,13 +10,16 @@ set_time_limit(0);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Symfttpd\Symfttpd;
 use Symfttpd\Command\ConfigurationGeneratorCommand;
 use Symfttpd\Command\MksymlinksCommand;
-use Symfony\Component\Console\Application;
+use Symfttpd\Command\SpawnCommand;
+use Symfttpd\Console\Application;
 
-$application = new Application('symfttpd', '2.0.0');
+$application = new Application();
 $application->addCommands(array(
     new ConfigurationGeneratorCommand(),
-    new MksymlinksCommand()
+    new MksymlinksCommand(),
+    new SpawnCommand(),
 ));
 $application->run();
