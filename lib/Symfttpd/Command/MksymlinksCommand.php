@@ -8,16 +8,8 @@
 
 namespace Symfttpd\Command;
 
-use Symfttpd\FileTools;
-use Symfttpd\Color;
-use Symfttpd\Argument;
-use Symfttpd\MultiConfig;
-use Symfttpd\PosixTools;
-use Symfttpd\Symfony;
 use Symfttpd\Validator\ProjectTypeValidator;
-use Symfttpd\Validator\Exception\NotSupportedProjectException;
 use Symfttpd\Configurator\Exception\ConfiguratorNotFoundException;
-use Symfttpd\Finder\ConfigurationFinder;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -45,7 +37,7 @@ class MksymlinksCommand extends Command
         $version = $input->getOption('ver');
 
         if (!ProjectTypeValidator::getInstance()->isValid($type, $version)) {
-            throw new ConfiguratorNotFoundException(sprintf('Symfttp does not support %s with the version yet.', $type, $version));
+            throw new ConfiguratorNotFoundException(sprintf('Symfttpd does not support %s with the version %s yet.', $type, $version));
         }
 
         $class = 'Symfttpd\\Configurator\\'.ucfirst($type).'Configurator';
@@ -55,28 +47,16 @@ class MksymlinksCommand extends Command
         }
 
         $configurator = new $class($version);
-        $finder       = $this->getFinder();
-        $configurator->configure($input->getOption('path'), $finder->find());
+        $configurator->configure($input->getOption('path'), $this->getConfiguration()->all());
     }
 
     /**
-     * @return Symfttpd\Finder\ConfigurationFinder
+     * Return the Symfttpd configuration.
+     *
+     * @return \Symfttpd\Configuration\SymfttpdConfiguration
      */
-    public function getFinder()
+    public function getConfiguration()
     {
-        if (is_null($this->finder)) {
-            $this->finder = new ConfigurationFinder();
-        }
-
-        return $this->finder;
-    }
-
-    /**
-     * @param $finder
-     * @return void
-     */
-    public function setFinder($finder)
-    {
-        $this->finder = $finder;
+        return $this->getApplication()->getSymfttpd()->getConfiguration();
     }
 }
