@@ -14,8 +14,9 @@ namespace Symfttpd\Command;
 use Symfttpd\Symfttpd;
 use Symfttpd\MultiTail;
 use Symfttpd\Tail;
+use Symfttpd\Color;
 use Symfttpd\PosixTools;
-use Symfttpd\Configuration\LighttpdConfiguration;
+use Symfttpd\Server\Lighttpd;
 use Symfttpd\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -73,15 +74,13 @@ class SpawnCommand extends Command
             exit(!PosixTools::killPid($this->getPidfile(), $output));
         }
 
-        $this->server = $this->getConfiguration()->get('server', 'lighttpd');
-
         // Initialise Server options
-        $serverConfiguration = new LighttpdConfiguration($this->getProjectPath());
-        $serverConfiguration->clear();
-        $serverConfiguration->set('port', $input->getOption('port'));
-        $serverConfiguration->set('bind', $input->getOption('bind'));
+        $this->server = $this->getSymfttpd()->getServer($this->getProjectPath());
+        $this->server->clear();
+        $this->server->configuration->set('port', $input->getOption('port'));
+        $this->server->configuration->set('bind', $input->getOption('bind'));
 
-        $this->getConfiguration()->set('restartfile', $serverConfiguration->getCacheDir().'/.symfttpd_restart');
+        $this->getConfiguration()->set('restartfile', $this->server->getCacheDir().'/.symfttpd_restart');
 
         $allow = explode(',', $input->getOption('allow'));
         $nophp = explode(',', $input->getOption('nophp'));
@@ -116,7 +115,7 @@ class SpawnCommand extends Command
             $files['php'][] = $name . '.php';
         }
 
-        $serverConfiguration->add(array(
+        $this->server->configuration->add(array(
             'document_root' => $path,
             'default' => $input->getOption('default'),
             'nophp'   => $nophp,
@@ -126,8 +125,8 @@ class SpawnCommand extends Command
         ));
 
         // Creates the server configuration.
-        $serverConfiguration->generate($this->getConfiguration());
-        $serverConfiguration->write();
+        $this->server->generate($this->getConfiguration());
+        $this->server->write();
 
         $boundAddress = $input->getOption('all') ? 'all-interfaces' : $input->getOption('bind');
 
@@ -135,7 +134,7 @@ class SpawnCommand extends Command
         $host = in_array($bind, array(false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
 
         $apps = array();
-        foreach ($serverConfiguration->get('phps') as $file) {
+        foreach ($this->server->configuration->get('phps') as $file) {
             if (preg_match('/.+\.php$/', $file)) {
                 $apps[$file] = ' http://' . $host . ':' . $input->getOption('port') . '/<info>' . $file . '</info>';
             }
@@ -151,23 +150,23 @@ Available applications:
 Press Ctrl+C to stop serving.
 
 TEXT;
-        $output->write(sprintf($text, $boundAddress, $serverConfiguration->get('port'), implode("\n", $apps)));
+        $output->write(sprintf($text, $boundAddress, $this->server->configuration->get('port'), implode("\n", $apps)));
 
         flush();
 
         if (true == $input->getOption('single_process')) {
             // Run lighttpd
-            $this->serverStart($serverConfiguration);
+            $this->serverStart($this->server);
 
             $output->write('Terminated.');
         } else {
             if ($input->getOption('tail')) {
-                $logDir = $this->getProjectPath() . $serverConfiguration->getLogDir();
+                $logDir = $this->server->getLogDir();
                 $multitail = new MultiTail();
                 $multitail->add('access', new Tail($logDir . '/access.log'),
-                    Symfttpd\Color::fgColor('blue'), Symfttpd\Color::style('normal'));
+                    Color::fgColor('blue'), Color::style('normal'));
                 $multitail->add(' error', new Tail($logDir . '/error.log'),
-                    Symfttpd\Color::style('bright') . Symfttpd\Color::fgColor('red'), Symfttpd\Color::style('normal'));
+                    Color::style('bright') . Color::fgColor('red'), Color::style('normal'));
                 // We have to do it before the fork to capture the startup messages
                 $multitail->consume();
             }
@@ -179,17 +178,17 @@ TEXT;
 
                     // Generate the configuration file.
                     if (false == $this->getConfiguration()->has('genconf_cmd')) {
-                        $serverConfiguration->generateHost($this->getConfiguration());
+                        $this->server->generateRules($this->getConfiguration());
                     }
 
-                    $genconf = $serverConfiguration->read();
+                    $genconf = $this->server->read();
 
                     if ($prevGenconf !== null && $prevGenconf !== $genconf) {
                         // This sleep() is so that if a HTTP request just created a file in web/,
                         // the web server isn't restarted right away.
                         sleep(1);
-                        touch($this->getRestartfile());
-                        !PosixTools::killPid($this->getPidfile(), $output);
+                        touch($this->getConfiguration()->get('restartfile'));
+                        !PosixTools::killPid($this->server->configuration->get('pidfile'), $output);
                     }
                     $prevGenconf = $genconf;
 
@@ -205,22 +204,22 @@ TEXT;
             } elseif ($pid == 0) {
                 // Child process
                 do {
-                    if (file_exists($this->getRestartfile())) {
-                        unlink($this->getRestartfile());
+                    if (file_exists($this->getConfiguration()->get('restartfile'))) {
+                        unlink($this->getConfiguration()->get('restartfile'));
                     }
 
                     // Run lighttpd
-                    $this->serverStart($serverConfiguration);
+                    $this->serverStart($this->server);
 
-                    if (!file_exists($this->getRestartfile())) {
+                    if (!file_exists($this->getConfiguration()->get('restartfile'))) {
                         $output->writeln('Terminated.');
                     } else {
                         $output->writeln('<info>Something in web/ changed. Restarting lighttpd.</info>');
 
                         // Regenerate the lighttpd configuration
-                        $serverConfiguration->generateHost($this->getConfiguration());
+                        $this->server->generateRules($this->getConfiguration());
                     }
-                } while (file_exists($this->getRestartfile()));
+                } while (file_exists($this->getConfiguration()->get('restartfile')));
             }
             else {
                 $input->writeln('<error>Unable to fork!</error>');
@@ -242,11 +241,27 @@ TEXT;
     /**
      * Start the server.
      *
-     * @param \Symfttpd\Configuration\ServerConfigurationInterface $serverConfiguration
+     * @param \Symfttpd\Server\ServerInterface $server
      */
-    protected function serverStart(\Symfttpd\Configuration\ServerConfigurationInterface $serverConfiguration)
+    protected function serverStart()
     {
-        passthru($this->getConfiguration()->getServerCmd() . ' -D -f ' . escapeshellarg($serverConfiguration->getConfigFile()));
+        // If a command exists in the symfttpd config file  it use this one.
+        // Else it will guess the lighttpd command to use.
+        if ($this->getConfiguration()->has('lighttpd_cmd')) {
+            $this->server->setCommand($this->getConfiguration()->get('lighttpd_cmd'));
+        }
+
+        $this->server->start();
+    }
+
+    /**
+     * Return the Symfttpd instance.
+     *
+     * @return \Symfttpd\Symfttpd
+     */
+    protected function getSymfttpd()
+    {
+        return $this->getApplication()->getSymfttpd();
     }
 
     /**

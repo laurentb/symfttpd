@@ -38,4 +38,12 @@ interface ServerInterface
      * @throws Exception\ConfigurationException
      */
     public function write();
+
+    /**
+     * Start the server.
+     *
+     * @abstract
+     * @return mixed
+     */
+    public function start();
 }
