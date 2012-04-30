@@ -51,6 +51,8 @@ class ScriptHandler
      */
     public static function setupFixtures(Event $event)
     {
+
+        return;
         $handler = new static();
 
         $handler->isUpdate = strpos($event->getName(), 'update');
