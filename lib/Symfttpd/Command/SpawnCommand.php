@@ -18,7 +18,7 @@ use Symfttpd\Color;
 use Symfttpd\PosixTools;
 use Symfttpd\Server\Lighttpd;
 use Symfttpd\Console\Application;
-use Symfony\Component\Console\Command\Command;
+use Symfttpd\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -252,16 +252,6 @@ TEXT;
         }
 
         $this->server->start();
-    }
-
-    /**
-     * Return the Symfttpd instance.
-     *
-     * @return \Symfttpd\Symfttpd
-     */
-    protected function getSymfttpd()
-    {
-        return $this->getApplication()->getSymfttpd();
     }
 
     /**

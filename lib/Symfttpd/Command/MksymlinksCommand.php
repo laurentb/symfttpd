@@ -12,7 +12,7 @@ use Symfttpd\Validator\ProjectTypeValidator;
 use Symfttpd\Configurator\Exception\ConfiguratorNotFoundException;
 
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
+use Symfttpd\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
