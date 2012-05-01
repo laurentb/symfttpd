@@ -11,7 +11,7 @@
 
 namespace Symfttpd\Command;
 
-use Symfony\Component\Console\Command\Command;
+use Symfttpd\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,11 +22,11 @@ use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfttpd\Configuration\Exception\ConfigurationException;
 
 /**
- * ConfigurationGenerator class.
+ * GenconfCommand class.
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class ConfigurationGeneratorCommand extends Command
+class GenconfCommand extends Command
 {
     /**
      * @return void
@@ -39,6 +39,9 @@ class ConfigurationGeneratorCommand extends Command
 The genconf command generates the host configuration for the server.
 EOT
         );
+
+        // Configure arguments
+        $this->addArgument('type', InputArgument::OPTIONAL, 'The config file type (config, rules, all).', 'all');
 
         // Configure options.
         $this->addOption('default',   null, InputOption::VALUE_OPTIONAL, 'Change the default application.', 'index')
@@ -59,22 +62,33 @@ EOT
         $output->writeln(sprintf('<comment>Symfttpd - version %s</comment>', Symfttpd::VERSION));
         $output->writeln('Starting generating symfttpd configuration.');
 
-        $configuration = new LighttpdConfiguration();
-
-        $symfttpdConfig = $this->getSymfttpdConfiguration($input->getOptions());
+        $server = $this->getSymfttpd()->getServer(getcwd());
+        $server->configuration->add($this->getServerOptions($input->getOptions()));
 
         try {
             $configDir = $input->getOption('output-dir');
 
-            $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.', $configuration->getFilename(), $configDir));
-
-            $configuration->generateHost($symfttpdConfig);
-
-            if (true == $input->getOption('quiet')) {
-                print $configuration->readHost();
-            } else {
-                $configuration->writeHost($configDir);
+            switch ($input->getArgument('type'))
+            {
+                case 'config':
+                    $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.', $server->getConfigFilename(), $configDir));
+                    $server->generateConfiguration($this->getSymfttpd()->getConfiguration());
+                    break;
+                case 'rules':
+                    $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.', $server->getRulesFilename(), $configDir));
+                    $server->generateRules($this->getSymfttpd()->getConfiguration());
+                    break;
+                default:
+                    $output->writeln(sprintf(
+                        'Generate <comment>%s</comment> and <comment>%s</comment> in <info>"%s"</info>.',
+                        $server->getConfigFilename(),
+                        $server->getRulesFilename(),
+                        $configDir
+                    ));
+                    $server->generate($this->getSymfttpd()->getConfiguration());
             }
+
+            $server->write($input->getArgument('type'));
 
         } catch (ConfigurationException $e) {
             $output->writeln('<error>An error occured while file generation.</error>');
@@ -89,14 +103,13 @@ EOT
     }
 
     /**
-     * Create the SymfttpdConfiguration class with the
-     * options passed to the command.
+     * Create the server options passed to the command.
      *
      * @param array $options
-     * @return \Symfttpd\Configuration\SymfttpdConfiguration
+     * @return array
      * @throws \InvalidArgumentException
      */
-    public function getSymfttpdConfiguration(array $options)
+    public function getServerOptions(array $options)
     {
         $allow = explode(',', $options['allow']);
         $nophp = explode(',', $options['nophp']);
@@ -131,15 +144,13 @@ EOT
             $files['php'][] = $name . '.php';
         }
 
-        $symfttpdConfig = new SymfttpdConfiguration(array(
+        return array(
             'document_root' => $path,
-            'nophp'   => $nophp,
-            'default' => $options['default'],
-            'php'     => $files['php'],
-            'file'    => $files['file'],
-            'dir'     => $files['dir'],
-        ));
-
-        return $symfttpdConfig;
+            'nophp'    => $nophp,
+            'default'  => $options['default'],
+            'phps'     => $files['php'],
+            'files'    => $files['file'],
+            'dirs'     => $files['dir'],
+        );
     }
 }
