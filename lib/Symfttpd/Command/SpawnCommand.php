@@ -12,9 +12,8 @@
 namespace Symfttpd\Command;
 
 use Symfttpd\Symfttpd;
-use Symfttpd\MultiTail;
-use Symfttpd\Tail;
-use Symfttpd\Color;
+use Symfttpd\Tail\MultiTail;
+use Symfttpd\Tail\Tail;
 use Symfttpd\PosixTools;
 use Symfttpd\Server\Lighttpd;
 use Symfttpd\Console\Application;
@@ -23,6 +22,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 
 /**
@@ -162,11 +163,9 @@ TEXT;
         } else {
             if ($input->getOption('tail')) {
                 $logDir = $this->server->getLogDir();
-                $multitail = new MultiTail();
-                $multitail->add('access', new Tail($logDir . '/access.log'),
-                    Color::fgColor('blue'), Color::style('normal'));
-                $multitail->add(' error', new Tail($logDir . '/error.log'),
-                    Color::style('bright') . Color::fgColor('red'), Color::style('normal'));
+                $multitail = new MultiTail(new OutputFormatter(true));
+                $multitail->add('access', new Tail($logDir . '/access.log'), new OutputFormatterStyle('blue'));
+                $multitail->add('error', new Tail($logDir . '/error.log'), new OutputFormatterStyle('red', null, array('bold')));
                 // We have to do it before the fork to capture the startup messages
                 $multitail->consume();
             }
