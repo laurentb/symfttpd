@@ -59,7 +59,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln(sprintf('<comment>Symfttpd - version %s</comment>', Symfttpd::VERSION));
+        $this->writeVersion($output);
         $output->writeln('Starting generating symfttpd configuration.');
 
         $server = $this->getSymfttpd()->getServer(getcwd());
