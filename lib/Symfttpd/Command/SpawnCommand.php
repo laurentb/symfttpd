@@ -14,7 +14,6 @@ namespace Symfttpd\Command;
 use Symfttpd\Symfttpd;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
-use Symfttpd\PosixTools;
 use Symfttpd\Server\Lighttpd;
 use Symfttpd\Console\Application;
 use Symfttpd\Command\Command;
@@ -77,8 +76,8 @@ class SpawnCommand extends Command
         // Initialise Server options
         $this->server = $this->getSymfttpd()->getServer($this->getProjectPath());
         $this->server->clear();
-        $this->server->configuration->set('port', $input->getOption('port'));
-        $this->server->configuration->set('bind', $input->getOption('bind'));
+        $this->server->options->set('port', $input->getOption('port'));
+        $this->server->options->set('bind', $input->getOption('bind'));
 
         $this->getConfiguration()->set('restartfile', $this->server->getCacheDir().'/.symfttpd_restart');
 
@@ -88,10 +87,10 @@ class SpawnCommand extends Command
             if (file_exists($this->getConfiguration()->get('restartfile'))) {
                 unlink($this->getConfiguration()->get('restartfile'));
             }
-            exit(!\Symfttpd\Utils\PosixTools::killPid($this->server->configuration->get('pidfile'), $output));
+            exit(!\Symfttpd\Utils\PosixTools::killPid($this->server->options->get('pidfile'), $output));
         }
 
-        $this->server->configuration->add($this->getServerOptions($input->getOptions()));
+        $this->server->options->add($this->getServerOptions($input->getOptions()));
 
         if ($this->getConfiguration()->has('lighttpd_cmd')) {
             $this->server->setCommand($this->getConfiguration()->get('lighttpd_cmd'));
@@ -107,7 +106,7 @@ class SpawnCommand extends Command
         $host = in_array($bind, array(false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
 
         $apps = array();
-        foreach ($this->server->configuration->get('phps') as $file) {
+        foreach ($this->server->options->get('phps') as $file) {
             if (preg_match('/.+\.php$/', $file)) {
                 $apps[$file] = ' http://' . $host . ':' . $input->getOption('port') . '/<info>' . $file . '</info>';
             }
@@ -124,7 +123,7 @@ Available applications:
 
 TEXT;
         $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
-        $output->write(sprintf($text, $boundAddress, $this->server->configuration->get('port'), implode("\n", $apps)));
+        $output->write(sprintf($text, $boundAddress, $this->server->options->get('port'), implode("\n", $apps)));
 
         flush();
 
@@ -167,12 +166,18 @@ TEXT;
         $forkCallback = function(ServerInterface $server, SymfttpdConfiguration $configuration) use ($output)
         {
             do {
+                $stop = false;
                 if (file_exists($configuration->get('restartfile'))) {
                     unlink($configuration->get('restartfile'));
                 }
 
-                // Run lighttpd
-                $server->start();
+                try {
+                    // Run lighttpd
+                    $server->start();
+                } catch (\Symfttpd\Server\Exception\ServerException $e) {
+                    $output->writeln(sprintf('%s', $e->getMessage()));
+                    $stop = true;
+                }
 
                 if (!file_exists($configuration->get('restartfile'))) {
                     $output->writeln('Terminated.');
@@ -182,7 +187,7 @@ TEXT;
                     // Regenerate the lighttpd configuration
                     $server->generateRules($configuration);
                 }
-            } while (file_exists($configuration->get('restartfile')));
+            } while ($stop == false && file_exists($configuration->get('restartfile')));
         };
 
         // Create variables for the callback
@@ -194,7 +199,7 @@ TEXT;
         {
             $filesystem = new \Symfttpd\Filesystem\Filesystem();
             $prevGenconf = null;
-            while (false !== sleep(1)) {
+            while ($server->isRunning() && false !== sleep(1)) {
                 // Generate the configuration file.
                 $server->generateRules($configuration);
                 $genconf = $server->read();
@@ -216,8 +221,7 @@ TEXT;
 
         $manager = new ProcessManager(new DeferredFactory());
         $manager->fork($forkCallback, array($this->server, $this->getConfiguration()))
-            ->always($callback)
-            ->resolve();
+            ->then($callback);
     }
 
     /**

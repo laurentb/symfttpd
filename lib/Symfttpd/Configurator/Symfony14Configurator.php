@@ -14,8 +14,6 @@ namespace Symfttpd\Configurator;
 use Symfttpd\Configurator\ConfiguratorInterface;
 use Symfttpd\Configurator\Exception\ConfiguratorException;
 use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\FileTools;
-use Symfttpd\PosixTools;
 use Symfony\Component\Process\PhpProcess;
 
 /**
@@ -61,12 +59,7 @@ class Symfony14Configurator implements ConfiguratorInterface
         // Creates cache and log folders
         $this->filesystem->mkdir(array($path . '/cache', $path . '/log'));
 
-        // Creates symlinks to lighttpd.conf
         $symlinks = array();
-        //if ($options['genconf']) {
-        //    $symlinks[$options['genconf']] = $options['path'] . '/genconf';
-        //}
-
         $sfPath = $options['sf_path'][$options['want']];
         $sfSymlinks = array(
             'symfony_symlink' => '',
@@ -94,7 +87,7 @@ class Symfony14Configurator implements ConfiguratorInterface
         // Generates
         if ($options['do_plugins']) {
             if (version_compare($options['want'], '1.2') >= 0) {
-                $process = new PhpProcess(' symfony plugin:publish-assets', realpath($path));
+                $process = new PhpProcess('symfony plugin:publish-assets', realpath($path));
                 $process->setTimeout(5);
                 $process->run();
 

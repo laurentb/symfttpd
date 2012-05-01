@@ -11,7 +11,7 @@
 
 namespace Symfttpd\Configuration;
 
-use Symfttpd\Configuration\ConfigurationBag;
+use Symfttpd\Configuration\OptionBag;
 use Symfttpd\Configuration\ConfigurationInterface;
 use Symfttpd\Exception\ExecutableNotFoundException;
 
@@ -20,7 +20,7 @@ use Symfttpd\Exception\ExecutableNotFoundException;
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class SymfttpdConfiguration extends ConfigurationBag implements ConfigurationInterface
+class SymfttpdConfiguration extends OptionBag implements ConfigurationInterface
 {
     /**
      * @var string

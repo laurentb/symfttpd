@@ -6,10 +6,10 @@ server.modules = (
     "mod_fastcgi",
 )
 
-server.port           = <?php echo $this->configuration->get('port') ?>
+server.port           = <?php echo $this->options->get('port') ?>
 
-<?php if ($this->configuration->has('bind')): ?>
-server.bind           = "<?php echo $this->configuration->get('bind') ?>"
+<?php if ($this->options->has('bind')): ?>
+server.bind           = "<?php echo $this->options->get('bind') ?>"
 <?php endif ?>
 
 fastcgi.server = ( ".php" =>
@@ -41,7 +41,7 @@ static-file.exclude-extensions = (".php")
 # http://redmine.lighttpd.net/issues/406
 server.force-lowercase-filenames = "disable"
 
-server.pid-file       = "<?php echo $this->configuration->get('pidfile') ?>"
+server.pid-file       = "<?php echo $this->options->get('pidfile') ?>"
 
 server.errorlog       = "<?php echo $this->getLogDir() ?>/error.log"
 accesslog.filename    = "<?php echo $this->getLogDir() ?>/access.log"
@@ -52,4 +52,3 @@ debug.log-request-header-on-error = "enable"
 <?php if (null !== $this->rules): ?>
 include "<?php echo $this->getRulesFile() ?>"
 <?php endif ?>
-

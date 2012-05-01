@@ -12,8 +12,9 @@
 namespace Symfttpd\Server;
 
 use Symfttpd\Server\ServerInterface;
+use Symfttpd\Server\Exception\ServerException;
 use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\Configuration\ConfigurationBag;
+use Symfttpd\Configuration\OptionBag;
 use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfttpd\Configuration\ConfigurationInterface;
 use Symfttpd\Configuration\Exception\ConfigurationException;
@@ -88,25 +89,30 @@ class Lighttpd implements ServerInterface
     /**
      * The collection of configuration options.
      *
-     * @var ConfigurationBag
+     * @var OptionBag
      */
-    public $configuration;
+    public $options;
+
+    /**
+     * @var bool
+     */
+    public $isRunning = false;
 
     /**
      * Constructor class
      *
      * @param null $workingDir
-     * @param null|\Symfttpd\Configuration\ConfigurationBag $configuration
+     * @param null|\Symfttpd\Configuration\OptionBag $options
      */
-    public function __construct($workingDir = null, ConfigurationBag $configuration = null)
+    public function __construct($workingDir = null, OptionBag $options = null)
     {
         $this->workingDir = $workingDir;
-        $this->configuration = $configuration ?: new ConfigurationBag();
+        $this->options = $options ?: new OptionBag();
 
         // Set the defaults settings
-        $this->configuration->set('log_dir', $this->workingDir . '/log/lighttpd');
-        $this->configuration->set('cache_dir', $this->workingDir . '/cache/lighttpd');
-        $this->configuration->set('pidfile', $this->getCacheDir().'/.sf');
+        $this->options->set('log_dir', $this->workingDir . '/log/lighttpd');
+        $this->options->set('cache_dir', $this->workingDir . '/cache/lighttpd');
+        $this->options->set('pidfile', $this->getCacheDir().'/.sf');
 
         $this->ensureDirectories();
     }
@@ -123,6 +129,8 @@ class Lighttpd implements ServerInterface
 
     /**
      * Return the lighttpd configuration content.
+     * Read the lighttpd.conf in the cache file
+     * if needed.
      *
      * @return string
      * @throws Exception\ConfigurationException
@@ -133,15 +141,23 @@ class Lighttpd implements ServerInterface
             return $this->lighttpdConfig;
         }
 
+        if (null == $this->configFile) {
+            $this->configFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->configFilename;
+        }
+
         if (false == file_exists($this->getConfigFile())) {
             throw new ConfigurationException('The lighttpd configuration has not been generated.');
         }
 
-        return file_get_contents($this->getConfigFile());
+        $this->lighttpdConfig = file_get_contents($this->getConfigFile());
+
+        return $this->lighttpdConfig;
     }
 
     /**
      * Return the rules configuration content.
+     * Read the rules.conf in the cache directory
+     * if needed.
      *
      * @return string
      * @throws Exception\ConfigurationException
@@ -152,11 +168,17 @@ class Lighttpd implements ServerInterface
             return $this->rules;
         }
 
+        if (null == $this->rulesFile) {
+            $this->rulesFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->rulesFilename;
+        }
+
         if (false == file_exists($this->rulesFile)) {
             throw new ConfigurationException('The rules configuration has not been generated.');
         }
 
-        return file_get_contents($this->rulesFile);
+        $this->rules = file_get_contents($this->rulesFile);
+
+        return $this->rules;
     }
 
     /**
@@ -278,7 +300,7 @@ class Lighttpd implements ServerInterface
      */
     public function getLogDir()
     {
-        return $this->configuration->get('log_dir');
+        return $this->options->get('log_dir');
 
     }
 
@@ -289,7 +311,7 @@ class Lighttpd implements ServerInterface
      */
     public function getCacheDir()
     {
-        return $this->configuration->get('cache_dir');
+        return $this->options->get('cache_dir');
     }
 
     /**
@@ -358,14 +380,20 @@ class Lighttpd implements ServerInterface
     /**
      * Return the server command value
      *
+     * @param null|\Symfony\Component\Process\ExecutableFinder $finder
+     * @return string
      * @throws \Symfttpd\Exception\ExecutableNotFoundException
      */
-    public function getCommand()
+    public function getCommand(ExecutableFinder $finder = null)
     {
         if (null == $this->command) {
-            $exeFinder = new ExecutableFinder();
-            $exeFinder->addSuffix('');
-            $cmd = $exeFinder->find('lighttpd');
+
+            if (null == $finder) {
+                $finder = new ExecutableFinder();
+            }
+
+            $finder->addSuffix('');
+            $cmd = $finder->find('lighttpd');
 
             if (null == $cmd) {
                 throw new ExecutableNotFoundException('lighttpd executable not found.');
@@ -389,9 +417,34 @@ class Lighttpd implements ServerInterface
 
     /**
      * Start the server.
+     *
+     * @return \Symfony\Component\Process\Process
+     * @throws Exception\ServerException
      */
     public function start()
     {
-        passthru($this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile()));
+        $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
+        $command = 'toto -D -f ' . escapeshellarg($this->getConfigFile());
+
+        $process = new \Symfony\Component\Process\Process($command, $this->workingDir, null, null, null);
+        $process->run();
+
+        if (false == $process->isRunning()) {
+            throw new ServerException($process->getErrorOutput());
+        }
+
+        $this->isRunning = $process->isRunning();
+
+        return $process;
+    }
+
+    /**
+     * Return the status of the server.
+     *
+     * @return bool
+     */
+    public function isRunning()
+    {
+        return $this->isRunning;
     }
 }

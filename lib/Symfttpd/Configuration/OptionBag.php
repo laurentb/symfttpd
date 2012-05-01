@@ -12,11 +12,11 @@
 namespace Symfttpd\Configuration;
 
 /**
- * ConfigurationBag class
+ * OptionBag class
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class ConfigurationBag implements \IteratorAggregate
+class OptionBag implements \IteratorAggregate
 {
     /**
      * @var array
@@ -83,11 +83,14 @@ class ConfigurationBag implements \IteratorAggregate
 
     /**
      * Merge new options with existing ones.
+     * Do not use array_merge as it rewrites the keys.
      *
      * @param array $options
      */
     public function add(array $options)
     {
-        $this->options = array_merge($this->options, $options);
+        if (false == empty($options)) {
+            $this->options = $this->options + $options;
+        }
     }
 }

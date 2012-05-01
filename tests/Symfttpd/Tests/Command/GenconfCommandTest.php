@@ -9,11 +9,11 @@
 namespace Symfttpd\Tests\Command;
 
 use Symfttpd\Tests\Test as BaseTestCase;
-use Symfttpd\Command\ConfigurationGeneratorCommand;
+use Symfttpd\Command\GenconfCommand;
 use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class ConfigurationGeneratorCommandTest extends BaseTestCase
+class GenconfCommandTest extends BaseTestCase
 {
     /**
      * @var Symfttpd\Filesystem\Filesystem $filesystem
@@ -38,7 +38,7 @@ class ConfigurationGeneratorCommandTest extends BaseTestCase
         $this->filesystem = new Filesystem();
         $this->filesystem->remove($this->fixtures.'/cache/lighttpd/lighttpd.conf');
 
-        $this->command = new ConfigurationGeneratorCommand();
+        $this->command = new GenconfCommand();
         $this->tester  = new CommandTester($this->command);
     }
 
