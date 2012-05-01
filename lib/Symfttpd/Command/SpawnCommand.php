@@ -24,15 +24,14 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-
+use Spork\Deferred\DeferredFactory;
+use Spork\ProcessManager;
 
 /**
  * SpawnCommand class
  *
  * @author Laurent Bachelier <laurent@bachelier.name>
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
- *
- * @todo Use Spork instead of native php function to creae a fork (mocking...)
  */
 class SpawnCommand extends Command
 {
@@ -62,9 +61,16 @@ class SpawnCommand extends Command
         }
     }
 
+    /**
+     * Run the SYmttpd configured server.
+     *
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @throws \InvalidArgumentException
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln(sprintf('<comment>Symfttpd - version %s</comment>', Symfttpd::VERSION));
+        $this->writeVersion($output);
 
         // Kill other symfttpd process.
         if ($input->getOption('kill')) {
@@ -160,71 +166,71 @@ TEXT;
             $this->serverStart($this->server);
 
             $output->write('Terminated.');
-        } else {
-            if ($input->getOption('tail')) {
-                $logDir = $this->server->getLogDir();
-                $multitail = new MultiTail(new OutputFormatter(true));
-                $multitail->add('access', new Tail($logDir . '/access.log'), new OutputFormatterStyle('blue'));
-                $multitail->add('error', new Tail($logDir . '/error.log'), new OutputFormatterStyle('red', null, array('bold')));
-                // We have to do it before the fork to capture the startup messages
-                $multitail->consume();
-            }
-            $pid = pcntl_fork();
-            if ($pid) {
-                // Parent process
-                $prevGenconf = null;
-                while (false !== sleep(1)) {
 
-                    // Generate the configuration file.
-                    if (false == $this->getConfiguration()->has('genconf_cmd')) {
-                        $this->server->generateRules($this->getConfiguration());
-                    }
-
-                    $genconf = $this->server->read();
-
-                    if ($prevGenconf !== null && $prevGenconf !== $genconf) {
-                        // This sleep() is so that if a HTTP request just created a file in web/,
-                        // the web server isn't restarted right away.
-                        sleep(1);
-                        touch($this->getConfiguration()->get('restartfile'));
-                        !PosixTools::killPid($this->server->configuration->get('pidfile'), $output);
-                    }
-                    $prevGenconf = $genconf;
-
-                    if ($input->getOption('tail')) {
-                        $multitail->consume();
-                    }
-
-                    // If the children is defunct, we are finished here
-                    if (pcntl_waitpid($pid, $status, WNOHANG)) {
-                        exit(0);
-                    }
-                }
-            } elseif ($pid == 0) {
-                // Child process
-                do {
-                    if (file_exists($this->getConfiguration()->get('restartfile'))) {
-                        unlink($this->getConfiguration()->get('restartfile'));
-                    }
-
-                    // Run lighttpd
-                    $this->serverStart($this->server);
-
-                    if (!file_exists($this->getConfiguration()->get('restartfile'))) {
-                        $output->writeln('Terminated.');
-                    } else {
-                        $output->writeln('<info>Something in web/ changed. Restarting lighttpd.</info>');
-
-                        // Regenerate the lighttpd configuration
-                        $this->server->generateRules($this->getConfiguration());
-                    }
-                } while (file_exists($this->getConfiguration()->get('restartfile')));
-            }
-            else {
-                $input->writeln('<error>Unable to fork!</error>');
-                exit(1);
-            }
+            return 0;
         }
+
+        $multitail = null;
+        if ($input->getOption('tail')) {
+            $logDir = $this->server->getLogDir();
+            $multitail = new MultiTail(new OutputFormatter(true));
+            $multitail->add('access', new Tail($logDir . '/access.log'), new OutputFormatterStyle('blue'));
+            $multitail->add('error', new Tail($logDir . '/error.log'), new OutputFormatterStyle('red', null, array('bold')));
+            // We have to do it before the fork to capture the startup messages
+            $multitail->consume();
+        }
+
+        $forkCallback = function(\Symfttpd\Server\ServerInterface $server, \Symfttpd\Configuration\SymfttpdConfiguration $configuration) use ($output) {
+            // Child process
+            do {
+                if (file_exists($configuration->get('restartfile'))) {
+                    unlink($configuration->get('restartfile'));
+                }
+
+                // Run lighttpd
+                $server->start();
+
+                if (!file_exists($configuration->get('restartfile'))) {
+                    $output->writeln('Terminated.');
+                } else {
+                    $output->writeln('<info>Something in web/ changed. Restarting lighttpd.</info>');
+
+                    // Regenerate the lighttpd configuration
+                    $server->generateRules($configuration);
+                }
+            } while (file_exists($configuration->get('restartfile')));
+        };
+
+        $server = $this->server;
+        $configuration = $this->getConfiguration();
+        $callback = function () use ($input, $output, $server, $configuration, $multitail) {
+            $filesystem = new \Symfttpd\Filesystem\Filesystem();
+            $prevGenconf = null;
+            while (false !== sleep(1)) {
+                // Generate the configuration file.
+                $server->generateRules($configuration);
+                $genconf = $server->read();
+
+                if ($prevGenconf !== null && $prevGenconf !== $genconf) {
+                    // This sleep() is so that if a HTTP request just created a file in web/,
+                    // the web server isn't restarted right away.
+                    sleep(1);
+                    $filesystem->touch($configuration->get('restartfile'));
+                    PosixTools::killPid($server->configuration->get('pidfile'), $output);
+                }
+                $prevGenconf = $genconf;
+
+                if ($multitail instanceof MultiTail) {
+                    $multitail->consume();
+                }
+            }
+        };
+        $manager = new ProcessManager(new DeferredFactory());
+        $manager->fork($forkCallback, array($this->server, $this->getConfiguration()))
+            ->always($callback)
+            ->resolve();
+
+        return 0;
     }
 
     /**
