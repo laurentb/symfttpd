@@ -23,8 +23,7 @@
         "php": ">=5.3.2",
         "symfony/console":    "dev-master",
         "symfony/process":    "dev-master",
-        "symfony/filesystem": "dev-master",
-        "monolog/monolog":    "dev-master"
+        "symfony/filesystem": "dev-master"
     },
     "autoload": {
         "psr-0": {
