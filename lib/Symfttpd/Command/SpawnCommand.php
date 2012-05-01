@@ -18,6 +18,8 @@ use Symfttpd\PosixTools;
 use Symfttpd\Server\Lighttpd;
 use Symfttpd\Console\Application;
 use Symfttpd\Command\Command;
+use Symfttpd\Server\ServerInterface;
+use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -72,15 +74,6 @@ class SpawnCommand extends Command
     {
         $this->writeVersion($output);
 
-        // Kill other symfttpd process.
-        if ($input->getOption('kill')) {
-            // Kill existing symfttpd instance if found.
-            if (file_exists($this->getRestartfile())) {
-                unlink($input->getRestartfile());
-            }
-            exit(!PosixTools::killPid($this->getPidfile(), $output));
-        }
-
         // Initialise Server options
         $this->server = $this->getSymfttpd()->getServer($this->getProjectPath());
         $this->server->clear();
@@ -89,47 +82,20 @@ class SpawnCommand extends Command
 
         $this->getConfiguration()->set('restartfile', $this->server->getCacheDir().'/.symfttpd_restart');
 
-        $allow = explode(',', $input->getOption('allow'));
-        $nophp = explode(',', $input->getOption('nophp'));
-        $path  = realpath($input->getOption('path'));
-
-        $files = array(
-            'dir' => array(),
-            'php' => array(),
-            'file' => array()
-        );
-
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf('Document root "%s" not found.', $input->getOption('path')));
-        }
-
-        foreach (new \DirectoryIterator($path) as $file) {
-            $name = $file->getFilename();
-            if ($name[0] != '.') {
-                if ($file->isDir()) {
-                    $files['dir'][] = $name;
-                }
-                elseif (!preg_match('/\.php$/', $name)) {
-                    $files['file'][] = $name;
-                }
-                elseif (empty($options['only'])) {
-                    $files['php'][] = $name;
-                }
+        // Kill other running server in the current project.
+        if ($input->getOption('kill')) {
+            // Kill existing symfttpd instance if found.
+            if (file_exists($this->getConfiguration()->get('restartfile'))) {
+                unlink($this->getConfiguration()->get('restartfile'));
             }
+            exit(!\Symfttpd\Utils\PosixTools::killPid($this->server->configuration->get('pidfile'), $output));
         }
 
-        foreach ($allow as $name) {
-            $files['php'][] = $name . '.php';
-        }
+        $this->server->configuration->add($this->getServerOptions($input->getOptions()));
 
-        $this->server->configuration->add(array(
-            'document_root' => $path,
-            'default' => $input->getOption('default'),
-            'nophp'   => $nophp,
-            'phps'    => $files['php'],
-            'files'   => $files['file'],
-            'dirs'    => $files['dir'],
-        ));
+        if ($this->getConfiguration()->has('lighttpd_cmd')) {
+            $this->server->setCommand($this->getConfiguration()->get('lighttpd_cmd'));
+        }
 
         // Creates the server configuration.
         $this->server->generate($this->getConfiguration());
@@ -154,22 +120,39 @@ lighttpd started on <info>%s</info>, port <info>%s</info>.
 Available applications:
 %s
 
-Press Ctrl+C to stop serving.
+<important>Press Ctrl+C to stop serving.</important>
 
 TEXT;
+        $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
         $output->write(sprintf($text, $boundAddress, $this->server->configuration->get('port'), implode("\n", $apps)));
 
         flush();
 
         if (true == $input->getOption('single_process')) {
             // Run lighttpd
-            $this->serverStart($this->server);
+            $this->server->start();
 
             $output->write('Terminated.');
 
             return 0;
         }
 
+        $this->spawn($input, $output);
+
+        return 0;
+    }
+
+    /**
+     * Launch the server in a fork.
+     * The parent thread check every seconds if the rewrite
+     * rules changed. In this case it will create a file that
+     * will tell to the fork that the server must be restarted.
+     *
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     */
+    protected function spawn(InputInterface $input, OutputInterface $output)
+    {
         $multitail = null;
         if ($input->getOption('tail')) {
             $logDir = $this->server->getLogDir();
@@ -180,8 +163,9 @@ TEXT;
             $multitail->consume();
         }
 
-        $forkCallback = function(\Symfttpd\Server\ServerInterface $server, \Symfttpd\Configuration\SymfttpdConfiguration $configuration) use ($output) {
-            // Child process
+        // Callback that will start the server.
+        $forkCallback = function(ServerInterface $server, SymfttpdConfiguration $configuration) use ($output)
+        {
             do {
                 if (file_exists($configuration->get('restartfile'))) {
                     unlink($configuration->get('restartfile'));
@@ -201,9 +185,13 @@ TEXT;
             } while (file_exists($configuration->get('restartfile')));
         };
 
+        // Create variables for the callback
         $server = $this->server;
         $configuration = $this->getConfiguration();
-        $callback = function () use ($input, $output, $server, $configuration, $multitail) {
+
+        // Callback to execute in parallel of the child process.
+        $callback = function () use ($input, $output, $server, $configuration, $multitail)
+        {
             $filesystem = new \Symfttpd\Filesystem\Filesystem();
             $prevGenconf = null;
             while (false !== sleep(1)) {
@@ -216,7 +204,7 @@ TEXT;
                     // the web server isn't restarted right away.
                     sleep(1);
                     $filesystem->touch($configuration->get('restartfile'));
-                    PosixTools::killPid($server->configuration->get('pidfile'), $output);
+                    \Symfttpd\Utils\PosixTools::killPid($server->configuration->get('pidfile'), $output);
                 }
                 $prevGenconf = $genconf;
 
@@ -225,12 +213,11 @@ TEXT;
                 }
             }
         };
+
         $manager = new ProcessManager(new DeferredFactory());
         $manager->fork($forkCallback, array($this->server, $this->getConfiguration()))
             ->always($callback)
             ->resolve();
-
-        return 0;
     }
 
     /**
@@ -244,26 +231,62 @@ TEXT;
     }
 
     /**
-     * Start the server.
-     *
-     * @param \Symfttpd\Server\ServerInterface $server
-     */
-    protected function serverStart()
-    {
-        // If a command exists in the symfttpd config file  it use this one.
-        // Else it will guess the lighttpd command to use.
-        if ($this->getConfiguration()->has('lighttpd_cmd')) {
-            $this->server->setCommand($this->getConfiguration()->get('lighttpd_cmd'));
-        }
-
-        $this->server->start();
-    }
-
-    /**
      * @return \Symfttpd\Configuration\SymfttpdConfiguration
      */
     public function getConfiguration()
     {
         return $this->getSymfttpd()->getConfiguration();
+    }
+
+    /**
+     * Create the server options passed to the command.
+     *
+     * @param array $options
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public function getServerOptions(array $options)
+    {
+        $allow = explode(',', $options['allow']);
+        $nophp = explode(',', $options['nophp']);
+        $path  = realpath($options['path']);
+
+        $files = array(
+            'dir' => array(),
+            'php' => array(),
+            'file' => array()
+        );
+
+        if (!file_exists($path)) {
+            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $options['path']));
+        }
+
+        foreach (new \DirectoryIterator($path) as $file) {
+            $name = $file->getFilename();
+            if ($name[0] != '.') {
+                if ($file->isDir()) {
+                    $files['dir'][] = $name;
+                }
+                elseif (!preg_match('/\.php$/', $name)) {
+                    $files['file'][] = $name;
+                }
+                elseif (empty($options['only'])) {
+                    $files['php'][] = $name;
+                }
+            }
+        }
+
+        foreach ($allow as $name) {
+            $files['php'][] = $name . '.php';
+        }
+
+        return array(
+            'document_root' => $path,
+            'nophp'    => $nophp,
+            'default'  => $options['default'],
+            'phps'     => $files['php'],
+            'files'    => $files['file'],
+            'dirs'     => $files['dir'],
+        );
     }
 }

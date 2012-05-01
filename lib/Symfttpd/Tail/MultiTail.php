@@ -89,9 +89,11 @@ class MultiTail implements TailInterface
         if (is_string($line)) {
             $message = $name . ': '.$line;
             if ($this->formatter->hasStyle($name)) {
+                echo PHP_EOL;
                 echo $this->formatter->getStyle($name)->apply($message);
             } else {
-                $this->formatter->format($message);
+                echo PHP_EOL;
+                echo $this->formatter->format($message);
             }
 
             return true;
