@@ -49,5 +49,7 @@ accesslog.filename    = "<?php echo $this->getLogDir() ?>/access.log"
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"
 
+<?php if (null !== $this->rules): ?>
 include "<?php echo $this->getRulesFile() ?>"
+<?php endif ?>
 

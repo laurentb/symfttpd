@@ -107,6 +107,8 @@ class Lighttpd implements ServerInterface
         $this->configuration->set('log_dir', $this->workingDir . '/log/lighttpd');
         $this->configuration->set('cache_dir', $this->workingDir . '/cache/lighttpd');
         $this->configuration->set('pidfile', $this->getCacheDir().'/.sf');
+
+        $this->ensureDirectories();
     }
 
     /**
@@ -293,18 +295,24 @@ class Lighttpd implements ServerInterface
     /**
      * Remove the log and cache directory of lighttpd.
      *
-     * @param string $workingDir
+     * @param null|\Symfttpd\Filesystem\Filesystem $filesystem
      */
-    public function clear()
+    public function clear(Filesystem $filesystem = null)
     {
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
-        $directories = array(
-            $this->workingDir . $this->getCacheDir(),
-            $this->workingDir . $this->getLogDir(),
-        );
+        $filesystem = $filesystem ?: new Filesystem();
+        $filesystem->remove(array($this->getCacheDir(), $this->getLogDir()));
+        $this->ensureDirectories($filesystem);
+    }
 
-        $filesystem->remove($directories);
-        $filesystem->mkdir($directories);
+    /**
+     * Create the log and cache directory if needed.
+     *
+     * @param null|\Symfttpd\Filesystem\Filesystem $filesystem
+     */
+    public function ensureDirectories(Filesystem $filesystem = null)
+    {
+        $filesystem = $filesystem ?: new Filesystem();
+        $filesystem->mkdir(array($this->getCacheDir(), $this->getLogDir()));
     }
 
     /**
@@ -327,6 +335,25 @@ class Lighttpd implements ServerInterface
         return $this->rulesFile;
     }
 
+    /**
+     * Return the name of the configuration file.
+     *
+     * @return string
+     */
+    public function getConfigFilename()
+    {
+        return $this->configFilename;
+    }
+
+    /**
+     * Return the name of the rules file.
+     *
+     * @return string
+     */
+    public function getRulesFilename()
+    {
+        return $this->rulesFilename;
+    }
 
     /**
      * Return the server command value
