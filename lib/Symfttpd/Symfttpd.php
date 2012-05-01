@@ -132,7 +132,7 @@ class Symfttpd
      * The server used by Symfttpd.
      *
      * @param null $path The path to initialize the server instance if needed.
-     * @return Server\ServerInterface
+     * @return Server\Lighttpd
      */
     public function getServer($path = null)
     {

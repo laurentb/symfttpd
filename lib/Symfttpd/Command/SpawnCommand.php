@@ -258,6 +258,6 @@ TEXT;
      */
     public function getConfiguration()
     {
-        return $this->getApplication()->getSymfttpd()->getConfiguration();
+        return $this->getSymfttpd()->getConfiguration();
     }
 }
