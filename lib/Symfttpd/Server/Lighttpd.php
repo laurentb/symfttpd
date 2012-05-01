@@ -424,7 +424,6 @@ class Lighttpd implements ServerInterface
     public function start()
     {
         $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
-        $command = 'toto -D -f ' . escapeshellarg($this->getConfigFile());
 
         $process = new \Symfony\Component\Process\Process($command, $this->workingDir, null, null, null);
         $process->run();

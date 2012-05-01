@@ -162,12 +162,14 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $lighttpd->readConfiguration();
     }
 
-    public function testStart()
+    /**
+     * @expectedException Symfttpd\Server\Exception\ServerException
+     * @expectedExceptionMessage command not found
+     */
+    public function testStartException()
     {
-        $process = $this->server->start();
-
-        $this->assertInstanceOf('\Symfony\Component\Process\Process', $process);
-//        $this->assertTrue($process->iRunn)
+        $this->server->setCommand('foo');
+        $this->server->start();
     }
 
     /**
