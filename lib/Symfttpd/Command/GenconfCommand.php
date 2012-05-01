@@ -63,7 +63,7 @@ EOT
         $output->writeln('Starting generating symfttpd configuration.');
 
         $server = $this->getSymfttpd()->getServer(getcwd());
-        $server->configuration->add($this->getServerOptions($input->getOptions()));
+        $server->options->add($this->getServerOptions($input->getOptions()));
 
         try {
             $configDir = $input->getOption('output-dir');

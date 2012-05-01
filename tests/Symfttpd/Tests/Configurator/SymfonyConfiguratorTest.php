@@ -20,9 +20,11 @@ class SymfonyConfiguratorTest extends \PHPUnit_Framework_TestCase
     public function testGuessConfigurator()
     {
         $this->assertInstanceOf('Symfttpd\\Configurator\\Symfony2Configurator', $this->configurator->guessConfigurator());
+        $this->assertEquals('2', $this->configurator->getVersion());
 
         $this->configurator->setVersion('1.4');
         $this->assertInstanceOf('Symfttpd\\Configurator\\Symfony14Configurator', $this->configurator->guessConfigurator());
+        $this->assertEquals('1.4', $this->configurator->getVersion());
     }
 
     /**

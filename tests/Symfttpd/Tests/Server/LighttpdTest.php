@@ -20,13 +20,16 @@ use Symfttpd\Server\Lighttpd;
  */
 class LighttpdTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Symfttpd\Server\Lighttpd
+     */
     protected $server;
 
     public function setUp()
     {
         $this->createSymfonyProject();
 
-        $this->server = new Lighttpd(sys_get_temp_dir(), $this->getConfiguration());
+        $this->server = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
     }
 
     public function testGenerateAndReadRule()
@@ -45,6 +48,126 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     {
         $this->server->generate($this->getSymfttpdConfiguration());
         $this->assertEquals($this->getGeneratedConfiguration(true).PHP_EOL.$this->getGeneratedRules(), $this->server->read());
+    }
+
+    public function testGetCommand()
+    {
+        $finder = $this->getMock('\Symfony\Component\Process\ExecutableFinder');
+        $finder->expects($this->once())
+            ->method('find')
+            ->with('lighttpd')
+            ->will($this->returnValue('/usr/sbin/lighttpd'));
+
+        $this->assertEquals('/usr/sbin/lighttpd', $this->server->getCommand($finder));
+
+        $this->server->setCommand('/opt/local/sbin/lighttpd');
+        $this->assertEquals('/opt/local/sbin/lighttpd', $this->server->getCommand());
+    }
+
+    /**
+     * @expectedException Symfttpd\Exception\ExecutableNotFoundException
+     * @expectedExceptionMessage lighttpd executable not found.
+     */
+    public function testGetCommandException()
+    {
+        $finder = $this->getMock('\Symfony\Component\Process\ExecutableFinder');
+        $finder->expects($this->once())
+            ->method('find')
+            ->with('lighttpd')
+            ->will($this->returnValue(null));
+
+        $this->server->getCommand($finder);
+    }
+
+    public function testGetConfigurationTemplate()
+    {
+        $this->assertStringEndsWith('Resources/templates/lighttpd.conf.php', $this->server->getConfigurationTemplate());
+    }
+
+    public function testGetRulesTemplate()
+    {
+        $this->assertStringEndsWith('Resources/templates/rules.conf.php', $this->server->getRulesTemplate());
+    }
+
+    public function testGetCacheDir()
+    {
+        $this->assertStringEndsWith('/cache/lighttpd', $this->server->getCacheDir());
+    }
+
+    public function testGetLogDir()
+    {
+        $this->assertStringEndsWith('/log/lighttpd', $this->server->getLogDir());
+    }
+
+    public function testGetConfigFilename()
+    {
+        $this->assertEquals('lighttpd.conf', $this->server->getConfigFilename());
+    }
+
+    public function testGetRulesFilename()
+    {
+        $this->assertEquals('rules.conf', $this->server->getRulesFilename());
+    }
+
+    public function testReadRulesFromFile()
+    {
+        $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
+        $this->server->writeRules();
+
+        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+        $this->assertEquals($this->getGeneratedRules(), (string) $lighttpd->readRules());
+    }
+
+    public function testReadConfigFromFile()
+    {
+        $this->server->generateConfiguration($this->getSymfttpdConfiguration());
+        $this->server->writeConfiguration();
+
+        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+        $this->assertEquals($this->getGeneratedConfiguration(), (string) $lighttpd->readConfiguration());
+    }
+
+    public function testReadFromFile()
+    {
+        $this->server->generate($this->getSymfttpdConfiguration());
+        $this->server->write();
+
+        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+        $this->assertEquals($this->getGeneratedConfiguration(true), (string) $lighttpd->readConfiguration());
+        $this->assertEquals($this->getGeneratedRules(), (string) $lighttpd->readRules());
+        $this->assertEquals($this->getGeneratedConfiguration(true).PHP_EOL.$this->getGeneratedRules(), (string) $lighttpd->read());
+    }
+
+    /**
+     * @expectedException Symfttpd\Configuration\Exception\ConfigurationException
+     * @expectedExceptionMessage The rules configuration has not been generated.
+     */
+    public function testReadRulesFromFileException()
+    {
+        $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
+
+        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+        $lighttpd->readRules();
+    }
+
+    /**
+     * @expectedException Symfttpd\Configuration\Exception\ConfigurationException
+     * @expectedExceptionMessage The lighttpd configuration has not been generated.
+     */
+    public function testReadConfigFromFileException()
+    {
+        $this->server->generateConfiguration($this->getSymfttpdConfiguration());
+
+        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+        $lighttpd->readConfiguration();
+    }
+
+    public function testStart()
+    {
+        $process = $this->server->start();
+
+        $this->assertInstanceOf('\Symfony\Component\Process\Process', $process);
+//        $this->assertTrue($process->iRunn)
     }
 
     /**
@@ -90,13 +213,13 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Return a ConfigurationBag mock.
+     * Return a OptionBag mock.
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    public function getConfiguration()
+    public function getOptions()
     {
-        $configuration = $this->getMock('\Symfttpd\Configuration\ConfigurationBag');
+        $configuration = $this->getMock('\Symfttpd\Configuration\OptionBag');
         $configuration->expects($this->any())
             ->method('get')
             ->will($this->returnValueMap(array(
@@ -194,15 +317,13 @@ accesslog.filename    = "%s/log/lighttpd/access.log"
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"
 
-include "%s"
-
-
+%s
 CONF;
 
         $templateDir = realpath(__DIR__.'/../../../../lib/Symfttpd/Resources/templates');
 
         if ($withRules) {
-            $rules = sys_get_temp_dir().'/cache/lighttpd/rules.conf';
+            $rules = 'include "'.sys_get_temp_dir().'/cache/lighttpd/rules.conf"'.PHP_EOL;
         } else {
             $rules = '';
         }

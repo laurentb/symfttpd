@@ -15,21 +15,23 @@ use Symfttpd\Filesystem\Filesystem;
 
 class Symfony14ConfiguratorTest extends BaseTestCase
 {
-    protected $filesystem;
-    protected $projectPath;
+    protected $filesystem,
+              $projectPath,
+              $configurator,
+              $configuration;
 
     public function setUp()
     {
         parent::setUp();
 
+        $this->projectPath = $this->fixtures.'/symfony-1.4';
+
         $this->filesystem = new Filesystem();
         $this->cleanUp();
 
-        $this->projectPath = $this->fixtures.'/symfony-1.4';
-
         $this->configurator = new Symfony14Configurator();
-
         $this->configuration = new SymfttpdConfiguration();
+        $this->configuration->set('do_plugins', false);
     }
 
     public function tearDown()
@@ -39,15 +41,12 @@ class Symfony14ConfiguratorTest extends BaseTestCase
 
     public function testConfigure()
     {
-        $this->markTestSkipped('I have to find a way to mock a symfony project.');
-
         $this->configurator->configure($this->projectPath, $this->configuration->all());
 
         $this->assertTrue(file_exists($this->projectPath.'/cache'), $this->projectPath.'/cache exists');
         $this->assertTrue(file_exists($this->projectPath.'/log'), $this->projectPath.'/log exists');
+        $this->assertTrue(is_link($this->projectPath.'/lib/vendor/symfony'), $this->projectPath.'/lib/vendor/symfony exists');
         $this->assertTrue(is_link($this->projectPath.'/web/sf'), $this->projectPath.'/web/sf exists and is a symlink');
-        $this->assertTrue(is_link($this->projectPath.'/web/sfDoctrinePlugin'), $this->projectPath.'/web/sfDoctrinePlugin exists and is a symlink');
-        $this->assertTrue(is_link($this->projectPath.'/web/sfFormExtraPlugin'), $this->projectPath.'/web/sfFormExtraPlugin exists and is a symlink');
     }
 
     public function testConfigureException()
@@ -56,14 +55,40 @@ class Symfony14ConfiguratorTest extends BaseTestCase
         $this->configurator->configure(__DIR__, $this->configuration->all());
     }
 
+    public function testFindPlugins()
+    {
+        $plugins = $this->configurator->findPlugins($this->projectPath);
+
+        $this->assertEquals(2, count($plugins));
+        $this->assertContains('sfTestPlugin', $plugins);
+        $this->assertContains('sfFooBarPlugin', $plugins);
+    }
+
     protected function cleanUp()
     {
-        $this->filesystem->remove(array(
+        $directories = array(
             $this->projectPath.'/cache',
             $this->projectPath.'/log',
+            $this->projectPath.'/plugins',
+            $this->projectPath.'/plugins/sfTestPlugin/web',
+            $this->projectPath.'/plugins/sfFooBarPlugin/web',
+            $this->projectPath.'/config',
+            $this->projectPath.'/apps',
+            $this->projectPath.'/web',
+        );
+
+        $symlinks = array(
             $this->projectPath.'/web/sf',
-            $this->projectPath.'/web/sfDoctrinePlugin',
-            $this->projectPath.'/web/sfFormExtraPlugin',
-        ));
+        );
+
+        $files = array(
+            $this->projectPath.'/symfony',
+            $this->projectPath.'/web/index.php',
+        );
+
+        $this->filesystem->remove($directories + $symlinks);
+        $this->filesystem->mkdir($directories);
+        $this->filesystem->touch($files);
+        $this->filesystem->chmod(reset($files), '755');
     }
 }
