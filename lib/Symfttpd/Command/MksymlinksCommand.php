@@ -24,17 +24,32 @@ class MksymlinksCommand extends Command
 
     public function configure()
     {
-        $this->setName('mksymlinks');
-        $this->setDescription('Generates project symbolic links to the web folder');
+        $this->setName('mksymlinks')
+            ->setDescription('Generates project symbolic links to the web folder');
+
+        // Configure Arguments
         $this->addArgument('type', InputArgument::REQUIRED, 'Type of project you want to setup (symfony for example).');
-        $this->addOption('ver', null, InputOption::VALUE_REQUIRED, 'The version of the project type.', null);
-        $this->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'The path of the project.', getcwd());
+
+        // Configure options
+        $this->addOption('ver', null, InputOption::VALUE_REQUIRED, 'The version of the project type.', null)
+            ->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'The path of the project.', getcwd());
     }
 
+    /**
+     * Create symbolik links.
+     *
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @throws \Symfttpd\Configurator\Exception\ConfiguratorNotFoundException
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->writeVersion($output);
+
         $type    = $input->getArgument('type');
         $version = $input->getOption('ver');
+
+        $output->writeln(sprintf('Generate symbolic links for <info>%s</info> version <info>%s</info>', $type, $version));
 
         if (!ProjectTypeValidator::getInstance()->isValid($type, $version)) {
             throw new ConfiguratorNotFoundException(sprintf('Symfttpd does not support %s with the version %s yet.', $type, $version));
@@ -47,16 +62,8 @@ class MksymlinksCommand extends Command
         }
 
         $configurator = new $class($version);
-        $configurator->configure($input->getOption('path'), $this->getConfiguration()->all());
-    }
+        $configurator->configure($input->getOption('path'), $this->getSymfttpd()->getConfiguration()->all());
 
-    /**
-     * Return the Symfttpd configuration.
-     *
-     * @return \Symfttpd\Configuration\SymfttpdConfiguration
-     */
-    public function getConfiguration()
-    {
-        return $this->getApplication()->getSymfttpd()->getConfiguration();
+        $output->writeln('Symbolic links created.');
     }
 }
