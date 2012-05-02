@@ -18,9 +18,9 @@
 
     <filter>
         <blacklist>
-            <directory>lib/vendor</directory>
+            <directory>bin</directory>
+            <directory>vendor</directory>
             <directory>tests</directory>
-            <directory>data</directory>
         </blacklist>
     </filter>
 </phpunit>
