@@ -199,7 +199,7 @@ TEXT;
         {
             $filesystem = new \Symfttpd\Filesystem\Filesystem();
             $prevGenconf = null;
-            while ($server->isRunning() && false !== sleep(1)) {
+            while (false !== sleep(1)) {
                 // Generate the configuration file.
                 $server->generateRules($configuration);
                 $genconf = $server->read();
@@ -221,7 +221,8 @@ TEXT;
 
         $manager = new ProcessManager(new DeferredFactory());
         $manager->fork($forkCallback, array($this->server, $this->getConfiguration()))
-            ->then($callback);
+            ->then($callback)
+            ->resolve();
     }
 
     /**
