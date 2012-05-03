@@ -90,7 +90,7 @@ class SpawnCommand extends Command
             \Symfttpd\Utils\PosixTools::killPid($this->server->options->get('pidfile'), $output);
         }
 
-        $this->server->options->add($this->getServerOptions($input->getOptions()));
+        $this->server->configure($input->getOptions());
 
         if ($this->getConfiguration()->has('lighttpd_cmd')) {
             $this->server->setCommand($this->getConfiguration()->get('lighttpd_cmd'));
@@ -154,7 +154,7 @@ TEXT;
             exit(1);
         } else if (0 === $pid) {
             // Child process
-            $this->spawn($input, $output);
+            $this->spawn($output);
         } else {
             $this->watch($multitail, $output);
             if (pcntl_waitpid($pid, $status, WNOHANG))
@@ -172,12 +172,10 @@ TEXT;
      * rules changed. In this case it will create a file that
      * will tell to the fork that the server must be restarted.
      *
-     * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      */
-    protected function spawn(InputInterface $input, OutputInterface $output)
+    protected function spawn(OutputInterface $output)
     {
-        $stop = false;
         do {
             if (file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile'))) {
                 unlink($this->getSymfttpd()->getConfiguration()->get('restartfile'));
@@ -189,18 +187,20 @@ TEXT;
             } catch (\ServerException $e) {
                 $output->writeln('<error>The server cannot start</error>');
                 $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
-                return 1;
             }
 
             if (!file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile'))) {
                 $output->writeln('Terminated.');
             } else {
-                $output->writeln('<info>Something in web/ changed. Restarting lighttpd.</info>');
+                $output->writeln('<comment>Something in web/ changed. Restarting lighttpd.</comment>');
 
                 // Regenerate the lighttpd configuration
-                $this->server->generateRules($this->getSymfttpd()->getConfiguration());
+                $this->server->generateConfiguration($this->getSymfttpd()->getConfiguration());
+                $this->server->writeConfiguration();
             }
-        } while ($stop == false && file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile')));
+        } while (file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile')));
+
+        return false;
     }
 
     /**
@@ -211,11 +211,12 @@ TEXT;
     {
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
         $prevGenconf = null;
-        $continue = true;
-        while (false !== $continue) {
+        while (false !== sleep(1)) {
             // Generate the configuration file.
+            $this->server->reconfigure();
             $this->server->generateRules($this->getSymfttpd()->getConfiguration());
-            $genconf = $this->server->read();
+            $this->server->writeRules();
+            $genconf = $this->server->readRules();
 
             if ($prevGenconf !== null && $prevGenconf !== $genconf) {
                 // This sleep() is so that if a HTTP request just created a file in web/,
@@ -226,18 +227,13 @@ TEXT;
                 $filesystem->touch($this->getSymfttpd()->getConfiguration()->get('restartfile'));
 
                 // Kill the current server process.
-                \Symfttpd\Utils\PosixTools::killPid($this->server->option->get('pidfile'), $output);
+                \Symfttpd\Utils\PosixTools::killPid($this->server->options->get('pidfile'), $output);
             }
             $prevGenconf = $genconf;
 
             if ($multitail instanceof MultiTail) {
                 $multitail->consume();
             }
-
-            $continue = sleep(1);
-//            if (false == $this->server->isRunning()) {
-//                $continue = false;
-//            }
         }
     }
 
@@ -257,57 +253,5 @@ TEXT;
     public function getConfiguration()
     {
         return $this->getSymfttpd()->getConfiguration();
-    }
-
-    /**
-     * Create the server options passed to the command.
-     *
-     * @param array $options
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    public function getServerOptions(array $options)
-    {
-        $allow = explode(',', $options['allow']);
-        $nophp = explode(',', $options['nophp']);
-        $path  = realpath($options['path']);
-
-        $files = array(
-            'dir' => array(),
-            'php' => array(),
-            'file' => array()
-        );
-
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $options['path']));
-        }
-
-        foreach (new \DirectoryIterator($path) as $file) {
-            $name = $file->getFilename();
-            if ($name[0] != '.') {
-                if ($file->isDir()) {
-                    $files['dir'][] = $name;
-                }
-                elseif (!preg_match('/\.php$/', $name)) {
-                    $files['file'][] = $name;
-                }
-                elseif (empty($options['only'])) {
-                    $files['php'][] = $name;
-                }
-            }
-        }
-
-        foreach ($allow as $name) {
-            $files['php'][] = $name . '.php';
-        }
-
-        return array(
-            'document_root' => $path,
-            'nophp'    => $nophp,
-            'default'  => $options['default'],
-            'phps'     => $files['php'],
-            'files'    => $files['file'],
-            'dirs'     => $files['dir'],
-        );
     }
 }

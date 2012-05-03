@@ -417,46 +417,73 @@ class Lighttpd implements ServerInterface
 
     /**
      * Start the server.
-     *
-     * @return \Symfony\Component\Process\Process
-     * @throws Exception\ServerException
      */
     public function start()
     {
         $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
 
         $this->process = new \Symfony\Component\Process\Process($command, $this->workingDir, null, null, null);
-        $this->process->run(function ($type, $buffer) {
-            if ('err' === $type) {
-                echo 'ERR > '.$buffer;
-            } else {
-                echo 'OUT > '.$buffer;
-            }
-        });
+        $this->process->run();
+    }
 
-        if (false == $this->process->isRunning()) {
-            throw new ServerException($this->process->getErrorOutput());
+    /**
+     * Configure the server with options.
+     *
+     * @param array $options
+     * @throws \InvalidArgumentException
+     */
+    public function configure(array $options)
+    {
+        $allow = array_key_exists('allow', $options) ? explode(',', $options['allow']) : array();
+        $nophp = array_key_exists('nophp', $options) ? explode(',', $options['nophp']) : array();
+        $path  = array_key_exists('path', $options) ? realpath($options['path']) : $this->workingDir;
+        $default = array_key_exists('default', $options) ? $options['default'] : 'index.php';
+
+        $files = array(
+            'dir' => array(),
+            'php' => array(),
+            'file' => array()
+        );
+
+        if (!file_exists($path)) {
+            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $options['path']));
         }
 
-        return $this->process;
+        foreach (new \DirectoryIterator($path) as $file) {
+            $name = $file->getFilename();
+            if ($name[0] != '.') {
+                if ($file->isDir()) {
+                    $files['dir'][] = $name;
+                }
+                elseif (!preg_match('/\.php$/', $name)) {
+                    $files['file'][] = $name;
+                }
+                elseif (empty($options['only'])) {
+                    $files['php'][] = $name;
+                }
+            }
+        }
+
+        foreach ($allow as $name) {
+            $files['php'][] = $name . '.php';
+        }
+
+        $this->options->set('document_root', $path);
+        $this->options->set('nophp', $nophp);
+        $this->options->set('default', $default);
+        $this->options->set('phps', $files['php']);
+        $this->options->set('files', $files['file']);
+        $this->options->set('dirs', $files['dir']);
     }
 
-    /**
-     * Stop the process running lighttpd
-     *
-     */
-    public function stop()
+    public function reconfigure()
     {
-        $this->process->stop(0);
-    }
+        $options = array();
+        $options['allow'] = implode(',', $this->options->get('allow', array()));
+        $options['nophp'] = implode(',', $this->options->get('nophp', array()));
+        $options['path'] = $this->options->get('document_root');
+        $options['default'] = $this->options->get('default');
 
-    /**
-     * Return the process
-     *
-     * @return null|\Symfony\Component\Process\Process
-     */
-    public function getProcess()
-    {
-        return $this->process;
+        $this->configure($options);
     }
 }
