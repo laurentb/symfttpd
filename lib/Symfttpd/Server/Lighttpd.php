@@ -94,9 +94,9 @@ class Lighttpd implements ServerInterface
     public $options;
 
     /**
-     * @var bool
+     * @var \Symfony\Component\Process\Process
      */
-    public $isRunning = false;
+    public $process;
 
     /**
      * Constructor class
@@ -425,25 +425,38 @@ class Lighttpd implements ServerInterface
     {
         $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
 
-        $process = new \Symfony\Component\Process\Process($command, $this->workingDir, null, null, null);
-        $process->run();
+        $this->process = new \Symfony\Component\Process\Process($command, $this->workingDir, null, null, null);
+        $this->process->run(function ($type, $buffer) {
+            if ('err' === $type) {
+                echo 'ERR > '.$buffer;
+            } else {
+                echo 'OUT > '.$buffer;
+            }
+        });
 
-        if (false == $process->isRunning()) {
-            throw new ServerException($process->getErrorOutput());
+        if (false == $this->process->isRunning()) {
+            throw new ServerException($this->process->getErrorOutput());
         }
 
-        $this->isRunning = $process->isRunning();
-
-        return $process;
+        return $this->process;
     }
 
     /**
-     * Return the status of the server.
+     * Stop the process running lighttpd
      *
-     * @return bool
      */
-    public function isRunning()
+    public function stop()
     {
-        return $this->isRunning;
+        $this->process->stop(0);
+    }
+
+    /**
+     * Return the process
+     *
+     * @return null|\Symfony\Component\Process\Process
+     */
+    public function getProcess()
+    {
+        return $this->process;
     }
 }
