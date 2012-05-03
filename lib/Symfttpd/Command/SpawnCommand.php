@@ -14,6 +14,7 @@ namespace Symfttpd\Command;
 use Symfttpd\Symfttpd;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
+use Symfttpd\Tail\TailInterface;
 use Symfttpd\Server\Lighttpd;
 use Symfttpd\Console\Application;
 use Symfttpd\Command\Command;
@@ -25,8 +26,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
-use Spork\Deferred\DeferredFactory;
-use Spork\ProcessManager;
 
 /**
  * SpawnCommand class
@@ -46,16 +45,17 @@ class SpawnCommand extends Command
         $this->setName('spawn');
         $this->setDescription('Launch the webserver.');
 
-        $this->addOption('default', null, InputOption::VALUE_OPTIONAL, 'Change the default application.', 'index');
-        $this->addOption('only', null, InputOption::VALUE_OPTIONAL, 'Do not allow any other application.', false);
-        $this->addOption('allow', null, InputOption::VALUE_OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false);
-        $this->addOption('nophp', null, InputOption::VALUE_OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', 'uploads');
-        $this->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', getcwd() . '/web');
-        $this->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port to listen', 4042);
-        $this->addOption('bind', 'b', InputOption::VALUE_OPTIONAL, 'The address to bind', '127.0.0.1');
-        $this->addOption('all', 'a', InputOption::VALUE_NONE, 'Bind on all addresses');
-        $this->addOption('tail', 't', InputOption::VALUE_NONE, 'Print the log in the console');
-        $this->addOption('kill', 'K', InputOption::VALUE_NONE, 'Kill existing running symfttpd');
+        // Configure options
+        $this->addOption('default', null, InputOption::VALUE_OPTIONAL, 'Change the default application.', 'index')
+            ->addOption('only', null, InputOption::VALUE_OPTIONAL, 'Do not allow any other application.', false)
+            ->addOption('allow', null, InputOption::VALUE_OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false)
+            ->addOption('nophp', null, InputOption::VALUE_OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', 'uploads')
+            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', getcwd() . '/web')
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port to listen', 4042)
+            ->addOption('bind', 'b', InputOption::VALUE_OPTIONAL, 'The address to bind', '127.0.0.1')
+            ->addOption('all', 'a', InputOption::VALUE_NONE, 'Bind on all addresses')
+            ->addOption('tail', 't', InputOption::VALUE_NONE, 'Print the log in the console')
+            ->addOption('kill', 'K', InputOption::VALUE_NONE, 'Kill existing running symfttpd');
 
         if (function_exists('pcntl_fork')) {
             $this->addOption('single_process', 's', InputOption::VALUE_OPTIONAL, 'Run symfttpd in another process', false);
@@ -87,7 +87,7 @@ class SpawnCommand extends Command
             if (file_exists($this->getConfiguration()->get('restartfile'))) {
                 unlink($this->getConfiguration()->get('restartfile'));
             }
-            exit(!\Symfttpd\Utils\PosixTools::killPid($this->server->options->get('pidfile'), $output));
+            \Symfttpd\Utils\PosixTools::killPid($this->server->options->get('pidfile'), $output);
         }
 
         $this->server->options->add($this->getServerOptions($input->getOptions()));
@@ -136,7 +136,32 @@ TEXT;
             return 0;
         }
 
-        $this->spawn($input, $output);
+
+        $multitail = null;
+        if ($input->getOption('tail')) {
+            $logDir = $this->server->getLogDir();
+            $multitail = new MultiTail(new OutputFormatter(true));
+            $multitail->add('access', new Tail($logDir . '/access.log'), new OutputFormatterStyle('blue'));
+            $multitail->add('error', new Tail($logDir . '/error.log'), new OutputFormatterStyle('red', null, array('bold')));
+            // We have to do it before the fork to capture the startup messages
+            $multitail->consume();
+        }
+
+        $pid = pcntl_fork();
+        $process = null;
+        if ($pid == -1) {
+             $output->writeln('<error>Could not fork</error>');
+            exit(1);
+        } else if (0 === $pid) {
+            // Child process
+            $this->spawn($input, $output);
+        } else {
+            $this->watch($multitail, $output);
+            if (pcntl_waitpid($pid, $status, WNOHANG))
+            {
+                exit(0);
+            }
+        }
 
         return 0;
     }
@@ -152,77 +177,68 @@ TEXT;
      */
     protected function spawn(InputInterface $input, OutputInterface $output)
     {
-        $multitail = null;
-        if ($input->getOption('tail')) {
-            $logDir = $this->server->getLogDir();
-            $multitail = new MultiTail(new OutputFormatter(true));
-            $multitail->add('access', new Tail($logDir . '/access.log'), new OutputFormatterStyle('blue'));
-            $multitail->add('error', new Tail($logDir . '/error.log'), new OutputFormatterStyle('red', null, array('bold')));
-            // We have to do it before the fork to capture the startup messages
-            $multitail->consume();
-        }
-
-        // Callback that will start the server.
-        $forkCallback = function(ServerInterface $server, SymfttpdConfiguration $configuration) use ($output)
-        {
-            do {
-                $stop = false;
-                if (file_exists($configuration->get('restartfile'))) {
-                    unlink($configuration->get('restartfile'));
-                }
-
-                try {
-                    // Run lighttpd
-                    $server->start();
-                } catch (\Symfttpd\Server\Exception\ServerException $e) {
-                    $output->writeln(sprintf('%s', $e->getMessage()));
-                    $stop = true;
-                }
-
-                if (!file_exists($configuration->get('restartfile'))) {
-                    $output->writeln('Terminated.');
-                } else {
-                    $output->writeln('<info>Something in web/ changed. Restarting lighttpd.</info>');
-
-                    // Regenerate the lighttpd configuration
-                    $server->generateRules($configuration);
-                }
-            } while ($stop == false && file_exists($configuration->get('restartfile')));
-        };
-
-        // Create variables for the callback
-        $server = $this->server;
-        $configuration = $this->getConfiguration();
-
-        // Callback to execute in parallel of the child process.
-        $callback = function () use ($input, $output, $server, $configuration, $multitail)
-        {
-            $filesystem = new \Symfttpd\Filesystem\Filesystem();
-            $prevGenconf = null;
-            while (false !== sleep(1)) {
-                // Generate the configuration file.
-                $server->generateRules($configuration);
-                $genconf = $server->read();
-
-                if ($prevGenconf !== null && $prevGenconf !== $genconf) {
-                    // This sleep() is so that if a HTTP request just created a file in web/,
-                    // the web server isn't restarted right away.
-                    sleep(1);
-                    $filesystem->touch($configuration->get('restartfile'));
-                    \Symfttpd\Utils\PosixTools::killPid($server->configuration->get('pidfile'), $output);
-                }
-                $prevGenconf = $genconf;
-
-                if ($multitail instanceof MultiTail) {
-                    $multitail->consume();
-                }
+        $stop = false;
+        do {
+            if (file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile'))) {
+                unlink($this->getSymfttpd()->getConfiguration()->get('restartfile'));
             }
-        };
 
-        $manager = new ProcessManager(new DeferredFactory());
-        $manager->fork($forkCallback, array($this->server, $this->getConfiguration()))
-            ->then($callback)
-            ->resolve();
+            try {
+                // Run lighttpd
+                $this->server->start();
+            } catch (\ServerException $e) {
+                $output->writeln('<error>The server cannot start</error>');
+                $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
+                return 1;
+            }
+
+            if (!file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile'))) {
+                $output->writeln('Terminated.');
+            } else {
+                $output->writeln('<info>Something in web/ changed. Restarting lighttpd.</info>');
+
+                // Regenerate the lighttpd configuration
+                $this->server->generateRules($this->getSymfttpd()->getConfiguration());
+            }
+        } while ($stop == false && file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile')));
+    }
+
+    /**
+     * @param \Symfttpd\Tail\TailInterface $multitail
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     */
+    public function watch(TailInterface $multitail, OutputInterface $output)
+    {
+        $filesystem = new \Symfttpd\Filesystem\Filesystem();
+        $prevGenconf = null;
+        $continue = true;
+        while (false !== $continue) {
+            // Generate the configuration file.
+            $this->server->generateRules($this->getSymfttpd()->getConfiguration());
+            $genconf = $this->server->read();
+
+            if ($prevGenconf !== null && $prevGenconf !== $genconf) {
+                // This sleep() is so that if a HTTP request just created a file in web/,
+                // the web server isn't restarted right away.
+                sleep(1);
+
+                // Tell the child process to restart the server
+                $filesystem->touch($this->getSymfttpd()->getConfiguration()->get('restartfile'));
+
+                // Kill the current server process.
+                \Symfttpd\Utils\PosixTools::killPid($this->server->option->get('pidfile'), $output);
+            }
+            $prevGenconf = $genconf;
+
+            if ($multitail instanceof MultiTail) {
+                $multitail->consume();
+            }
+
+            $continue = sleep(1);
+//            if (false == $this->server->isRunning()) {
+//                $continue = false;
+//            }
+        }
     }
 
     /**
