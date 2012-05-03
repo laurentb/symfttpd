@@ -154,10 +154,12 @@ TEXT;
             exit(1);
         } else if (0 === $pid) {
             // Child process
-            $process = $this->server->start();
+            $this->spawn($input, $output);
         } else {
-            if ($process instanceof \Symfony\Component\Process\Process && $process->isRunning()) {
-                print 'server runs';
+            $this->watch($multitail, $output);
+            if (pcntl_waitpid($pid, $status, WNOHANG))
+            {
+                exit(0);
             }
         }
 
@@ -225,7 +227,7 @@ TEXT;
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
         $prevGenconf = null;
         $continue = true;
-        while ($continue) {
+        while (false !== $continue) {
             // Generate the configuration file.
             $this->server->generateRules($this->getSymfttpd()->getConfiguration());
             $genconf = $this->server->read();
