@@ -71,8 +71,6 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->writeVersion($output);
-
         // Initialise Server options
         $this->server = $this->getSymfttpd()->getServer($this->getProjectPath());
         $this->server->clear();

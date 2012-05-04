@@ -44,8 +44,6 @@ class MksymlinksCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->writeVersion($output);
-
         $type    = $input->getArgument('type');
         $version = $input->getOption('ver');
 

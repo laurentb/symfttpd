@@ -13,6 +13,7 @@ namespace Symfttpd\Command;
 
 use Symfttpd\Symfttpd;
 use Symfttpd\Console\Application;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 
@@ -38,11 +39,12 @@ class Command extends BaseCommand
     }
 
     /**
-     * Write the Symfttpd version in the console.
+     * Initialize the command.
      *
+     * @param InputInterface $input
      * @param OutputInterface $output
      */
-    public function writeVersion(OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $output->writeln(sprintf('<comment>Symfttpd - version %s</comment>', Symfttpd::VERSION));
     }
