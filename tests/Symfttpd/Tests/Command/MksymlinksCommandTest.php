@@ -41,7 +41,7 @@ class MksymlinksCommandTest extends Test
     {
         $this->tester->run(array('command' => $this->command->getName()), array('interactive' => false));
         $this->assertRegExp('~RuntimeException~', $this->tester->getDisplay());
-        $this->assertRegExp('~Not enough arguments~', $this->tester->getDisplay());
+        $this->assertRegExp('~Not enough~', $this->tester->getDisplay());
     }
 
     public function getSymfttpd()
