@@ -39,7 +39,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testGenerateAndReadRule()
     {
         $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
-        $this->assertEquals($this->getGeneratedRules(), (string) $this->server->readRules());
+        $this->assertEquals($this->getGeneratedRules(), (string)$this->server->readRules());
     }
 
     public function testGenerateAndReadConfiguration()
@@ -51,7 +51,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testGenerateAndWrite()
     {
         $this->server->generate($this->getSymfttpdConfiguration());
-        $this->assertEquals($this->getGeneratedConfiguration(true).PHP_EOL.$this->getGeneratedRules(), $this->server->read());
+        $this->assertEquals($this->getGeneratedConfiguration(true) . PHP_EOL . $this->getGeneratedRules(), $this->server->read());
     }
 
     public function testGetCommand()
@@ -129,7 +129,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
         $this->assertEquals($this->getGeneratedConfiguration(true), $lighttpd->readConfiguration());
         $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
-        $this->assertEquals($this->getGeneratedConfiguration(true).PHP_EOL.$this->getGeneratedRules(), $lighttpd->read());
+        $this->assertEquals($this->getGeneratedConfiguration(true) . PHP_EOL . $this->getGeneratedRules(), $lighttpd->read());
     }
 
     /**
@@ -172,22 +172,22 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $baseDir = $project->getRootDir();
 
         $projectTree = array(
-            $baseDir.DIRECTORY_SEPARATOR.'apps',
-            $baseDir.DIRECTORY_SEPARATOR.'cache',
-            $baseDir.DIRECTORY_SEPARATOR.'config',
-            $baseDir.DIRECTORY_SEPARATOR.'lib',
-            $baseDir.DIRECTORY_SEPARATOR.'log',
-            $baseDir.DIRECTORY_SEPARATOR.'web',
-            $baseDir.DIRECTORY_SEPARATOR.'web/css',
-            $baseDir.DIRECTORY_SEPARATOR.'web/js',
+            $baseDir . DIRECTORY_SEPARATOR . 'apps',
+            $baseDir . DIRECTORY_SEPARATOR . 'cache',
+            $baseDir . DIRECTORY_SEPARATOR . 'config',
+            $baseDir . DIRECTORY_SEPARATOR . 'lib',
+            $baseDir . DIRECTORY_SEPARATOR . 'log',
+            $baseDir . DIRECTORY_SEPARATOR . 'web',
+            $baseDir . DIRECTORY_SEPARATOR . 'web/css',
+            $baseDir . DIRECTORY_SEPARATOR . 'web/js',
         );
 
         $files = array(
-            $baseDir.DIRECTORY_SEPARATOR.'web/index.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/frontend_dev.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/backend_dev.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/robots.txt',
-            $baseDir.DIRECTORY_SEPARATOR.'log/frontend.log',
+            $baseDir . DIRECTORY_SEPARATOR . 'web/index.php',
+            $baseDir . DIRECTORY_SEPARATOR . 'web/frontend_dev.php',
+            $baseDir . DIRECTORY_SEPARATOR . 'web/backend_dev.php',
+            $baseDir . DIRECTORY_SEPARATOR . 'web/robots.txt',
+            $baseDir . DIRECTORY_SEPARATOR . 'log/frontend.log',
         );
 
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
@@ -223,9 +223,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
         $configuration->expects($this->once())
             ->method('get')
-            ->will($this->returnValueMap(array(
-                array('php_cgi_cmd', null, '/opt/local/bin/php-cgi')
-        )));
+            ->will($this->returnValueMap(array(array('php_cgi_cmd', null, '/opt/local/bin/php-cgi'))));
 
         return $configuration;
     }
@@ -298,10 +296,10 @@ debug.log-request-header-on-error = "enable"
 %s
 CONF;
 
-        $templateDir = realpath(__DIR__.'/../../../../lib/Symfttpd/Resources/templates');
+        $templateDir = realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates');
         $baseDir = $this->getProject(false)->getRootDir();
         if ($withRules) {
-            $rules = 'include "'.$baseDir.'/cache/lighttpd/rules.conf"'.PHP_EOL;
+            $rules = 'include "' . $baseDir . '/cache/lighttpd/rules.conf"' . PHP_EOL;
         } else {
             $rules = '';
         }

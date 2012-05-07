@@ -82,6 +82,10 @@ abstract class BaseProject implements ProjectInterface
                 }
             }
         }
+
+        sort($this->readableDirs);
+        sort($this->readableFiles);
+        sort($this->readablePhpFiles);
     }
 
     /**
