@@ -1,5 +1,3 @@
-server.document-root = "<?php echo $this->options->get('document_root') ?>"
-
 url.rewrite-once = (
 <?php foreach ($this->options->get('dirs') as $name): ?>
   "^/<?php echo preg_quote($name) ?>/.+" => "$0",
@@ -13,7 +11,7 @@ url.rewrite-once = (
   "^/<?php echo preg_quote($name) ?>(/[^\?]*)?(\?.*)?" => "/<?php echo $name ?>$1$2",
 <?php endforeach ?>
 
-  "^(/[^\?]*)(\?.*)?" => "/<?php echo $this->options->get('default') ?>.php$1$2"
+  "^(/[^\?]*)(\?.*)?" => "/<?php echo $this->options->get('default') ?>$1$2"
 )
 
 <?php foreach ($this->options->get('nophp') as $name): ?>

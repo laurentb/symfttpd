@@ -32,11 +32,6 @@ class MksymlinksCommandTest extends Test
         $this->tester  = new ApplicationTester($application);
     }
 
-    public function tearDown()
-    {
-        $this->filesystem->remove($this->fixtures.'/symfony-1.4/web/symfttpd.conf.php');
-    }
-
     public function testExecute()
     {
         $this->tester->run(array('command' => $this->command->getName(),'type' => 'symfony', '--ver' => '1.4', '-p' => $this->fixtures.'/symfony-1.4'), array('interactive' => false));

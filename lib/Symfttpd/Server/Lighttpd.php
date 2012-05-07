@@ -12,6 +12,7 @@
 namespace Symfttpd\Server;
 
 use Symfttpd\Server\ServerInterface;
+use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\Exception\ServerException;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Configuration\OptionBag;
@@ -94,9 +95,9 @@ class Lighttpd implements ServerInterface
     public $options;
 
     /**
-     * @var \Symfony\Component\Process\Process
+     * @var ProjectInterface
      */
-    public $process;
+    public $project;
 
     /**
      * Constructor class
@@ -104,27 +105,40 @@ class Lighttpd implements ServerInterface
      * @param null $workingDir
      * @param null|\Symfttpd\Configuration\OptionBag $options
      */
-    public function __construct($workingDir = null, OptionBag $options = null)
+    public function __construct(ProjectInterface $project, OptionBag $options = null)
     {
-        $this->workingDir = $workingDir;
+        $this->project = $project;
         $this->options = $options ?: new OptionBag();
 
         // Set the defaults settings
-        $this->options->set('log_dir', $this->workingDir . '/log/lighttpd');
-        $this->options->set('cache_dir', $this->workingDir . '/cache/lighttpd');
-        $this->options->set('pidfile', $this->getCacheDir().'/.sf');
+        $this->options->add(array(
+            // Lighttpd configuration options.
+            'document_root' => $this->project->getWebDir(),
+            'log_dir'       => $this->project->getLogDir().'/lighttpd',
+            'cache_dir'     => $this->project->getCacheDir().'/lighttpd',
+            // Rewrite rules options.
+            'nophp'         => array(),
+            'default'       => $this->project->getIndexFile(),
+            'phps'          => $this->project->readablePhpFiles,
+            'files'         => $this->project->readableFiles,
+            'dirs'          => $this->project->readableDirs,
+        ));
 
-        $this->ensureDirectories();
+        $this->options->set('pidfile', $this->options->get('cache_dir').'/.sf');
+        $this->options->set('restartfile', $this->options->get('cache_dir').'/.symfttpd_restart');
+
+        $this->rotate();
     }
 
     /**
      * Read the server configuration.
      *
+     * @param string $separator
      * @return string
      */
-    public function read()
+    public function read($separator = PHP_EOL)
     {
-        return $this->readConfiguration().PHP_EOL.$this->readRules();
+        return $this->readConfiguration().$separator.$this->readRules();
     }
 
     /**
@@ -142,7 +156,7 @@ class Lighttpd implements ServerInterface
         }
 
         if (null == $this->configFile) {
-            $this->configFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->configFilename;
+            $this->configFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->configFilename;
         }
 
         if (false == file_exists($this->getConfigFile())) {
@@ -169,7 +183,7 @@ class Lighttpd implements ServerInterface
         }
 
         if (null == $this->rulesFile) {
-            $this->rulesFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->rulesFilename;
+            $this->rulesFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->rulesFilename;
         }
 
         if (false == file_exists($this->rulesFile)) {
@@ -184,10 +198,12 @@ class Lighttpd implements ServerInterface
     /**
      * Write the configurations files.
      *
-     * @throws Exception\ConfigurationException
+     * @param bool $force If false, does not overwrite the existing files.
+     * @throws \Symfttpd\Configuration\Exception\ConfigurationException
      */
-    public function write()
+    public function write($force = false)
     {
+        $file = '';
         $type = count(func_get_args()) > 0 ? func_get_arg(0) : 'all';
 
         switch ($type) {
@@ -205,6 +221,11 @@ class Lighttpd implements ServerInterface
                 $this->write('config');
                 $this->write('rules');
                 break;
+        }
+
+        // Don't rewrite existing configuration if not forced to.
+        if (false === $force && file_exists($file)) {
+            return;
         }
 
         if ($type !== 'all' && false === file_put_contents($file, $content)) {
@@ -256,7 +277,7 @@ class Lighttpd implements ServerInterface
         require $this->getConfigurationTemplate();
 
         $this->lighttpdConfig = ob_get_clean();
-        $this->configFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->configFilename;
+        $this->configFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->configFilename;
     }
 
     /**
@@ -270,7 +291,7 @@ class Lighttpd implements ServerInterface
         require $this->getRulesTemplate();
 
         $this->rules = ob_get_clean();
-        $this->rulesFile = $this->getCacheDir().DIRECTORY_SEPARATOR.$this->rulesFilename;
+        $this->rulesFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->rulesFilename;
     }
 
     /**
@@ -280,7 +301,7 @@ class Lighttpd implements ServerInterface
      */
     public function getConfigurationTemplate()
     {
-        return __DIR__ . sprintf('/../Resources/templates/%s.php', $this->configFilename);
+        return __DIR__ . sprintf('/../Resources/templates/lighttpd/%s.php', $this->configFilename);
     }
 
     /**
@@ -290,51 +311,28 @@ class Lighttpd implements ServerInterface
      */
     public function getRulesTemplate()
     {
-        return __DIR__ . sprintf('/../Resources/templates/%s.php', $this->rulesFilename);
+        return __DIR__ . sprintf('/../Resources/templates/lighttpd/%s.php', $this->rulesFilename);
     }
 
     /**
-     * Return the lighttpd log directory.
-     *
-     * @return string
-     */
-    public function getLogDir()
-    {
-        return $this->options->get('log_dir');
-
-    }
-
-    /**
-     * Return the lighttpd cache directory.
-     *
-     * @return string
-     */
-    public function getCacheDir()
-    {
-        return $this->options->get('cache_dir');
-    }
-
-    /**
-     * Remove the log and cache directory of lighttpd.
+     * Remove the log and cache directory of
+     * lighttpd and recreate them.
      *
      * @param null|\Symfttpd\Filesystem\Filesystem $filesystem
      */
-    public function clear(Filesystem $filesystem = null)
+    public function rotate($clear = false, Filesystem $filesystem = null)
     {
-        $filesystem = $filesystem ?: new Filesystem();
-        $filesystem->remove(array($this->getCacheDir(), $this->getLogDir()));
-        $this->ensureDirectories($filesystem);
-    }
+        $directories = array(
+            $this->options->get('cache_dir'),
+            $this->options->get('log_dir'),
+        );
 
-    /**
-     * Create the log and cache directory if needed.
-     *
-     * @param null|\Symfttpd\Filesystem\Filesystem $filesystem
-     */
-    public function ensureDirectories(Filesystem $filesystem = null)
-    {
         $filesystem = $filesystem ?: new Filesystem();
-        $filesystem->mkdir(array($this->getCacheDir(), $this->getLogDir()));
+
+        if (true === $clear) {
+            $filesystem->remove($directories);
+        }
+        $filesystem->mkdir($directories);
     }
 
     /**
@@ -418,72 +416,46 @@ class Lighttpd implements ServerInterface
     /**
      * Start the server.
      */
-    public function start()
+    public function run()
     {
         $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
 
-        $this->process = new \Symfony\Component\Process\Process($command, $this->workingDir, null, null, null);
-        $this->process->run();
+        $process = new \Symfony\Component\Process\Process($command, $this->project->getRootDir(), null, null, null);
+        $process->run();
     }
 
     /**
-     * Configure the server with options.
+     * Return the restartfile.
      *
-     * @param array $options
-     * @throws \InvalidArgumentException
+     * If the server configuration (rules or base configuration)
+     * changed, it generates a restart file that means that
+     * the server must be restarted.
+     *
+     * @return mixed|null
      */
-    public function configure(array $options)
+    public function getRestartFile()
     {
-        $allow = array_key_exists('allow', $options) ? explode(',', $options['allow']) : array();
-        $nophp = array_key_exists('nophp', $options) ? explode(',', $options['nophp']) : array();
-        $path  = array_key_exists('path', $options) ? realpath($options['path']) : $this->workingDir;
-        $default = array_key_exists('default', $options) ? $options['default'] : 'index.php';
-
-        $files = array(
-            'dir' => array(),
-            'php' => array(),
-            'file' => array()
-        );
-
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $options['path']));
-        }
-
-        foreach (new \DirectoryIterator($path) as $file) {
-            $name = $file->getFilename();
-            if ($name[0] != '.') {
-                if ($file->isDir()) {
-                    $files['dir'][] = $name;
-                }
-                elseif (!preg_match('/\.php$/', $name)) {
-                    $files['file'][] = $name;
-                }
-                elseif (empty($options['only'])) {
-                    $files['php'][] = $name;
-                }
-            }
-        }
-
-        foreach ($allow as $name) {
-            $files['php'][] = $name . '.php';
-        }
-
-        $this->options->set('document_root', $path);
-        $this->options->set('nophp', $nophp);
-        $this->options->set('default', $default);
-        $this->options->set('phps', $files['php']);
-        $this->options->set('files', $files['file']);
-        $this->options->set('dirs', $files['dir']);
+        return $this->options->get('restartfile');
     }
 
-    public function reconfigure()
+    /**
+     * Return the pidfile which contains the pid of the process
+     * of the server.
+     *
+     * @return mixed|null
+     */
+    public function getPidfile()
     {
-        $options = array();
-        $options['allow'] = implode(',', $this->options->get('allow', array()));
-        $options['nophp'] = implode(',', $this->options->get('nophp', array()));
-        $options['path'] = $this->options->get('document_root');
-        $options['default'] = $this->options->get('default');
+        return $this->options->get('pidfile');
+    }
 
-        $this->configure($options);
+    /**
+     * Delete the restart file if exists.
+     */
+    public function removeRestartFile()
+    {
+        if (file_exists($this->getRestartFile())) {
+            unlink($this->getRestartFile());
+        }
     }
 }

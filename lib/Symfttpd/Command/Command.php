@@ -35,7 +35,7 @@ class Command extends BaseCommand
             return $this->getApplication()->getSymfttpd();
         }
 
-        return new Symfttpd();
+        return \Symfttpd\Factory::createSymfttpd();
     }
 
     /**

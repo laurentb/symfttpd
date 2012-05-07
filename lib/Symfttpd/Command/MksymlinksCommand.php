@@ -1,23 +1,30 @@
 <?php
 /**
- * MksymlinksCommand class.
+ * This file is part of the Symfttpd Project
  *
- * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
- * @since 24/10/11
+ * (c) Laurent Bachelier <laurent@bachelier.name>
+ * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace Symfttpd\Command;
 
 use Symfttpd\Validator\ProjectTypeValidator;
 use Symfttpd\Configurator\Exception\ConfiguratorNotFoundException;
-
-use Symfony\Component\Console\Application;
 use Symfttpd\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * MksymlinksCommand class.
+ *
+ * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ * @since 24/10/11
+ */
 class MksymlinksCommand extends Command
 {
     protected $finder;
@@ -36,7 +43,7 @@ class MksymlinksCommand extends Command
     }
 
     /**
-     * Create symbolik links.
+     * Create symbolic links.
      *
      * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
@@ -44,6 +51,13 @@ class MksymlinksCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $symfttpd = $this->getSymfttpd();
+        $symfttpd->getConfiguration()->read();
+
+        $project = $symfttpd->getProject();
+        $project->setRootDir($input->getOption('path'));
+        $project->initialize();
+
         $type    = $input->getArgument('type');
         $version = $input->getOption('ver');
 
@@ -60,7 +74,7 @@ class MksymlinksCommand extends Command
         }
 
         $configurator = new $class($version);
-        $configurator->configure($input->getOption('path'), $this->getSymfttpd()->getConfiguration()->all());
+        $configurator->configure($project, $this->getSymfttpd()->getConfiguration()->all());
 
         $output->writeln('Symbolic links created.');
     }

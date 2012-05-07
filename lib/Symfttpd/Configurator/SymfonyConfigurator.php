@@ -12,6 +12,7 @@ use Symfttpd\Configurator\ConfiguratorInterface;
 use Symfttpd\Configurator\Symfony2Configurator;
 use Symfttpd\Configurator\Symfony14Configurator;
 use Symfttpd\Configurator\Exception\ConfiguratorException;
+use Symfttpd\Project\ProjectInterface;
 
 class SymfonyConfigurator implements ConfiguratorInterface
 {
@@ -23,17 +24,18 @@ class SymfonyConfigurator implements ConfiguratorInterface
     }
 
     /**
-     * Configure the project so that symfftpd
-     * will be able to launch it.
+     * Configure the project so that it can be launched with symfttpd.
      *
-     * @param string $path
+     * @abstract
+     * @throw Symfttpd\Configurator\Exception\ConfiguratorException
+     * @param \Symfttpd\Project\ProjectInterface
      * @param array $options
      * @return void
      */
-    public function configure($path, array $options)
+    public function configure(ProjectInterface $project, array $options)
     {
         $configurator = $this->guessConfigurator();
-        $configurator->configure($path, $options);
+        $configurator->configure($project, $options);
     }
 
     /**

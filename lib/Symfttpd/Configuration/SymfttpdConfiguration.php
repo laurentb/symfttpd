@@ -36,18 +36,17 @@ class SymfttpdConfiguration extends OptionBag implements ConfigurationInterface
      * Constructor
      *
      * @param array $options
+     * @param array $paths
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = array(), array $paths = array())
     {
         $this->options = $options;
 
-        $this->paths = array(
+        $this->paths = array_merge(array(
             __DIR__.'/../Resources/templates/', // Resource directory
             getenv('HOME').'/.',  // user configuration
             getcwd().'/config/',  // project configuration
-        );
-
-        $this->read();
+        ), $paths);
     }
 
     /**

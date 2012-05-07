@@ -18,6 +18,24 @@ namespace Symfttpd\Filesystem;
  */
 class Filesystem extends \Symfony\Component\Filesystem\Filesystem
 {
+    /**
+     * Replace the existing symbolic links.
+     *
+     * @param $basePath
+     * @param $target
+     * @param $link
+     * @param bool $relative
+     * @author Laurent Bachelier <laurent@bachelier.name>
+     */
+    public function replaceSymlink($basePath, $target, $link, $relative = true)
+    {
+        if ($relative) {
+            $target = $this->calculateRelativeDir($basePath . '/' . $link, $target);
+        }
+
+        $this->mkdir(dirname($basePath . '/' . $link));
+        $this->symlink($target, $basePath . '/' . $link);
+    }
 
     /**
      * Calculates the relative path from one to another directory.

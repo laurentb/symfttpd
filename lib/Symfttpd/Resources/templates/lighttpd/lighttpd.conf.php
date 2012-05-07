@@ -6,6 +6,7 @@ server.modules = (
     "mod_fastcgi",
 )
 
+server.document-root  = "<?php echo $this->options->get('document_root') ?>"
 server.port           = <?php echo $this->options->get('port') ?>
 
 <?php if ($this->options->has('bind')): ?>
@@ -43,8 +44,8 @@ server.force-lowercase-filenames = "disable"
 
 server.pid-file       = "<?php echo $this->options->get('pidfile') ?>"
 
-server.errorlog       = "<?php echo $this->getLogDir() ?>/error.log"
-accesslog.filename    = "<?php echo $this->getLogDir() ?>/access.log"
+server.errorlog       = "<?php echo $this->options->get('log_dir') ?>/error.log"
+accesslog.filename    = "<?php echo $this->options->get('log_dir') ?>/access.log"
 
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"

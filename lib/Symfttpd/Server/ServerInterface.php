@@ -22,6 +22,22 @@ use Symfttpd\Configuration\Exception\ConfigurationException;
 interface ServerInterface
 {
     /**
+     * Return the command that will run the server.
+     * It is lighttpd for the Lighttpd server for example.
+     *
+     * @abstract
+     * @return mixed
+     */
+    public function getCommand();
+
+    /**
+     * @abstract
+     * @param $command
+     * @return mixed
+     */
+    public function setCommand($command);
+
+    /**
      * Read the configuration.
      *
      * @abstract
@@ -40,10 +56,34 @@ interface ServerInterface
     public function write();
 
     /**
-     * Start the server.
+     * Run the server command to start it.
      *
      * @abstract
      * @return mixed
      */
-    public function start();
+    public function run();
+
+    /**
+     * Return the restart file path.
+     *
+     * @abstract
+     * @return mixed
+     */
+    public function getRestartFile();
+
+    /**
+     * Delete the restart file if exists.
+     *
+     * @abstract
+     */
+    public function removeRestartFile();
+
+    /**
+     * Return the pidfile which contains
+     * the pid of the process of the server.
+     *
+     * @abstract
+     * @return mixed
+     */
+    public function getPidfile();
 }

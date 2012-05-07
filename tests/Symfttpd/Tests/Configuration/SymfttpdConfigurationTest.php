@@ -17,6 +17,7 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->configuration = new SymfttpdConfiguration();
+        $this->configuration->read();
     }
 
     public function testAll()
@@ -47,11 +48,15 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testRead()
     {
-        $this->configuration->read();
+        $configuration = new SymfttpdConfiguration();
 
-        $this->assertTrue(count($this->configuration->all()) > 0);
-        $this->assertTrue($this->configuration->has('path'));
-        $this->assertTrue($this->configuration->has('genconf'));
+        $this->assertEquals(0, count($configuration->all()));
+
+        $configuration->read();
+
+        $this->assertGreaterThan(0, count($configuration->all()));
+        $this->assertTrue($configuration->has('path'));
+        $this->assertTrue($configuration->has('genconf'));
     }
 
     public function testAddPath()

@@ -13,6 +13,7 @@ namespace Symfttpd\Configurator;
 
 use Symfttpd\Configurator\ConfiguratorInterface;
 use Symfttpd\Configurator\Exception\ConfiguratorException;
+use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpProcess;
 
@@ -44,23 +45,23 @@ class Symfony14Configurator implements ConfiguratorInterface
      * Creates cache and log directories, add symbolic links for
      * plugins web assets.
      *
-     * @param $path
+     * @param \Symfttpd\Project\ProjectInterface
      * @param array $options
      * @throws \RuntimeException
      * @throws ConfiguratorException
      */
-    public function configure($path, array $options)
+    public function configure(ProjectInterface $project, array $options)
     {
         // Try to find the symfony executable file.
-        if (false == file_exists($path.'/symfony') || false == is_executable($path.'/symfony')) {
+        if (false == file_exists($project->getRootDir().'/symfony') || false == is_executable($project->getRootDir().'/symfony')) {
             throw new ConfiguratorException('This is not a symfony project.');
         }
 
         // Creates cache and log folders
-        $this->filesystem->mkdir(array($path . '/cache', $path . '/log'));
+        $this->filesystem->mkdir(array($project->getCacheDir(), $project->getLogDir()));
 
         $symlinks = array();
-        $sfPath = $options['sf_path'][$options['want']];
+        $sfPath = $options['sf_path'][$project->getVersion()];
         $sfSymlinks = array(
             'symfony_symlink' => '',
             'lib_symlink'     => 'lib',
@@ -81,50 +82,32 @@ class Symfony14Configurator implements ConfiguratorInterface
 
         foreach ($symlinks as $link => $target)
         {
-            $this->replaceSymlink($path, $target, $link, $options['relative']);
+            $this->filesystem->replaceSymlink($project->getRootDir(), $target, $link, $options['relative']);
         }
 
         // Generates
         if ($options['do_plugins']) {
-            if (version_compare($options['want'], '1.2') >= 0) {
-                $process = new PhpProcess('symfony plugin:publish-assets', realpath($path));
-                $process->setTimeout(5);
+            if (version_compare($project->getVersion(), '1.2') >= 0) {
+                $process = new PhpProcess('symfony plugin:publish-assets', realpath($project->getRootDir()));
+                $process->setTimeout(10);
                 $process->run();
 
-                if (!$process->isSuccessful()) {
+                if (false == $process->isSuccessful()) {
                     throw new \RuntimeException($process->getErrorOutput());
                 }
             } else {
-                foreach ($this->findPlugins($path) as $name) {
+                foreach ($this->findPlugins($project->getRootDir()) as $name) {
                     $link = 'web/' . $name;
-                    $target = $path . '/plugins/' . $name . '/web';
+                    $target = $project->getRootDir() . '/plugins/' . $name . '/web';
                     // Ignore if there is a real directory with this name
-                    if (is_link($path . '/' . $link) || !is_dir($path . '/' . $link)) {
-                        $this->replaceSymlink($path, $target, $link, $options['relative']);
+                    if (is_link($project->getRootDir() . '/' . $link) || !is_dir($project->getRootDir() . '/' . $link)) {
+                        $this->replaceSymlink($project->getRootDir(), $target, $link, $options['relative']);
                     }
                 }
             }
         }
     }
 
-    /**
-     * Replace the existing symbolic links.
-     *
-     * @param $projectPath
-     * @param $target
-     * @param $link
-     * @param bool $relative
-     * @author Laurent Bachelier <laurent@bachelier.name>
-     */
-    public function replaceSymlink($projectPath, $target, $link, $relative = true)
-    {
-        if ($relative) {
-            $target = $this->filesystem->calculateRelativeDir($projectPath . '/' . $link, $target);
-        }
-
-        $this->filesystem->mkdir(dirname($projectPath . '/' . $link));
-        $this->filesystem->symlink($target, $projectPath . '/' . $link);
-    }
 
     /**
      * Find plugins with a "web" directory

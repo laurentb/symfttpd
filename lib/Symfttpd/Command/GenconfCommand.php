@@ -41,15 +41,10 @@ EOT
         );
 
         // Configure arguments
-        $this->addArgument('type', InputArgument::OPTIONAL, 'The config file type (config, rules, all).', 'all');
+        $this->addArgument('type', InputArgument::OPTIONAL, 'The config file type (config, rules, all).', 'rules');
 
         // Configure options.
-        $this->addOption('default',   null, InputOption::VALUE_OPTIONAL, 'Change the default application.', 'index')
-            ->addOption('only',       null, InputOption::VALUE_OPTIONAL, 'Do not allow any other application.', false)
-            ->addOption('allow',      null, InputOption::VALUE_OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false)
-            ->addOption('nophp',      null, InputOption::VALUE_OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', 'uploads')
-            ->addOption('path',       null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', getcwd() . '/../web')
-            ->addOption('output-dir', null, InputOption::VALUE_OPTIONAL, 'The path to generate the configuration.', getcwd().'/cache/lighttpd/');
+        $this->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to /web if not present.');
     }
 
     /**
@@ -61,20 +56,34 @@ EOT
     {
         $output->writeln('Starting generating symfttpd configuration.');
 
-        $server = $this->getSymfttpd()->getServer(getcwd());
-        $server->options->add($this->getServerOptions($input->getOptions()));
+        $symfttpd = $this->getSymfttpd();
+        $symfttpd->getConfiguration()->read();
+
+        $project = $symfttpd->getProject();
+        $project->setRootDir(getcwd());
+        $project->initialize();
+
+        $server = $this->getSymfttpd()->getServer();
+
+        if (null !== $input->getOption('path')) {
+            $server->options->set('document_root', $input->getOption('path'));
+        }
 
         try {
-            $configDir = $input->getOption('output-dir');
-
             switch ($input->getArgument('type'))
             {
                 case 'config':
-                    $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.', $server->getConfigFilename(), $configDir));
+                    $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.',
+                        $server->getConfigFilename(),
+                        $server->options->get('cache_dir')
+                    ));
                     $server->generateConfiguration($this->getSymfttpd()->getConfiguration());
                     break;
                 case 'rules':
-                    $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.', $server->getRulesFilename(), $configDir));
+                    $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.',
+                        $server->getRulesFilename(),
+                        $server->options->get('cache_dir')
+                    ));
                     $server->generateRules($this->getSymfttpd()->getConfiguration());
                     break;
                 default:
@@ -82,7 +91,7 @@ EOT
                         'Generate <comment>%s</comment> and <comment>%s</comment> in <info>"%s"</info>.',
                         $server->getConfigFilename(),
                         $server->getRulesFilename(),
-                        $configDir
+                        $server->options->get('cache_dir')
                     ));
                     $server->generate($this->getSymfttpd()->getConfiguration());
             }
@@ -99,57 +108,5 @@ EOT
         $output->writeln('The configuration file has been well generated.');
 
         return 0;
-    }
-
-    /**
-     * Create the server options passed to the command.
-     *
-     * @param array $options
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    public function getServerOptions(array $options)
-    {
-        $allow = explode(',', $options['allow']);
-        $nophp = explode(',', $options['nophp']);
-        $path  = realpath($options['path']);
-
-        $files = array(
-            'dir' => array(),
-            'php' => array(),
-            'file' => array()
-        );
-
-        if (!file_exists($path)) {
-            throw new \InvalidArgumentException(sprintf('Directory "%s" not found.', $options['path']));
-        }
-
-        foreach (new \DirectoryIterator($path) as $file) {
-            $name = $file->getFilename();
-            if ($name[0] != '.') {
-                if ($file->isDir()) {
-                    $files['dir'][] = $name;
-                }
-                elseif (!preg_match('/\.php$/', $name)) {
-                    $files['file'][] = $name;
-                }
-                elseif (empty($options['only'])) {
-                    $files['php'][] = $name;
-                }
-            }
-        }
-
-        foreach ($allow as $name) {
-            $files['php'][] = $name . '.php';
-        }
-
-        return array(
-            'document_root' => $path,
-            'nophp'    => $nophp,
-            'default'  => $options['default'],
-            'phps'     => $files['php'],
-            'files'    => $files['file'],
-            'dirs'     => $files['dir'],
-        );
     }
 }

@@ -26,9 +26,15 @@ class Application extends BaseApplication
      */
     protected $symfttpd;
 
+    /**
+     * Constructor
+     * Initialize a Symfttpd object.
+     */
     public function __construct()
     {
         parent::__construct('Symfttpd', Symfttpd::VERSION);
+
+        $this->symfttpd = \Symfttpd\Factory::createSymfttpd();
     }
 
     /**
@@ -38,11 +44,6 @@ class Application extends BaseApplication
      */
     public function getSymfttpd()
     {
-        if (null == $this->symfttpd) {
-
-            $this->symfttpd = new Symfttpd();
-        }
-
         return $this->symfttpd;
     }
 

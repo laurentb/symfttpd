@@ -27,9 +27,13 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->createSymfonyProject();
+        $this->server = new Lighttpd($this->getProject(), $this->getOptions());
+    }
 
-        $this->server = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+    public function tearDown()
+    {
+        $filesystem = new \Symfttpd\Filesystem\Filesystem();
+        $filesystem->remove($this->getProject()->getRootDir());
     }
 
     public function testGenerateAndReadRule()
@@ -81,22 +85,12 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConfigurationTemplate()
     {
-        $this->assertStringEndsWith('Resources/templates/lighttpd.conf.php', $this->server->getConfigurationTemplate());
+        $this->assertStringEndsWith('Resources/templates/lighttpd/lighttpd.conf.php', $this->server->getConfigurationTemplate());
     }
 
     public function testGetRulesTemplate()
     {
-        $this->assertStringEndsWith('Resources/templates/rules.conf.php', $this->server->getRulesTemplate());
-    }
-
-    public function testGetCacheDir()
-    {
-        $this->assertStringEndsWith('/cache/lighttpd', $this->server->getCacheDir());
-    }
-
-    public function testGetLogDir()
-    {
-        $this->assertStringEndsWith('/log/lighttpd', $this->server->getLogDir());
+        $this->assertStringEndsWith('Resources/templates/lighttpd/rules.conf.php', $this->server->getRulesTemplate());
     }
 
     public function testGetConfigFilename()
@@ -114,8 +108,8 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
         $this->server->writeRules();
 
-        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
-        $this->assertEquals($this->getGeneratedRules(), (string) $lighttpd->readRules());
+        $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
+        $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
     }
 
     public function testReadConfigFromFile()
@@ -123,8 +117,8 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generateConfiguration($this->getSymfttpdConfiguration());
         $this->server->writeConfiguration();
 
-        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
-        $this->assertEquals($this->getGeneratedConfiguration(), (string) $lighttpd->readConfiguration());
+        $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
+        $this->assertEquals($this->getGeneratedConfiguration(), $lighttpd->readConfiguration());
     }
 
     public function testReadFromFile()
@@ -132,10 +126,10 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generate($this->getSymfttpdConfiguration());
         $this->server->write();
 
-        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
-        $this->assertEquals($this->getGeneratedConfiguration(true), (string) $lighttpd->readConfiguration());
-        $this->assertEquals($this->getGeneratedRules(), (string) $lighttpd->readRules());
-        $this->assertEquals($this->getGeneratedConfiguration(true).PHP_EOL.$this->getGeneratedRules(), (string) $lighttpd->read());
+        $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
+        $this->assertEquals($this->getGeneratedConfiguration(true), $lighttpd->readConfiguration());
+        $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
+        $this->assertEquals($this->getGeneratedConfiguration(true).PHP_EOL.$this->getGeneratedRules(), $lighttpd->read());
     }
 
     /**
@@ -144,9 +138,8 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadRulesFromFileException()
     {
-        $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
-
-        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+        $lighttpd = new Lighttpd($this->getProject(), $this->getOptions());
+        $lighttpd->rotate(true);
         $lighttpd->readRules();
     }
 
@@ -156,20 +149,9 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadConfigFromFileException()
     {
-        $this->server->generateConfiguration($this->getSymfttpdConfiguration());
-
-        $lighttpd = new Lighttpd(sys_get_temp_dir(), $this->getOptions());
+        $lighttpd = new Lighttpd($this->getProject(), $this->getOptions());
+        $lighttpd->rotate();
         $lighttpd->readConfiguration();
-    }
-
-    /**
-     * @expectedException Symfttpd\Server\Exception\ServerException
-     * @expectedExceptionMessage command not found
-     */
-    public function testStartException()
-    {
-        $this->server->setCommand('foo');
-        $this->server->start();
     }
 
     /**
@@ -185,9 +167,9 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      *   backend_dev.php
      *
      */
-    public function createSymfonyProject()
+    public function createSymfonyProject($project)
     {
-        $baseDir = sys_get_temp_dir();
+        $baseDir = $project->getRootDir();
 
         $projectTree = array(
             $baseDir.DIRECTORY_SEPARATOR.'apps',
@@ -221,30 +203,10 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function getOptions()
     {
-        $configuration = $this->getMock('\Symfttpd\Configuration\OptionBag');
-        $configuration->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap(array(
-                array('document_root', null, sys_get_temp_dir().'/web'),
-                array('dirs', null, array('css', 'js')),
-                array('files', null, array('robots.txt')),
-                array('phps', null, array('index.php', 'frontend_dev.php', 'backend_dev.php')),
-                array('default', null, 'index'),
-                array('nophp', null, array('log')),
-                array('port', null, 4042),
-                array('bind', null, '127.0.0.1'),
-                // Set does not work with the mock.
-                array('pidfile', null, sys_get_temp_dir().'/cache/lighttpd/.sf'),
-                array('log_dir', null, sys_get_temp_dir().'/log/lighttpd'),
-                array('cache_dir', null, sys_get_temp_dir().'/cache/lighttpd'),
-            )
-        ));
-
-        $configuration->expects($this->any())
-            ->method('has')
-            ->will($this->returnValueMap(array(
-                array('bind', true),
-            )
+        $configuration = new \Symfttpd\Configuration\OptionBag();
+        $configuration->add(array(
+            'port' => 4042,
+            'bind' => '127.0.0.1'
         ));
 
         return $configuration;
@@ -268,6 +230,19 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         return $configuration;
     }
 
+    public function getProject($reset = true)
+    {
+        $project = new \Symfttpd\Tests\Fixtures\TestProject();
+
+        if (true == $reset) {
+            $this->createSymfonyProject($project);
+        }
+
+        $project->initialize();
+
+        return $project;
+    }
+
     public function getGeneratedConfiguration($withRules = false)
     {
         $conf = <<<CONF
@@ -279,6 +254,7 @@ server.modules = (
     "mod_fastcgi",
 )
 
+server.document-root  = "%s/web"
 server.port           = 4042
 server.bind           = "127.0.0.1"
 
@@ -302,7 +278,7 @@ fastcgi.server = ( ".php" =>
 setenv.add-response-header = ( "X-Symfttpd" => "1",
     "Expires" => "Sun, 17 Mar 1985 00:42:00 GMT" )
 
-include "%s/mime-types.conf"
+include "%s/lighttpd/mime-types.conf"
 server.indexfiles     = ("index.php", "index.html",
                         "index.htm", "default.htm")
 server.follow-symlink = "enable"
@@ -323,20 +299,21 @@ debug.log-request-header-on-error = "enable"
 CONF;
 
         $templateDir = realpath(__DIR__.'/../../../../lib/Symfttpd/Resources/templates');
-
+        $baseDir = $this->getProject(false)->getRootDir();
         if ($withRules) {
-            $rules = 'include "'.sys_get_temp_dir().'/cache/lighttpd/rules.conf"'.PHP_EOL;
+            $rules = 'include "'.$baseDir.'/cache/lighttpd/rules.conf"'.PHP_EOL;
         } else {
             $rules = '';
         }
 
         return sprintf(
             $conf,
+            $baseDir,
             sys_get_temp_dir(),
             $templateDir,
-            sys_get_temp_dir(),
-            sys_get_temp_dir(),
-            sys_get_temp_dir(),
+            $baseDir,
+            $baseDir,
+            $baseDir,
             $rules
         );
     }
@@ -344,17 +321,15 @@ CONF;
     public function getGeneratedRules()
     {
         $conf = <<<CONF
-server.document-root = "%s/web"
-
 url.rewrite-once = (
   "^/css/.+" => "$0",
   "^/js/.+" => "$0",
 
   "^/robots\.txt$" => "$0",
 
-  "^/index\.php(/[^\?]*)?(\?.*)?" => "/index.php$1$2",
-  "^/frontend_dev\.php(/[^\?]*)?(\?.*)?" => "/frontend_dev.php$1$2",
   "^/backend_dev\.php(/[^\?]*)?(\?.*)?" => "/backend_dev.php$1$2",
+  "^/frontend_dev\.php(/[^\?]*)?(\?.*)?" => "/frontend_dev.php$1$2",
+  "^/index\.php(/[^\?]*)?(\?.*)?" => "/index.php$1$2",
 
   "^(/[^\?]*)(\?.*)?" => "/index.php$1$2"
 )
@@ -362,6 +337,6 @@ url.rewrite-once = (
 
 CONF;
 
-        return sprintf($conf, sys_get_temp_dir());
+        return $conf;
     }
 }

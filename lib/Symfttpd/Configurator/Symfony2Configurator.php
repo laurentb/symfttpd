@@ -8,12 +8,20 @@
 
 namespace Symfttpd\Configurator;
 
-use Symfttpd\Configurator\ConfiguratorInterface;
+use Symfttpd\Project\ProjectInterface;
 
 class Symfony2Configurator implements ConfiguratorInterface
 {
-    public function configure($path, array $options)
+    /**
+     * Configure the project so that it can be launched with symfttpd.
+     *
+     * @throw Symfttpd\Configurator\Exception\ConfiguratorException
+     * @param \Symfttpd\Project\ProjectInterface
+     * @param array $options
+     * @return void
+     */
+    public function configure(ProjectInterface $project, array $options)
     {
-
+        // TODO: Implement configure() method.
     }
 }

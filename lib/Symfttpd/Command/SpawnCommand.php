@@ -15,7 +15,6 @@ use Symfttpd\Symfttpd;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
 use Symfttpd\Tail\TailInterface;
-use Symfttpd\Server\Lighttpd;
 use Symfttpd\Console\Application;
 use Symfttpd\Command\Command;
 use Symfttpd\Server\ServerInterface;
@@ -26,6 +25,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+
+
+use Symfttpd\Project\Symfony14;
 
 /**
  * SpawnCommand class
@@ -45,13 +47,8 @@ class SpawnCommand extends Command
         $this->setName('spawn');
         $this->setDescription('Launch the webserver.');
 
-        // Configure options
-        $this->addOption('default', null, InputOption::VALUE_OPTIONAL, 'Change the default application.', 'index')
-            ->addOption('only', null, InputOption::VALUE_OPTIONAL, 'Do not allow any other application.', false)
-            ->addOption('allow', null, InputOption::VALUE_OPTIONAL, 'Useful with `only`, allow some other applications (useful for allowing a _dev alternative, for example).', false)
-            ->addOption('nophp', null, InputOption::VALUE_OPTIONAL, 'Deny PHP execution in the specified directories (default being uploads).', 'uploads')
-            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to ../web if not present.', getcwd() . '/web')
-            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port to listen', 4042)
+        // Spawning options
+        $this->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port to listen', 4042)
             ->addOption('bind', 'b', InputOption::VALUE_OPTIONAL, 'The address to bind', '127.0.0.1')
             ->addOption('all', 'a', InputOption::VALUE_NONE, 'Bind on all addresses')
             ->addOption('tail', 't', InputOption::VALUE_NONE, 'Print the log in the console')
@@ -63,7 +60,7 @@ class SpawnCommand extends Command
     }
 
     /**
-     * Run the SYmttpd configured server.
+     * Run the Symttpd configured server.
      *
      * @param \Symfony\Component\Console\Input\InputInterface $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
@@ -71,42 +68,44 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Initialise Server options
-        $this->server = $this->getSymfttpd()->getServer($this->getProjectPath());
-        $this->server->clear();
-        $this->server->options->set('port', $input->getOption('port'));
-        $this->server->options->set('bind', $input->getOption('bind'));
+        $symfttpd = $this->getSymfttpd();
+        $symfttpd->getConfiguration()->read();
 
-        $this->getConfiguration()->set('restartfile', $this->server->getCacheDir().'/.symfttpd_restart');
+        $project = $symfttpd->getProject();
+        $project->setRootDir(getcwd());
+        $project->initialize();
+
+        $server = $this->getSymfttpd()->getServer();
+        $server->options->add(array(
+            // Lighttpd options
+            'port' => $input->getOption('port'),
+            'bind' => true == $input->getOption('all') ? false : $input->getOption('bind')
+        ));
 
         // Kill other running server in the current project.
-        if ($input->getOption('kill')) {
+        if (true == $input->getOption('kill')) {
             // Kill existing symfttpd instance if found.
-            if (file_exists($this->getConfiguration()->get('restartfile'))) {
-                unlink($this->getConfiguration()->get('restartfile'));
-            }
-            \Symfttpd\Utils\PosixTools::killPid($this->server->options->get('pidfile'), $output);
-        }
-
-        $this->server->configure($input->getOptions());
-
-        if ($this->getConfiguration()->has('lighttpd_cmd')) {
-            $this->server->setCommand($this->getConfiguration()->get('lighttpd_cmd'));
+            $server->removeRestartFile();
+            \Symfttpd\Utils\PosixTools::killPid($server->getPidfile(), $output);
         }
 
         // Creates the server configuration.
-        $this->server->generate($this->getConfiguration());
-        $this->server->write();
+        $server->generate($this->getConfiguration());
+        $server->write();
 
-        $boundAddress = $input->getOption('all') ? 'all-interfaces' : $input->getOption('bind');
+        if (false == $server->options->get('bind')) {
+            $boundAddress = 'all-interfaces';
+        } else {
+            $boundAddress = $server->options->get('bind');
+        }
 
-        $bind = $input->getOption('all') ? : $input->getOption('bind');
+        $bind = $server->options->get('bind');
         $host = in_array($bind, array(false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
 
         $apps = array();
-        foreach ($this->server->options->get('phps') as $file) {
+        foreach ($this->getSymfttpd()->getProject()->readablePhpFiles as $file) {
             if (preg_match('/.+\.php$/', $file)) {
-                $apps[$file] = ' http://' . $host . ':' . $input->getOption('port') . '/<info>' . $file . '</info>';
+                $apps[$file] = ' http://' . $host . ':' . $server->options->get('port') . '/<info>' . $file . '</info>';
             }
         }
 
@@ -121,23 +120,22 @@ Available applications:
 
 TEXT;
         $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
-        $output->write(sprintf($text, $boundAddress, $this->server->options->get('port'), implode("\n", $apps)));
+        $output->write(sprintf($text, $boundAddress, $server->options->get('port'), implode("\n", $apps)));
 
         flush();
 
         if (true == $input->getOption('single_process')) {
             // Run lighttpd
-            $this->server->start();
+            $server->run();
 
             $output->write('Terminated.');
 
             return 0;
         }
 
-
         $multitail = null;
         if ($input->getOption('tail')) {
-            $logDir = $this->server->getLogDir();
+            $logDir = $server->options->get('log_dir');
             $multitail = new MultiTail(new OutputFormatter(true));
             $multitail->add('access', new Tail($logDir . '/access.log'), new OutputFormatterStyle('blue'));
             $multitail->add('error', new Tail($logDir . '/error.log'), new OutputFormatterStyle('red', null, array('bold')));
@@ -152,9 +150,9 @@ TEXT;
             exit(1);
         } else if (0 === $pid) {
             // Child process
-            $this->spawn($output);
+            $this->spawn($server, $output);
         } else {
-            $this->watch($multitail, $output);
+            $this->watch($server, $multitail, $output);
             if (pcntl_waitpid($pid, $status, WNOHANG))
             {
                 exit(0);
@@ -170,51 +168,57 @@ TEXT;
      * rules changed. In this case it will create a file that
      * will tell to the fork that the server must be restarted.
      *
+     * @param \Symfttpd\Server\ServerInterface $server
      * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @return bool
      */
-    protected function spawn(OutputInterface $output)
+    protected function spawn(ServerInterface $server, OutputInterface $output)
     {
         do {
-            if (file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile'))) {
-                unlink($this->getSymfttpd()->getConfiguration()->get('restartfile'));
-            }
+            $server->removeRestartFile();
 
             try {
                 // Run lighttpd
-                $this->server->start();
-            } catch (\ServerException $e) {
+                $server->run();
+            } catch (\Exception $e) {
                 $output->writeln('<error>The server cannot start</error>');
                 $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
             }
 
-            if (!file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile'))) {
+            if (!file_exists($server->getRestartFile())) {
                 $output->writeln('Terminated.');
             } else {
                 $output->writeln('<comment>Something in web/ changed. Restarting lighttpd.</comment>');
 
                 // Regenerate the lighttpd configuration
-                $this->server->generateConfiguration($this->getSymfttpd()->getConfiguration());
-                $this->server->writeConfiguration();
+                $server->generateConfiguration($this->getSymfttpd()->getConfiguration());
+                $server->writeConfiguration();
             }
-        } while (file_exists($this->getSymfttpd()->getConfiguration()->get('restartfile')));
+        } while (file_exists($server->getRestartFile()));
 
         return false;
     }
 
     /**
+     * Watch the document directory.
+     * If the configuration of the server changed (a file has been added in the
+     * web directory for instance), it creates the restart file used in the
+     * spawn to tell it to restart the server.
+     *
+     * @param \Symfttpd\Server\ServerInterface $server
      * @param \Symfttpd\Tail\TailInterface $multitail
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      */
-    public function watch(TailInterface $multitail, OutputInterface $output)
+    public function watch(ServerInterface $server, TailInterface $multitail, OutputInterface $output)
     {
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
         $prevGenconf = null;
         while (false !== sleep(1)) {
+            $this->getSymfttpd()->getProject()->initialize();
             // Generate the configuration file.
-            $this->server->reconfigure();
-            $this->server->generateRules($this->getSymfttpd()->getConfiguration());
-            $this->server->writeRules();
-            $genconf = $this->server->readRules();
+            $server->generateRules($this->getSymfttpd()->getConfiguration());
+            $server->writeRules();
+            $genconf = $server->readRules();
 
             if ($prevGenconf !== null && $prevGenconf !== $genconf) {
                 // This sleep() is so that if a HTTP request just created a file in web/,
@@ -225,7 +229,7 @@ TEXT;
                 $filesystem->touch($this->getSymfttpd()->getConfiguration()->get('restartfile'));
 
                 // Kill the current server process.
-                \Symfttpd\Utils\PosixTools::killPid($this->server->options->get('pidfile'), $output);
+                \Symfttpd\Utils\PosixTools::killPid($server->options->get('pidfile'), $output);
             }
             $prevGenconf = $genconf;
 

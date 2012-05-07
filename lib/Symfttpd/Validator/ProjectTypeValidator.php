@@ -1,13 +1,22 @@
 <?php
 /**
- * ProjectTypeValidator class.
- * 
- * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
- * @since 25/10/11
+ * This file is part of the Symfttpd Project
+ *
+ * (c) Laurent Bachelier <laurent@bachelier.name>
+ * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace Symfttpd\Validator;
 
+/**
+ * ProjectTypeValidator class.
+ *
+ * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ * @since 25/10/11
+ */
 class ProjectTypeValidator
 {
     protected $types = array(
@@ -22,7 +31,7 @@ class ProjectTypeValidator
 
     /**
      * Checks that the project type and the verison is supported by symfttpd.
-     * 
+     *
      * @param $type
      * @param null $version
      * @return bool
