@@ -97,6 +97,18 @@ class OptionBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(reset($options), $this->options->get(key($options)));
     }
 
+    public function testMerge()
+    {
+        $this->options->add(array('foo' => 'bar', 'bar' => 'foo'));
+        $this->options->merge(array('foo' => 'foo', 'test' => 'bar'));
+
+        $this->assertEquals(array(
+            'foo' => 'foo',
+            'bar' => 'foo',
+            'test' => 'bar',
+        ), $this->options->all());
+    }
+
     public function getOptions()
     {
         return array(

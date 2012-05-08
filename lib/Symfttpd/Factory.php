@@ -45,7 +45,7 @@ class Factory
      * @return \Symfttpd\Project\ProjectInterface
      * @throws \InvalidArgumentException
      */
-    public static function createProject($type, $version)
+    public static function createProject($type, $version, $path = null)
     {
         $version = str_replace(array('.', '-', 'O'), '', $version);
 
@@ -55,7 +55,12 @@ class Factory
             throw new \InvalidArgumentException(sprintf('"%s" in version "%s" is not supported.', $type, $version));
         }
 
+        if (null == $path) {
+            $path = getcwd();
+        }
+
         $project = new $class();
+        $project->setRootDir($path);
 
         return $project;
     }

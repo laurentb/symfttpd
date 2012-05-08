@@ -110,8 +110,24 @@ class Lighttpd implements ServerInterface
         $this->project = $project;
         $this->options = $options ?: new OptionBag();
 
+        $this->setup();
+
+        $this->options->set('pidfile', $this->options->get('cache_dir').'/.sf');
+        $this->options->set('restartfile', $this->options->get('cache_dir').'/.symfttpd_restart');
+
+        $this->rotate();
+    }
+
+    /**
+     * Update the options.
+     * Called after initializing the project.
+     */
+    public function setup()
+    {
+        $this->getProject()->initialize();
+
         // Set the defaults settings
-        $this->options->add(array(
+        $this->options->merge(array(
             // Lighttpd configuration options.
             'document_root' => $this->project->getWebDir(),
             'log_dir'       => $this->project->getLogDir().'/lighttpd',
@@ -123,11 +139,6 @@ class Lighttpd implements ServerInterface
             'files'         => $this->project->readableFiles,
             'dirs'          => $this->project->readableDirs,
         ));
-
-        $this->options->set('pidfile', $this->options->get('cache_dir').'/.sf');
-        $this->options->set('restartfile', $this->options->get('cache_dir').'/.symfttpd_restart');
-
-        $this->rotate();
     }
 
     /**
@@ -457,5 +468,13 @@ class Lighttpd implements ServerInterface
         if (file_exists($this->getRestartFile())) {
             unlink($this->getRestartFile());
         }
+    }
+
+    /**
+     * @return \Symfttpd\Project\ProjectInterface
+     */
+    public function getProject()
+    {
+        return $this->project;
     }
 }

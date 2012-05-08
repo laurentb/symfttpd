@@ -82,7 +82,7 @@ class OptionBag implements \IteratorAggregate
     }
 
     /**
-     * Merge new options with existing ones.
+     * Add new options with existing ones.
      * Do not use array_merge as it rewrites the keys.
      *
      * @param array $options
@@ -92,5 +92,15 @@ class OptionBag implements \IteratorAggregate
         if (false == empty($options)) {
             $this->options = $this->options + $options;
         }
+    }
+
+    /**
+     * Merge options with existings ones.
+     *
+     * @param array $options
+     */
+    public function merge(array $options)
+    {
+        $this->options = array_merge($this->options, $options);
     }
 }

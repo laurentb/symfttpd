@@ -68,6 +68,10 @@ abstract class BaseProject implements ProjectInterface
      */
     public function initialize()
     {
+        $this->readableDirs = array();
+        $this->readableFiles = array();
+        $this->readablePhpFiles = array();
+
         $iterator = new \DirectoryIterator($this->getWebDir());
 
         foreach ($iterator as $file) {

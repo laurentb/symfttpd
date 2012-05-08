@@ -73,7 +73,6 @@ class SpawnCommand extends Command
 
         $project = $symfttpd->getProject();
         $project->setRootDir(getcwd());
-        $project->initialize();
 
         $server = $this->getSymfttpd()->getServer();
         $server->options->add(array(
@@ -125,6 +124,7 @@ TEXT;
         flush();
 
         if (true == $input->getOption('single_process')) {
+            $output->writeln('<info>Symfttpd will run in a single process mode.</info>');
             // Run lighttpd
             $server->run();
 
@@ -145,18 +145,19 @@ TEXT;
 
         $pid = pcntl_fork();
         $process = null;
-        if ($pid == -1) {
-             $output->writeln('<error>Could not fork</error>');
-            exit(1);
-        } else if (0 === $pid) {
-            // Child process
-            $this->spawn($server, $output);
-        } else {
+        if ($pid) {
             $this->watch($server, $multitail, $output);
             if (pcntl_waitpid($pid, $status, WNOHANG))
             {
                 exit(0);
             }
+        } else if (0 === $pid) {
+            // Child process
+            $this->spawn($server, $output);
+        } else {
+            $output->writeln('<error>Could not fork</error>');
+
+            exit(1);
         }
 
         return 0;
@@ -187,6 +188,8 @@ TEXT;
 
             if (!file_exists($server->getRestartFile())) {
                 $output->writeln('Terminated.');
+
+                return false;
             } else {
                 $output->writeln('<comment>Something in web/ changed. Restarting lighttpd.</comment>');
 
@@ -214,8 +217,8 @@ TEXT;
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
         $prevGenconf = null;
         while (false !== sleep(1)) {
-            $this->getSymfttpd()->getProject()->initialize();
             // Generate the configuration file.
+            $server->setup();
             $server->generateRules($this->getSymfttpd()->getConfiguration());
             $server->writeRules();
             $genconf = $server->readRules();
@@ -226,10 +229,10 @@ TEXT;
                 sleep(1);
 
                 // Tell the child process to restart the server
-                $filesystem->touch($this->getSymfttpd()->getConfiguration()->get('restartfile'));
+                $filesystem->touch($server->getRestartFile());
 
                 // Kill the current server process.
-                \Symfttpd\Utils\PosixTools::killPid($server->options->get('pidfile'), $output);
+                \Symfttpd\Utils\PosixTools::killPid($server->getPidfile(), $output);
             }
             $prevGenconf = $genconf;
 
