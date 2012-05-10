@@ -33,7 +33,7 @@ fastcgi.server = ( ".php" =>
 setenv.add-response-header = ( "X-Symfttpd" => "1",
     "Expires" => "Sun, 17 Mar 1985 00:42:00 GMT" )
 
-include "<?php echo __DIR__.'/mime-types.conf' ?>"
+<?php echo file_get_contents(__DIR__.'/mime-types.conf') ?>
 server.indexfiles     = ("index.php", "index.html",
                         "index.htm", "default.htm")
 server.follow-symlink = "enable"

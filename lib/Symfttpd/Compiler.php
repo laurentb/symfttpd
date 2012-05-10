@@ -35,6 +35,7 @@ class Compiler
         $finder->files()
             ->ignoreVCS(true)
             ->name('*.php')
+            ->name('*.conf')
             ->notName('Compiler.php')
             ->in(__DIR__.'/..')
             ->in(__DIR__.'/../../vendor/symfony')

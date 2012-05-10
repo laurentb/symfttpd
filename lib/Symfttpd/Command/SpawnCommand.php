@@ -146,7 +146,7 @@ TEXT;
         $pid = pcntl_fork();
         $process = null;
         if ($pid) {
-            $this->watch($server, $multitail, $output);
+            $this->watch($server, $output, $multitail);
             if (pcntl_waitpid($pid, $status, WNOHANG))
             {
                 exit(0);
@@ -209,10 +209,10 @@ TEXT;
      * spawn to tell it to restart the server.
      *
      * @param \Symfttpd\Server\ServerInterface $server
-     * @param \Symfttpd\Tail\TailInterface $multitail
      * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface $multitail
      */
-    public function watch(ServerInterface $server, TailInterface $multitail, OutputInterface $output)
+    public function watch(ServerInterface $server, OutputInterface $output, TailInterface $multitail = null)
     {
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
         $prevGenconf = null;
