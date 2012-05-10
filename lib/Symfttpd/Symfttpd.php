@@ -88,6 +88,11 @@ class Symfttpd
      */
     public function getProjectVersion()
     {
+        // Simple PHP project don't need a version.
+        if ($this->getProjectType() === 'php') {
+            return null;
+        }
+
         // BC with the 1.0 configuration version
         if (true == $this->configuration->has('want')
             && false == $this->configuration->has('project_version')) {
