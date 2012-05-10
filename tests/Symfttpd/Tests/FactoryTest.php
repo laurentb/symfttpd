@@ -49,14 +49,15 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateServerException()
     {
-        $project = Factory::createProject('symfony', '1.4');
-
-        Factory::createServer('foo', $project);
+        Factory::createServer('foo', $this->getMock('\Symfttpd\Project\Symfony14'));
     }
 
     public function testCreateServer()
     {
-        $project = Factory::createProject('symfony', '1.4');
+        $project = $this->getMock('\Symfttpd\Project\Symfony14');
+        $project->expects($this->once())
+            ->method('initialize');
+
         $server = Factory::createServer('lighttpd', $project);
 
         $this->assertInstanceof('Symfttpd\\Server\\ServerInterface', $server);

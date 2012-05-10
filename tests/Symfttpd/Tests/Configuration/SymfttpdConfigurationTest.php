@@ -61,15 +61,15 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
 
     public function testAddPath()
     {
-        $this->assertEquals(3, count($this->configuration->getPaths()));
-
-        $this->configuration->addPath(__DIR__.'/../../fixtures/');
-
         $this->assertEquals(4, count($this->configuration->getPaths()));
 
         $this->configuration->addPath(__DIR__.'/../../fixtures/');
 
-        $this->assertEquals(4, count($this->configuration->getPaths()));
+        $this->assertEquals(5, count($this->configuration->getPaths()));
+
+        $this->configuration->addPath(__DIR__.'/../../fixtures/');
+
+        $this->assertEquals(5, count($this->configuration->getPaths()));
     }
 
     public function testSetPath()

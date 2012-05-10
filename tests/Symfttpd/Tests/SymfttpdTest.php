@@ -92,10 +92,16 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectTypeBC()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('has')
             ->with('want')
             ->will($this->returnValue(true));
+
+        $this->symfttpd->getConfiguration()
+            ->expects($this->at(1))
+            ->method('has')
+            ->with('project_type')
+            ->will($this->returnValue(false));
 
         $this->assertEquals('symfony', $this->symfttpd->getProjectType());
     }
@@ -126,10 +132,16 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectVersionBC()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('has')
             ->with('want')
             ->will($this->returnValue(true));
+
+        $this->symfttpd->getConfiguration()
+            ->expects($this->at(1))
+            ->method('has')
+            ->with('project_version')
+            ->will($this->returnValue(false));
 
         $this->symfttpd->getConfiguration()
             ->expects($this->once())
@@ -156,10 +168,16 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetServerTypeBC()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('has')
             ->with('lighttpd_cmd')
             ->will($this->returnValue(true));
+
+        $this->symfttpd->getConfiguration()
+            ->expects($this->at(1))
+            ->method('has')
+            ->with('server_type')
+            ->will($this->returnValue(false));
 
         $this->assertEquals('lighttpd', $this->symfttpd->getServerType());
     }
@@ -190,6 +208,9 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
             'project_version' => '1.4',
             'server_type' => 'lighttpd'
         ));
+
+        $project = $this->getMock('\Symfttpd\Project\Symfony14');
+        $this->symfttpd->setProject($project);
 
         $this->assertInstanceof('Symfttpd\\Server\\ServerInterface', $this->symfttpd->getServer());
     }
