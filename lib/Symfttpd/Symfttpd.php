@@ -67,7 +67,8 @@ class Symfttpd
     public function getProjectType()
     {
         // BC with the 1.1 configuration version
-        if ($this->configuration->has('want')) {
+        if (true == $this->configuration->has('want')
+            && false == $this->configuration->has('project_type')) {
             return "symfony";
         }
 
@@ -88,7 +89,8 @@ class Symfttpd
     public function getProjectVersion()
     {
         // BC with the 1.0 configuration version
-        if ($this->configuration->has('want')) {
+        if (true == $this->configuration->has('want')
+            && false == $this->configuration->has('project_version')) {
             return $this->configuration->get('want');
         }
 
@@ -142,7 +144,8 @@ class Symfttpd
     public function getServerType()
     {
         // BC with 1.0 version
-        if ($this->configuration->has('lighttpd_cmd')) {
+        if (true == $this->configuration->has('lighttpd_cmd')
+            && false == $this->configuration->has('server_type')) {
             return 'lighttpd';
         }
 

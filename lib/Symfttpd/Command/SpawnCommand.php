@@ -68,6 +68,7 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // @todo this should be transparent and not do here?
         $symfttpd = $this->getSymfttpd();
         $symfttpd->getConfiguration()->read();
 

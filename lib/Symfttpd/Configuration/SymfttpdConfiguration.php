@@ -46,6 +46,7 @@ class SymfttpdConfiguration extends OptionBag implements ConfigurationInterface
             __DIR__.'/../Resources/templates/', // Resource directory
             getenv('HOME').'/.',  // user configuration
             getcwd().'/config/',  // project configuration
+            getcwd().'/',
         ), $paths);
     }
 

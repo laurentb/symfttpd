@@ -47,9 +47,7 @@ class Factory
      */
     public static function createProject($type, $version, $path = null)
     {
-        $version = str_replace(array('.', '-', 'O'), '', $version);
-
-        $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type).$version);
+        $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type).str_replace(array('.', '-', 'O'), '', $version));
 
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('"%s" in version "%s" is not supported.', $type, $version));
