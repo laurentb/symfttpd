@@ -58,10 +58,15 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectVersionException()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->at(0))
+            ->expects($this->exactly(4))
             ->method('has')
-            ->with('want')
-            ->will($this->returnValue(false));
+            ->will($this->returnValueMap(array(
+                array('want', false),
+                array('project_type', true),
+                array('want', false),
+                array('project_version', false),
+            ))
+        );
 
         $this->assertEquals('symfony', $this->symfttpd->getProjectVersion());
     }
@@ -69,21 +74,18 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectType()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('has')
-            ->with('want')
-            ->will($this->returnValue(false));
-
-        $this->symfttpd->getConfiguration()
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('project_type')
-            ->will($this->returnValue(true));
+            ->will($this->returnValueMap(array(
+                array('want', false),
+                array('project_type', true),
+            )
+        ));
 
         $this->symfttpd->getConfiguration()
             ->expects($this->once())
             ->method('get')
-            ->with('project_type', null)
+            ->with('project_type')
             ->will($this->returnValue('symfony'));
 
         $this->assertEquals('symfony', $this->symfttpd->getProjectType());
@@ -92,16 +94,13 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectTypeBC()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('has')
-            ->with('want')
-            ->will($this->returnValue(true));
-
-        $this->symfttpd->getConfiguration()
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('project_type')
-            ->will($this->returnValue(false));
+            ->will($this->returnValueMap(array(
+                array('want', true),
+                array('project_type', false),
+            )
+        ));
 
         $this->assertEquals('symfony', $this->symfttpd->getProjectType());
     }
@@ -109,22 +108,24 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectVersion()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->at(0))
+            ->expects($this->exactly(4))
             ->method('has')
-            ->with('want')
-            ->will($this->returnValue(false));
+            ->will($this->returnValueMap(array(
+                array('want', false),
+                array('project_type', true),
+                array('want', false),
+                array('project_version', true),
+            )
+        ));
 
         $this->symfttpd->getConfiguration()
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('project_version')
-            ->will($this->returnValue(true));
-
-        $this->symfttpd->getConfiguration()
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('get')
-            ->with('project_version')
-            ->will($this->returnValue('1.4'));
+            ->will($this->returnValueMap(array(
+                array('project_type', null, 'foo'),
+                array('project_version', null, '1.4')
+            )
+        ));
 
         $this->assertEquals('1.4', $this->symfttpd->getProjectVersion());
     }
@@ -132,16 +133,15 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectVersionBC()
     {
         $this->symfttpd->getConfiguration()
-            ->expects($this->at(0))
+            ->expects($this->exactly(4))
             ->method('has')
-            ->with('want')
-            ->will($this->returnValue(true));
-
-        $this->symfttpd->getConfiguration()
-            ->expects($this->at(1))
-            ->method('has')
-            ->with('project_version')
-            ->will($this->returnValue(false));
+            ->will($this->returnValueMap(array(
+                array('want', true),
+                array('project_type', false),
+                array('want', true),
+                array('project_version', false),
+            )
+        ));
 
         $this->symfttpd->getConfiguration()
             ->expects($this->once())

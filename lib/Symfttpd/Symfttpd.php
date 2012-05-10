@@ -103,7 +103,7 @@ class Symfttpd
             throw new \RuntimeException('A project version must be set in the symfttpd.conf.php file.');
         }
 
-        return $this->configuration->get('project_version', '');
+        return $this->configuration->get('project_version');
     }
 
     /**
