@@ -70,7 +70,6 @@ class SpawnCommand extends Command
     {
         // @todo this should be transparent and not do here?
         $symfttpd = $this->getSymfttpd();
-        $symfttpd->getConfiguration()->read();
 
         $project = $symfttpd->getProject();
         $project->setRootDir(getcwd());
