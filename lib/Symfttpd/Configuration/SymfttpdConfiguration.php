@@ -12,7 +12,6 @@
 namespace Symfttpd\Configuration;
 
 use Symfttpd\Configuration\OptionBag;
-use Symfttpd\Configuration\ConfigurationInterface;
 use Symfttpd\Exception\ExecutableNotFoundException;
 
 /**
@@ -20,7 +19,7 @@ use Symfttpd\Exception\ExecutableNotFoundException;
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class SymfttpdConfiguration extends OptionBag implements ConfigurationInterface
+class SymfttpdConfiguration extends OptionBag
 {
     /**
      * @var string
@@ -48,13 +47,7 @@ class SymfttpdConfiguration extends OptionBag implements ConfigurationInterface
             getcwd().'/config/',  // project configuration
             getcwd().'/',
         ), $paths);
-    }
 
-    /**
-     * Read the configuration file and return the options.
-     */
-    public function read()
-    {
         foreach ($this->paths as $path) {
             $config = strpos($path, $this->filename) === false ? $path.$this->filename : $path;
 
@@ -66,37 +59,5 @@ class SymfttpdConfiguration extends OptionBag implements ConfigurationInterface
                 }
             }
         }
-    }
-
-    /**
-     * Add a path to search the symfttpd
-     * configuration file if it is not already
-     * registered.
-     *
-     * @param string $path
-     * @return void
-     */
-    public function addPath($path)
-    {
-        if (false == array_search($path, $this->paths)) {
-            $this->paths[] = $path;
-        }
-    }
-
-    /**
-     * @param array $paths
-     * @return void
-     */
-    public function setPaths(array $paths)
-    {
-        $this->paths = $paths;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPaths()
-    {
-        return $this->paths;
     }
 }

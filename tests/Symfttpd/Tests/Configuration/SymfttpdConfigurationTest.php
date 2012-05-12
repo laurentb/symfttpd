@@ -17,7 +17,6 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->configuration = new SymfttpdConfiguration();
-        $this->configuration->read();
     }
 
     public function testAll()
@@ -44,39 +43,5 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('plop', $this->configuration->get('genconf'));
         $this->configuration->set('unexistent', 'plop');
         $this->assertEquals('plop', $this->configuration->get('unexistent'));
-    }
-
-    public function testRead()
-    {
-        $configuration = new SymfttpdConfiguration();
-
-        $this->assertEquals(0, count($configuration->all()));
-
-        $configuration->read();
-
-        $this->assertGreaterThan(0, count($configuration->all()));
-        $this->assertTrue($configuration->has('path'));
-        $this->assertTrue($configuration->has('genconf'));
-    }
-
-    public function testAddPath()
-    {
-        $this->assertEquals(4, count($this->configuration->getPaths()));
-
-        $this->configuration->addPath(__DIR__.'/../../fixtures/');
-
-        $this->assertEquals(5, count($this->configuration->getPaths()));
-
-        $this->configuration->addPath(__DIR__.'/../../fixtures/');
-
-        $this->assertEquals(5, count($this->configuration->getPaths()));
-    }
-
-    public function testSetPath()
-    {
-        $this->configuration->setPaths(array('fixtures', 'home'));
-        $this->assertContains('fixtures', $this->configuration->getPaths());
-        $this->assertContains('home', $this->configuration->getPaths());
-        $this->assertEquals(2, count($this->configuration->getPaths()));
     }
 }

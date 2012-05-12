@@ -57,7 +57,6 @@ EOT
         $output->writeln('Starting generating symfttpd configuration.');
 
         $symfttpd = $this->getSymfttpd();
-        $symfttpd->getConfiguration()->read();
 
         $project = $symfttpd->getProject();
         $project->setRootDir(getcwd());

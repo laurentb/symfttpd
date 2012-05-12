@@ -52,7 +52,6 @@ class MksymlinksCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $symfttpd = $this->getSymfttpd();
-        $symfttpd->getConfiguration()->read();
 
         $project = $symfttpd->getProject();
         $project->setRootDir($input->getOption('path'));
