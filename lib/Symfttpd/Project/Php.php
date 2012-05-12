@@ -62,4 +62,14 @@ class Php extends BaseProject
         return 'index.php';
     }
 
+    /**
+     * Initialize readable files, dirs and php executable files
+     * as index.php.
+     */
+    public function initialize()
+    {
+        $this->readableDirs = array();
+        $this->readableFiles = array();
+        $this->readablePhpFiles = array($this->getIndexFile());
+    }
 }
