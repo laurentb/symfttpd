@@ -3,6 +3,8 @@
 symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.
 
+**This version of symfttpd is under development, this documentation can be outdated and contains some errors.**
+
 
 `spawn` will setup and start a lighttpd server with a minimal
 configuration to serve one symfony project. The server will not be run as
@@ -26,6 +28,84 @@ to create all the symlinks.
 It leverages the `include_shell` directive which means no endless
 copy/pasting and easy updates (only restarting lighttpd is necessary).
 
+
+## Installation
+
+Clone this repository and checkout the refactoring branch
+
+```
+benjamin:~/dev benjamin $ git clone git://github.com/benja-M-1/symfttpd.git
+benjamin:~/dev benjamin $ cd symfttpd
+benjamin:~/dev/symfttpd benjamin $ git checkout origin/refactoring
+```
+
+Install vendors with composer
+
+```
+benjamin:~/dev/symfttpd benjamin $ curl -s http://getcomposer.org/installer | php
+benjamin:~/dev/symfttpd benjamin $ php composer.phar install
+```
+
+Then complie symfttpd in your project to create an executable .phar file
+
+```
+benjamin:~/dev/project benjamin $ php ../symfttpd/bin/compile
+benjamin:~/dev/project benjamin $ php symfttpd.phar --help
+Usage:
+ help [--xml] [command_name]
+
+Arguments:
+ command               The command to execute
+ command_name          The command name (default: 'help')
+
+Options:
+ --xml                 To output help as XML
+ --help (-h)           Display this help message.
+ --quiet (-q)          Do not output any message.
+ --verbose (-v)        Increase verbosity of messages.
+ --version (-V)        Display this application version.
+ --ansi                Force ANSI output.
+ --no-ansi             Disable ANSI output.
+ --no-interaction (-n) Do not ask any interactive question.
+
+Help:
+ The help command displays help for a given command:
+ 
+   php bin/symfttpd help list
+ 
+ You can also output the help as XML by using the --xml option:
+ 
+   php bin/symfttpd help --xml list
+```
+
+*Adapt paths to your environment*  
+*A webpage is under development to download the symfttpd.phar directly in your project*
+
+
+## Configuration
+
+### How?
+
+First of all you need to configure symfttpd with a symfttpd.conf.php file. Symfttpd looks for the configuration file:
+
+* in you home directory, this file must be named .symfttpd.conf.php
+* in the root directory of your project (or in config/ for a symfony 1.x project)
+
+By default symfttpd read the configuration from it's own symfttpd.conf.file.
+
+### What I have to configure?
+
+The minimal information symfttpd needs is a project type and a project version.
+
+```
+<?php
+// symfttpd.conf.php of a Symfony 2 project
+$options['project_type']    = "symfony";
+$options['project_version'] = "2";
+
+```
+
+**Symfttpd support symfony 1.0 to 2.1.**
 
 
 ## spawn
@@ -70,11 +150,8 @@ by using the symfttpd.conf.php mechanism.
     (useful for running multiple projects at the same time)
 * `--all` or `-A`: Listen on all interfaces (overrides `--bind`)
 * `--bind=<port>` or `-b<ip>`: Listen on a specific IP (default is `127.0.0.1`)
-* `--path=<path>` or `-P<path>`: Use a different project path (default is current dir)
 * `--tail` or `-t`: Display server logs in the console
     (like the UNIX `tail` command would do)
-* `--no-color` or `-C`: Disable colored output
-    (also automatically disabled if the output is piped)
 * `--single-process` or `-s`: Do not try to run lighttpd in another process
     (not recommended, you will lose auto-reloading of the rewriting rules)
 
