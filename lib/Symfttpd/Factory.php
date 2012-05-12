@@ -29,9 +29,7 @@ class Factory
      */
     public static function createSymfttpd()
     {
-        $config = new SymfttpdConfiguration();
-
-        $symfttpd = new Symfttpd($config);
+        $symfttpd = new Symfttpd(new SymfttpdConfiguration());
 
         return $symfttpd;
     }

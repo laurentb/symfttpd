@@ -13,6 +13,7 @@ namespace Symfttpd\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfttpd\Symfttpd;
+use Symfttpd\Factory;
 
 /**
  * Application class
@@ -34,7 +35,7 @@ class Application extends BaseApplication
     {
         parent::__construct('Symfttpd', Symfttpd::VERSION);
 
-        $this->symfttpd = \Symfttpd\Factory::createSymfttpd();
+        $this->symfttpd = Factory::createSymfttpd();
     }
 
     /**

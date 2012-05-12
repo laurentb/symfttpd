@@ -74,6 +74,7 @@ class SpawnCommand extends Command
 
         $project = $symfttpd->getProject();
         $project->setRootDir(getcwd());
+        $project->initialize();
 
         $server = $this->getSymfttpd()->getServer();
         $server->options->add(array(

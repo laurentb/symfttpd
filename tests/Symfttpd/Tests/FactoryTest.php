@@ -55,8 +55,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreateServer()
     {
         $project = $this->getMock('\Symfttpd\Project\Symfony14');
-        $project->expects($this->once())
-            ->method('initialize');
 
         $server = Factory::createServer('lighttpd', $project);
 

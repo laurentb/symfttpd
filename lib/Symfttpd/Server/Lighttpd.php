@@ -128,12 +128,9 @@ class Lighttpd implements ServerInterface
 
     /**
      * Update the options.
-     * Called after initializing the project.
      */
     public function setup()
     {
-        $this->getProject()->initialize();
-
         // Set the defaults settings
         $this->options->merge(array(
             // Lighttpd configuration options.
