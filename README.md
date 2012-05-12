@@ -71,11 +71,11 @@ Options:
 Help:
  The help command displays help for a given command:
  
-   php bin/symfttpd help list
+   php symfttpd.phar help list
  
  You can also output the help as XML by using the --xml option:
  
-   php bin/symfttpd help --xml list
+   php symfttpd.phar help --xml list
 ```
 
 *Adapt paths to your environment*  
