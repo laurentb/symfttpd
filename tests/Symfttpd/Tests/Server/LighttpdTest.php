@@ -243,175 +243,44 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedConfiguration($withRules = false)
     {
-        $conf = <<<CONF
-server.modules = (
-    "mod_rewrite",
-    "mod_access",
-    "mod_accesslog",
-    "mod_setenv",
-    "mod_fastcgi",
-)
+        $renderer = new \Symfttpd\Renderer\TwigRenderer();
 
-server.document-root  = "%s/web"
-server.port           = 4042
-server.bind           = "127.0.0.1"
-
-fastcgi.server = ( ".php" =>
-  ( "localhost" =>
-    (
-      "socket" => "%s/symfttpd-php-" + PID + ".socket",
-      "bin-path" => "/opt/local/bin/php-cgi -d error_log=/dev/stderr'",
-      "max-procs" => 1,
-      "max-load-per-proc" => 1,
-      "idle-timeout" => 120,
-      "bin-environment" => (
-        "PHP_FCGI_CHILDREN" => "3",
-        "PHP_FCGI_MAX_REQUESTS" => "100",
-        "IN_SYMFTTPD" => "1"
-      )
-    )
-  )
-)
-
-setenv.add-response-header = ( "X-Symfttpd" => "1",
-    "Expires" => "Sun, 17 Mar 1985 00:42:00 GMT" )
-
-###############################################################################
-# Default mime-types.conf for Gentoo.
-# include'd from lighttpd.conf.
-# \$Header: /var/cvsroot/gentoo-x86/www-servers/lighttpd/files/conf/mime-types.conf,v 1.4 2010/03/14 21:45:18 bangert Exp $
-###############################################################################
-
-# {{{ mime types
-mimetype.assign             = (
-  ".svg"          =>      "image/svg+xml",
-  ".svgz"         =>      "image/svg+xml",
-  ".pdf"          =>      "application/pdf",
-  ".sig"          =>      "application/pgp-signature",
-  ".spl"          =>      "application/futuresplash",
-  ".class"        =>      "application/octet-stream",
-  ".ps"           =>      "application/postscript",
-  ".torrent"      =>      "application/x-bittorrent",
-  ".dvi"          =>      "application/x-dvi",
-  ".gz"           =>      "application/x-gzip",
-  ".pac"          =>      "application/x-ns-proxy-autoconfig",
-  ".swf"          =>      "application/x-shockwave-flash",
-  ".tar.gz"       =>      "application/x-tgz",
-  ".tgz"          =>      "application/x-tgz",
-  ".tar"          =>      "application/x-tar",
-  ".zip"          =>      "application/zip",
-  ".dmg"          =>      "application/x-apple-diskimage",
-  ".mp3"          =>      "audio/mpeg",
-  ".m3u"          =>      "audio/x-mpegurl",
-  ".wma"          =>      "audio/x-ms-wma",
-  ".wax"          =>      "audio/x-ms-wax",
-  ".ogg"          =>      "application/ogg",
-  ".wav"          =>      "audio/x-wav",
-  ".gif"          =>      "image/gif",
-  ".jpg"          =>      "image/jpeg",
-  ".jpeg"         =>      "image/jpeg",
-  ".png"          =>      "image/png",
-  ".xbm"          =>      "image/x-xbitmap",
-  ".xpm"          =>      "image/x-xpixmap",
-  ".xwd"          =>      "image/x-xwindowdump",
-  ".css"          =>      "text/css",
-  ".html"         =>      "text/html",
-  ".htm"          =>      "text/html",
-  ".js"           =>      "text/javascript",
-  ".asc"          =>      "text/plain",
-  ".c"            =>      "text/plain",
-  ".h"            =>      "text/plain",
-  ".cc"           =>      "text/plain",
-  ".cpp"          =>      "text/plain",
-  ".hh"           =>      "text/plain",
-  ".hpp"          =>      "text/plain",
-  ".conf"         =>      "text/plain",
-  ".log"          =>      "text/plain",
-  ".text"         =>      "text/plain",
-  ".txt"          =>      "text/plain",
-  ".diff"         =>      "text/plain",
-  ".patch"        =>      "text/plain",
-  ".ebuild"       =>      "text/plain",
-  ".eclass"       =>      "text/plain",
-  ".rtf"          =>      "application/rtf",
-  ".bmp"          =>      "image/bmp",
-  ".tif"          =>      "image/tiff",
-  ".tiff"         =>      "image/tiff",
-  ".ico"          =>      "image/x-icon",
-  ".dtd"          =>      "text/xml",
-  ".xml"          =>      "text/xml",
-  ".mpeg"         =>      "video/mpeg",
-  ".mpg"          =>      "video/mpeg",
-  ".mov"          =>      "video/quicktime",
-  ".qt"           =>      "video/quicktime",
-  ".avi"          =>      "video/x-msvideo",
-  ".asf"          =>      "video/x-ms-asf",
-  ".asx"          =>      "video/x-ms-asf",
-  ".wmv"          =>      "video/x-ms-wmv",
-  ".bz2"          =>      "application/x-bzip",
-  ".tbz"          =>      "application/x-bzip-compressed-tar",
-  ".tar.bz2"      =>      "application/x-bzip-compressed-tar"
- )
-# }}}
-
-# vim: set ft=conf foldmethod=marker et :
-server.indexfiles     = ("index.php", "index.html",
-                        "index.htm", "default.htm")
-server.follow-symlink = "enable"
-static-file.exclude-extensions = (".php")
-
-# http://redmine.lighttpd.net/issues/406
-server.force-lowercase-filenames = "disable"
-
-server.pid-file       = "%s/cache/lighttpd/.sf"
-
-server.errorlog       = "%s/log/lighttpd/error.log"
-accesslog.filename    = "%s/log/lighttpd/access.log"
-
-debug.log-file-not-found = "enable"
-debug.log-request-header-on-error = "enable"
-
-%s
-CONF;
-
-        $templateDir = realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates');
         $baseDir = $this->getProject(false)->getRootDir();
+        $rules = null;
         if ($withRules) {
-            $rules = 'include "' . $baseDir . '/cache/lighttpd/rules.conf"' . PHP_EOL;
-        } else {
-            $rules = '';
+            $rules = $baseDir . '/cache/lighttpd/rules.conf';
         }
 
-        return sprintf(
-            $conf,
-            $baseDir,
-            sys_get_temp_dir(),
-            $baseDir,
-            $baseDir,
-            $baseDir,
-            $rules
+        return $renderer->render(
+            realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'),
+            'lighttpd.conf.twig',
+            array(
+                'document_root' => $baseDir.'/web',
+                'port'          => 4042,
+                'bind'          => "127.0.0.1",
+                'error_log'     => $baseDir.'/log/lighttpd/error.log',
+                'access_log'    => $baseDir.'/log/lighttpd/access.log',
+                'pidfile'       => $baseDir.'/cache/lighttpd/.sf',
+                'rules_file'    => $rules,
+                'php_cgi_cmd'   => '/opt/local/bin/php-cgi',
+            )
         );
     }
 
     public function getGeneratedRules()
     {
-        $conf = <<<CONF
-url.rewrite-once = (
-  "^/css/.+" => "$0",
-  "^/js/.+" => "$0",
+        $renderer = new \Symfttpd\Renderer\TwigRenderer();
 
-  "^/robots\.txt$" => "$0",
-
-  "^/backend_dev\.php(/[^\?]*)?(\?.*)?" => "/backend_dev.php$1$2",
-  "^/frontend_dev\.php(/[^\?]*)?(\?.*)?" => "/frontend_dev.php$1$2",
-  "^/index\.php(/[^\?]*)?(\?.*)?" => "/index.php$1$2",
-
-  "^(/[^\?]*)(\?.*)?" => "/index.php$1$2"
-)
-
-
-CONF;
-
-        return $conf;
+        return $renderer->render(
+            realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'),
+            'rules.conf.twig',
+            array(
+                'dirs'    => array('css', 'js'),
+                'files'   => array('robots.txt'),
+                'phps'    => array('backend_dev.php', 'frontend_dev.php', 'index.php'),
+                'default' => 'index.php',
+                'nophp'   => array(),
+            )
+        );
     }
 }

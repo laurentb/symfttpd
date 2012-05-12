@@ -16,6 +16,8 @@ use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\Exception\ServerException;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Configuration\OptionBag;
+use Symfttpd\Renderer\RendererInterface;
+use Symfttpd\Renderer\TwigRenderer;
 use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfttpd\Configuration\ConfigurationInterface;
 use Symfttpd\Configuration\Exception\ConfigurationException;
@@ -100,15 +102,21 @@ class Lighttpd implements ServerInterface
     public $project;
 
     /**
+     * @var RendererInterface
+     */
+    public $renderer;
+
+    /**
      * Constructor class
      *
      * @param null $workingDir
      * @param null|\Symfttpd\Configuration\OptionBag $options
      */
-    public function __construct(ProjectInterface $project, OptionBag $options = null)
+    public function __construct(ProjectInterface $project, OptionBag $options = null, RendererInterface $renderer = null)
     {
         $this->project = $project;
         $this->options = $options ?: new OptionBag();
+        $this->renderer = $renderer ?: new TwigRenderer();
 
         $this->setup();
 
@@ -284,10 +292,20 @@ class Lighttpd implements ServerInterface
      */
     public function generateConfiguration(SymfttpdConfiguration $configuration)
     {
-        ob_start();
-        require $this->getConfigurationTemplate();
-
-        $this->lighttpdConfig = ob_get_clean();
+        $this->lighttpdConfig = $this->renderer->render(
+            $this->getTemplateDir(),
+            $this->configFilename.'.twig',
+            array(
+                'document_root' => $this->options->get('document_root'),
+                'port'          => $this->options->get('port'),
+                'bind'          => $this->options->get('bind', null),
+                'error_log'     => $this->options->get('log_dir').'/error.log',
+                'access_log'    => $this->options->get('log_dir').'/access.log',
+                'pidfile'       => $this->getPidfile(),
+                'rules_file'    => $this->getRulesFile(),
+                'php_cgi_cmd'   => $configuration->get('php_cgi_cmd'),
+            )
+        );
         $this->configFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->configFilename;
     }
 
@@ -298,11 +316,26 @@ class Lighttpd implements ServerInterface
      */
     public function generateRules(SymfttpdConfiguration $configuration)
     {
-        ob_start();
-        require $this->getRulesTemplate();
-
-        $this->rules = ob_get_clean();
+        $this->rules = $this->renderer->render(
+            $this->getTemplateDir(),
+            $this->rulesFilename.'.twig',
+            array(
+                'dirs'    => $this->options->get('dirs'),
+                'files'   => $this->options->get('files'),
+                'phps'    => $this->options->get('phps'),
+                'default' => $this->options->get('default'),
+                'nophp'   => $this->options->get('nophp'),
+            )
+        );
         $this->rulesFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->rulesFilename;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplateDir()
+    {
+        return __DIR__ . sprintf('/../Resources/templates/lighttpd');
     }
 
     /**
@@ -312,7 +345,7 @@ class Lighttpd implements ServerInterface
      */
     public function getConfigurationTemplate()
     {
-        return __DIR__ . sprintf('/../Resources/templates/lighttpd/%s.php', $this->configFilename);
+        return $this->getTemplateDir().sprintf('/%s.php', $this->configFilename);
     }
 
     /**
@@ -322,7 +355,7 @@ class Lighttpd implements ServerInterface
      */
     public function getRulesTemplate()
     {
-        return __DIR__ . sprintf('/../Resources/templates/lighttpd/%s.php', $this->rulesFilename);
+        return $this->getTemplateDir().sprintf('/%s.php', $this->rulesFilename);
     }
 
     /**

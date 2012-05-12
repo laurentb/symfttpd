@@ -1,0 +1,23 @@
+url.rewrite-once = (
+{% for dir in dirs %}
+  "^/{{ dir|preg_quote }}/.+" => "$0",
+{% endfor %}
+
+{% for file in files %}
+  "^/{{ file|preg_quote }}$" => "$0",
+{% endfor %}
+
+{% for php in phps %}
+  "^/{{ php|preg_quote }}(/[^\?]*)?(\?.*)?" => "/{{ php }}$1$2",
+{% endfor %}
+
+  "^(/[^\?]*)(\?.*)?" => "/{{ default }}$1$2"
+)
+
+{% for file in nophp %}
+{% if in_array(file, dirs) %}
+$HTTP["url"] =~ "^/{{ file }}/" {
+  url.access-deny = (".php")
+}
+{% endif %}
+{% endfor %}

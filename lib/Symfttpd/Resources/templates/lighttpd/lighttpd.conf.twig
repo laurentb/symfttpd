@@ -6,18 +6,18 @@ server.modules = (
     "mod_fastcgi",
 )
 
-server.document-root  = "<?php echo $this->options->get('document_root') ?>"
-server.port           = <?php echo $this->options->get('port') ?>
+server.document-root  = "{{ document_root }}"
+server.port           = {{ port }}
 
-<?php if ($this->options->has('bind')): ?>
-server.bind           = "<?php echo $this->options->get('bind') ?>"
-<?php endif ?>
+{% if bind is not null %}
+server.bind           = "{{ bind }}"
+{% endif %}
 
 fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
-      "socket" => "<?php echo sys_get_temp_dir() ?>/symfttpd-php-" + PID + ".socket",
-      "bin-path" => "<?php echo $configuration->get('php_cgi_cmd') ?> -d error_log=/dev/stderr'",
+      "socket" => "{{ sys_get_temp_dir() }}/symfttpd-php-" + PID + ".socket",
+      "bin-path" => "{{ php_cgi_cmd }} -d error_log=/dev/stderr'",
       "max-procs" => 1,
       "max-load-per-proc" => 1,
       "idle-timeout" => 120,
@@ -33,7 +33,8 @@ fastcgi.server = ( ".php" =>
 setenv.add-response-header = ( "X-Symfttpd" => "1",
     "Expires" => "Sun, 17 Mar 1985 00:42:00 GMT" )
 
-<?php echo file_get_contents(__DIR__.'/mime-types.conf') ?>
+{% include 'mime-types.conf.twig' %}
+
 server.indexfiles     = ("index.php", "index.html",
                         "index.htm", "default.htm")
 server.follow-symlink = "enable"
@@ -42,14 +43,14 @@ static-file.exclude-extensions = (".php")
 # http://redmine.lighttpd.net/issues/406
 server.force-lowercase-filenames = "disable"
 
-server.pid-file       = "<?php echo $this->options->get('pidfile') ?>"
+server.pid-file       = "{{ pidfile }}"
 
-server.errorlog       = "<?php echo $this->options->get('log_dir') ?>/error.log"
-accesslog.filename    = "<?php echo $this->options->get('log_dir') ?>/access.log"
+server.errorlog       = "{{ error_log }}"
+accesslog.filename    = "{{ access_log }}"
 
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"
 
-<?php if (null !== $this->rules): ?>
-include "<?php echo $this->getRulesFile() ?>"
-<?php endif ?>
+{% if rules_file is not null %}
+include "{{ rules_file }}"
+{% endif %}
