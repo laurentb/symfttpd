@@ -1,6 +1,6 @@
 {
     "name": "laurentb/symfttpd",
-    "description": "Symfony webserver",
+    "description": "PHP webserver",
     "keywords": [
         "symfony",
         "server",
@@ -24,25 +24,9 @@
         "symfony/console":    "dev-master",
         "symfony/process":    "dev-master",
         "symfony/finder":     "dev-master",
-        "symfony/filesystem": "dev-master"
+        "symfony/filesystem": "dev-master",
+        "twig/twig":          "v1.8.0"
     },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "version": "master",
-                "name": "kriswallsmith/spork",
-                "source": {
-                    "url": "https://github.com/kriswallsmith/spork.git",
-                    "type": "git",
-                    "reference": "master"
-                },
-                "autoload": {
-                    "psr-0": { "Spork": "src/" }
-                }
-            }
-        }
-    ],
     "autoload": {
         "psr-0": {
             "Symfttpd": "lib/"
