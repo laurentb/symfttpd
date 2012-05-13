@@ -67,7 +67,8 @@ class Symfttpd
         if (null == $this->project) {
             $this->project = Factory::createProject(
                 $this->configuration->getProjectType(),
-                $this->configuration->getProjectVersion()
+                $this->configuration->getProjectVersion(),
+                $this->configuration->getProjectOptions()
             );
 
             // The root directory is where Symfttpd is running.

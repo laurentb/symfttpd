@@ -20,6 +20,13 @@ use Symfttpd\Project\Exception\ProjectException;
  */
 abstract class BaseProject implements ProjectInterface
 {
+    static public $configurationKeys = array(
+        'project_readable_dirs',     // readable directories by the server in the web dir.
+        'project_readable_files',    // readable files by the server in the web dir (robots.txt).
+        'project_readable_phpfiles', // executable php files in the web directory (index.php)
+        'project_readable_restrict', // true if no other php files are readable than configured ones or index file.
+    );
+
     /**
      * The name of the project framework.
      *
@@ -63,6 +70,22 @@ abstract class BaseProject implements ProjectInterface
     protected $rootDir;
 
     /**
+     * @var \Symfttpd\Configuration\OptionBag
+     */
+    protected $options;
+
+    public function __construct(\Symfttpd\Configuration\OptionBag $options, $path = null)
+    {
+        $this->rootDir = $path;
+
+        $this->readableDirs = $options->get('project_readable_dirs', array());
+        $this->readableFiles = $options->get('project_readable_files', array());
+        $this->readablePhpFiles = $options->get('project_readable_phpfiles', array('index.php'));
+
+        $this->options = $options;
+    }
+
+    /**
      * Initialize readable files, dirs and php executable files
      * as index.php.
      */
@@ -78,7 +101,10 @@ abstract class BaseProject implements ProjectInterface
                 } elseif (!preg_match('/\.php$/', $name)) {
                     $this->readableFiles[] = $name;
                 } else {
-                    $this->readablePhpFiles[] = $name;
+                    if (false === $this->options->has('project_readable_restrict')
+                        && false == in_array($name, $this->readablePhpFiles)) {
+                        $this->readablePhpFiles[] = $name;
+                    }
                 }
             }
         }

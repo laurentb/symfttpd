@@ -126,4 +126,20 @@ class SymfttpdConfiguration extends OptionBag
 
         return $this->get('server_type', 'lighttpd');
     }
+
+    /**
+     * Return the options for the project.
+     *
+     * @return array
+     */
+    public function getProjectOptions()
+    {
+        $options = array();
+
+        foreach (\Symfttpd\Project\BaseProject::$configurationKeys as $key) {
+            $options[$key] = $this->get($key, null);
+        }
+
+        return $options;
+    }
 }

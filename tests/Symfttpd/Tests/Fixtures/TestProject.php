@@ -13,6 +13,7 @@ namespace Symfttpd\Tests\Fixtures;
 
 /**
  * TestProject class
+ * This class allow us to test the abstract BaseProject class.
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
@@ -21,7 +22,22 @@ class TestProject extends \Symfttpd\Project\BaseProject
     protected $name = 'test',
               $version = "1.0";
 
-    protected $rootDir;
+    protected $filesystem;
+
+    public function __construct(\Symfttpd\Configuration\OptionBag $options, $path = null)
+    {
+        if (null == $path) {
+            $path = sys_get_temp_dir().'/symfttpd-project-test';
+        }
+
+        $this->filesystem = new \Symfttpd\Filesystem\Filesystem();
+
+        parent::__construct($options, $path);
+
+        $this->buildProject();
+    }
+
+
     /**
      * Return the cache directory of the project.
      *
@@ -63,20 +79,6 @@ class TestProject extends \Symfttpd\Project\BaseProject
     }
 
     /**
-     * Return the directory where lives the project.
-     *
-     * @return mixed
-     */
-    public function getRootDir()
-    {
-        if (null == $this->rootDir) {
-            $this->rootDir = sys_get_temp_dir().'/symfttpd-project-test';
-        }
-
-        return $this->rootDir;
-    }
-
-    /**
      * Set the directory where lives the project.
      *
      * @param $rootDir
@@ -87,4 +89,48 @@ class TestProject extends \Symfttpd\Project\BaseProject
         $this->rootDir = $rootDir;
     }
 
+    /**
+     * Create the structure of the test project.
+     */
+    public function buildProject()
+    {
+        $this->filesystem->mkdir(array(
+            $this->getRootDir(),
+            $this->getCacheDir(),
+            $this->getLogDir(),
+            $this->getWebDir(),
+            $this->getWebDir().'/uploads',
+        ));
+
+        $this->filesystem->touch(array(
+            $this->getIndexFile(),
+            $this->getWebDir().'/class.php',
+            $this->getWebDir().'/phpinfo.php',
+            $this->getWebDir().'/authors.txt',
+            $this->getWebDir().'/uploads/picture.png',
+        ));
+    }
+
+    /**
+     * Remove the structure of the test project.
+     */
+    public function removeProject()
+    {
+        $this->filesystem->remove(array(
+            $this->getIndexFile(),
+            $this->getWebDir().'/class.php',
+            $this->getWebDir().'/phpinfo.php',
+            $this->getWebDir().'/authors.txt',
+            $this->getWebDir().'/uploads/picture.png',
+            $this->getRootDir(),
+            $this->getCacheDir(),
+            $this->getLogDir(),
+            $this->getWebDir(),
+        ));
+    }
+
+    public function __destruct()
+    {
+        $this->removeProject();
+    }
 }

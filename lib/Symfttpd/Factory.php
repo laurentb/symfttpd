@@ -13,6 +13,7 @@ namespace Symfttpd;
 
 use Symfttpd\Symfttpd;
 use Symfttpd\Configuration\SymfttpdConfiguration;
+use Symfttpd\Configuration\OptionBag;
 
 /**
  * Factory class
@@ -38,13 +39,16 @@ class Factory
      * Create a new project.
      *
      * @static
-     * @param $type The type of the project (Symfony for instance).
-     * @param $version The version of the project (2.0 or 2)
+     * @param $type
+     * @param $version
+     * @param array $options
+     * @param null $path
      * @return \Symfttpd\Project\ProjectInterface
      * @throws \InvalidArgumentException
      */
-    public static function createProject($type, $version, $path = null)
+    public static function createProject($type, $version, $options = array(), $path = null)
     {
+        // Guess the project class with the type and the version.
         $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type).str_replace(array('.', '-', 'O'), '', $version));
 
         if (!class_exists($class)) {
@@ -55,10 +59,7 @@ class Factory
             $path = getcwd();
         }
 
-        $project = new $class();
-        $project->setRootDir($path);
-
-        return $project;
+        return new $class(new OptionBag($options), $path);
     }
 
     /**
