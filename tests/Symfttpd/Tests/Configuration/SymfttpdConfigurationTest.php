@@ -44,4 +44,97 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->configuration->set('unexistent', 'plop');
         $this->assertEquals('plop', $this->configuration->get('unexistent'));
     }
+
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A project type must be set in the symfttpd.conf.php file.
+     */
+    public function testGetProjectTypeException()
+    {
+        $configuration = new SymfttpdConfiguration(array());
+        $configuration->clear();
+
+        $configuration->getProjectType();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage A project version must be set in the symfttpd.conf.php file.
+     */
+    public function testGetProjectVersionException()
+    {
+        $configuration = new SymfttpdConfiguration(array());
+        $configuration->clear();
+        $configuration->add(array(
+            'want' => null,
+            'project_type' => 'foo',
+            'project_version' => null,
+        ));
+
+        $configuration->getProjectVersion();
+    }
+
+    public function testGetProjectType()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'want' => null,
+            'project_type' => 'foo',
+        ));
+
+        $this->assertEquals('foo', $configuration->getProjectType());
+    }
+
+    public function testGetProjectTypeBC()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'want' => '1.4',
+            'project_type' => null,
+        ));
+
+        $this->assertEquals('symfony', $configuration->getProjectType());
+    }
+
+    public function testGetProjectVersion()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'want' => null,
+            'project_type' => 'foo',
+            'project_version' => '1.4',
+        ));
+
+        $this->assertEquals('1.4', $configuration->getProjectVersion());
+    }
+
+    public function testGetProjectVersionBC()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'want' => '1.4',
+            'project_type' => null,
+            'project_version' => null,
+        ));
+
+        $this->assertEquals('1.4', $configuration->getProjectVersion());
+    }
+
+
+    public function testGetServerTypeBC()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'lighttpd_cmd' => 'lighttpd',
+            'server_type' => null,
+        ));
+
+        $this->assertEquals('lighttpd', $configuration->getServerType());
+    }
+
+    public function testGetServerType()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'lighttpd_cmd' => null,
+            'server_type' => 'foo',
+        ));
+
+        $this->assertEquals('foo', $configuration->getServerType());
+    }
 }

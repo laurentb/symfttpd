@@ -103,4 +103,12 @@ class OptionBag implements \IteratorAggregate
     {
         $this->options = array_merge($this->options, $options);
     }
+
+    /**
+     * Remove every options.
+     */
+    public function clear()
+    {
+        $this->options = array();
+    }
 }

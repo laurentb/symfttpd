@@ -60,4 +60,70 @@ class SymfttpdConfiguration extends OptionBag
             }
         }
     }
+
+    /**
+     * Return the type of the project.
+     * If the project is a Symfony2 one, it will return Symfony.
+     * This value is set in the configuration file.
+     *
+     * @return string
+     */
+    public function getProjectType()
+    {
+        // BC with the 1.1 configuration version
+        if (true == $this->has('want')
+            && false == $this->has('project_type')) {
+            return "symfony";
+        }
+
+        if (false == $this->has('project_type')) {
+            throw new \RuntimeException('A project type must be set in the symfttpd.conf.php file.');
+        }
+
+        return $this->get('project_type');
+    }
+
+    /**
+     * Return the project version.
+     * For a symfony project it can be 1.4 or 2.0 (which
+     * is the same as 2), even 2.1.
+     *
+     * @return mixed|null
+     */
+    public function getProjectVersion()
+    {
+        // Simple PHP project don't need a version.
+        if ($this->getProjectType() === 'php') {
+            return null;
+        }
+
+        // BC with the 1.0 configuration version
+        if (true == $this->has('want')
+            && false == $this->has('project_version')) {
+            return $this->get('want');
+        }
+
+        if (false == $this->has('project_version')) {
+            throw new \RuntimeException('A project version must be set in the symfttpd.conf.php file.');
+        }
+
+        return $this->get('project_version');
+    }
+
+
+    /**
+     * Return the type of the server.
+     *
+     * @return mixed|null|string
+     */
+    public function getServerType()
+    {
+        // BC with 1.0 version
+        if (true == $this->has('lighttpd_cmd')
+            && false == $this->has('server_type')) {
+            return 'lighttpd';
+        }
+
+        return $this->get('server_type', 'lighttpd');
+    }
 }

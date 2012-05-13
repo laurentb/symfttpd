@@ -58,55 +58,6 @@ class Symfttpd
     }
 
     /**
-     * Return the type of the project.
-     * If the project is a Symfony2 one, it will return Symfony.
-     * This value is set in the configuration file.
-     *
-     * @return string
-     */
-    public function getProjectType()
-    {
-        // BC with the 1.1 configuration version
-        if (true == $this->configuration->has('want')
-            && false == $this->configuration->has('project_type')) {
-            return "symfony";
-        }
-
-        if (false == $this->configuration->has('project_type')) {
-            throw new \RuntimeException('A project type must be set in the symfttpd.conf.php file.');
-        }
-
-        return $this->configuration->get('project_type');
-    }
-
-    /**
-     * Return the project version.
-     * For a symfony project it can be 1.4 or 2.0 (which
-     * is the same as 2), even 2.1.
-     *
-     * @return mixed|null
-     */
-    public function getProjectVersion()
-    {
-        // Simple PHP project don't need a version.
-        if ($this->getProjectType() === 'php') {
-            return null;
-        }
-
-        // BC with the 1.0 configuration version
-        if (true == $this->configuration->has('want')
-            && false == $this->configuration->has('project_version')) {
-            return $this->configuration->get('want');
-        }
-
-        if (false == $this->configuration->has('project_version')) {
-            throw new \RuntimeException('A project version must be set in the symfttpd.conf.php file.');
-        }
-
-        return $this->configuration->get('project_version');
-    }
-
-    /**
      * Return the project.
      *
      * @return \Symfttpd\Project\ProjectInterface
@@ -114,7 +65,10 @@ class Symfttpd
     public function getProject()
     {
         if (null == $this->project) {
-            $this->project = Factory::createProject($this->getProjectType(), $this->getProjectVersion());
+            $this->project = Factory::createProject(
+                $this->configuration->getProjectType(),
+                $this->configuration->getProjectVersion()
+            );
         }
 
         return $this->project;
@@ -129,7 +83,7 @@ class Symfttpd
     public function getServer()
     {
         if (null == $this->server) {
-            $this->server = Factory::createServer($this->getServerType(), $this->getProject());
+            $this->server = Factory::createServer($this->configuration->getServerType(), $this->getProject());
 
             // BC with the 1.0 configuration version
             if ($this->server instanceof \Symfttpd\Server\Lighttpd
@@ -139,22 +93,6 @@ class Symfttpd
         }
 
         return $this->server;
-    }
-
-    /**
-     * Return the type of the server.
-     *
-     * @return mixed|null|string
-     */
-    public function getServerType()
-    {
-        // BC with 1.0 version
-        if (true == $this->configuration->has('lighttpd_cmd')
-            && false == $this->configuration->has('server_type')) {
-            return 'lighttpd';
-        }
-
-        return $this->configuration->get('server_type', 'lighttpd');
     }
 
     /**
