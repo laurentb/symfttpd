@@ -24,6 +24,16 @@ class OptionBag implements \IteratorAggregate
     protected $options = array();
 
     /**
+     * Constructor.
+     *
+     * @param array $options
+     */
+    public function __construct($options = array())
+    {
+        $this->options = $options;
+    }
+
+    /**
      * Retrieve an iterator for options.
      *
      * @return \ArrayIterator
