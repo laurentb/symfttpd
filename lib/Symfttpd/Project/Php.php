@@ -18,9 +18,8 @@ namespace Symfttpd\Project;
  */
 class Php extends BaseProject
 {
-    protected $name = 'php';
-
-    protected $version = null;
+    protected $name = 'php',
+              $version = null;
 
     /**
      * Return the cache directory of the project.
@@ -60,16 +59,5 @@ class Php extends BaseProject
     public function getIndexFile()
     {
         return 'index.php';
-    }
-
-    /**
-     * Initialize readable files, dirs and php executable files
-     * as index.php.
-     */
-    public function initialize()
-    {
-        $this->readableDirs = array();
-        $this->readableFiles = array();
-        $this->readablePhpFiles = array($this->getIndexFile());
     }
 }
