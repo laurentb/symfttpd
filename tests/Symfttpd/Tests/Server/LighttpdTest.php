@@ -230,7 +230,25 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getProject($reset = true)
     {
-        $project = new \Symfttpd\Tests\Fixtures\TestProject();
+        $project = $this->getMockBuilder('\Symfttpd\Project\BaseProject')
+            ->setConstructorArgs(array(new \Symfttpd\Configuration\OptionBag(), sys_get_temp_dir().'/symfttd-test'))
+            ->getMockForAbstractClass();
+
+        $project->expects($this->any())
+            ->method('getWebDir')
+            ->will($this->returnValue(sys_get_temp_dir().'/symfttd-test/web'));
+
+        $project->expects($this->any())
+            ->method('getLogDir')
+            ->will($this->returnValue(sys_get_temp_dir().'/symfttd-test/log'));
+
+        $project->expects($this->any())
+            ->method('getCacheDir')
+            ->will($this->returnValue(sys_get_temp_dir().'/symfttd-test/cache'));
+
+        $project->expects($this->any())
+            ->method('getIndexFile')
+            ->will($this->returnValue('index.php'));
 
         if (true == $reset) {
             $this->createSymfonyProject($project);
