@@ -69,6 +69,9 @@ class Symfttpd
                 $this->configuration->getProjectType(),
                 $this->configuration->getProjectVersion()
             );
+
+            // The root directory is where Symfttpd is running.
+            $this->project->setRootDir(getcwd());
         }
 
         return $this->project;
