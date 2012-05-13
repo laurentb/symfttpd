@@ -35,7 +35,7 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
         $this->symfttpd = new Symfttpd(new \Symfttpd\Tests\Fixtures\TestConfiguration());
         $this->symfttpd->getConfiguration()->add(array(
             'project_type' => 'symfony',
-            'project_version' => '1.4'
+            'project_version' => '1'
         ));
 
         $project = $this->symfttpd->getProject();
@@ -48,11 +48,11 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
         $this->symfttpd = new Symfttpd(new \Symfttpd\Tests\Fixtures\TestConfiguration());
         $this->symfttpd->getConfiguration()->add(array(
             'project_type' => 'symfony',
-            'project_version' => '1.4',
+            'project_version' => '1',
             'server_type' => 'lighttpd'
         ));
 
-        $project = $this->getMock('\Symfttpd\Project\Symfony14', array(), array(new \Symfttpd\Configuration\OptionBag()));
+        $project = $this->getMock('\\Symfttpd\\Project\\Symfony1', array(), array(new \Symfttpd\Configuration\OptionBag()));
         $this->symfttpd->setProject($project);
 
         $this->assertInstanceof('Symfttpd\\Server\\ServerInterface', $this->symfttpd->getServer());

@@ -58,7 +58,7 @@ abstract class BaseProject implements ProjectInterface
     public $readableFiles = array();
 
     /**
-     * Php executable for symfony applications.
+     * Php executable for the application.
      *
      * @var Array
      */
@@ -142,15 +142,10 @@ abstract class BaseProject implements ProjectInterface
     }
 
     /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
+     * Return the name of the project.
+     *
      * @return string
+     * @throws \Symfttpd\Project\Exception\ProjectException
      */
     public function getName()
     {
@@ -162,19 +157,11 @@ abstract class BaseProject implements ProjectInterface
     }
 
     /**
-     * @param string $version
-     */
-    public function setVersion($version)
-    {
-        $this->version = $version;
-    }
-
-    /**
      * @return string
      */
     public function getVersion()
     {
-        if (null == $this->name) {
+        if (null == $this->version) {
             throw new ProjectException('The version must be set.');
         }
 

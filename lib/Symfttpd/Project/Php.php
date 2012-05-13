@@ -60,4 +60,14 @@ class Php extends BaseProject
     {
         return 'index.php';
     }
+
+    /**
+     * PHP project does not need a version.
+     *
+     * @return null
+     */
+    public function getVersion()
+    {
+        return null;
+    }
 }

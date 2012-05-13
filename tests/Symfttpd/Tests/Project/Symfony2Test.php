@@ -11,20 +11,20 @@
 
 namespace Symfttpd\Tests\Project;
 
-use Symfttpd\Project\Symfony14;
+use Symfttpd\Project\Symfony2;
 
 /**
- * Symfony14Test class
+ * Symfony2Test class
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class Symfony14Test extends \PHPUnit_Framework_TestCase
+class Symfony2Test extends \PHPUnit_Framework_TestCase
 {
     protected $project;
 
     public function setUp()
     {
-        $this->project = new Symfony14(new \Symfttpd\Configuration\OptionBag());
+        $this->project = new Symfony2(new \Symfttpd\Configuration\OptionBag());
     }
 
     /**
@@ -51,8 +51,8 @@ class Symfony14Test extends \PHPUnit_Framework_TestCase
     public function directoryGetterTestProvider()
     {
         return array(
-            array('cache', sys_get_temp_dir(), realpath(sys_get_temp_dir()).'/cache'),
-            array('log', sys_get_temp_dir(), realpath(sys_get_temp_dir()).'/log'),
+            array('cache', sys_get_temp_dir(), realpath(sys_get_temp_dir()).'/app/cache'),
+            array('log', sys_get_temp_dir(), realpath(sys_get_temp_dir()).'/app/logs'),
             array('web', sys_get_temp_dir(), realpath(sys_get_temp_dir()).'/web'),
         );
     }
@@ -75,22 +75,18 @@ class Symfony14Test extends \PHPUnit_Framework_TestCase
         $baseDir = $this->project->getRootDir();
 
         $projectTree = array(
-            $baseDir.DIRECTORY_SEPARATOR.'apps',
-            $baseDir.DIRECTORY_SEPARATOR.'cache',
-            $baseDir.DIRECTORY_SEPARATOR.'config',
-            $baseDir.DIRECTORY_SEPARATOR.'lib',
-            $baseDir.DIRECTORY_SEPARATOR.'log',
-            $baseDir.DIRECTORY_SEPARATOR.'web',
-            $baseDir.DIRECTORY_SEPARATOR.'web/css',
-            $baseDir.DIRECTORY_SEPARATOR.'web/js',
+            $baseDir.'/app',
+            $baseDir.'/app/cache',
+            $baseDir.'/app/config',
+            $baseDir.'/src',
+            $baseDir.'/app/logs',
+            $baseDir.'/web',
+            $baseDir.'/web/bundles',
         );
 
         $files = array(
-            $baseDir.DIRECTORY_SEPARATOR.'web/index.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/frontend_dev.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/backend_dev.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/robots.txt',
-            $baseDir.DIRECTORY_SEPARATOR.'log/frontend.log',
+            $baseDir.'/web/index.php',
+            $baseDir.'/web/robots.txt',
         );
 
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
@@ -101,13 +97,18 @@ class Symfony14Test extends \PHPUnit_Framework_TestCase
         $this->project->initialize();
 
         $this->assertContains('index.php', $this->project->readablePhpFiles);
-        $this->assertContains('frontend_dev.php', $this->project->readablePhpFiles);
-        $this->assertContains('backend_dev.php', $this->project->readablePhpFiles);
-
-        $this->assertContains('css', $this->project->readableDirs);
-        $this->assertContains('js', $this->project->readableDirs);
-
+        $this->assertContains('bundles', $this->project->readableDirs);
         $this->assertContains('robots.txt', $this->project->readableFiles);
+    }
+
+    public function testGetName()
+    {
+        $this->assertEquals('symfony', $this->project->getName());
+    }
+
+    public function testGetVersion()
+    {
+        $this->assertEquals('2', $this->project->getVersion());
     }
 }
 

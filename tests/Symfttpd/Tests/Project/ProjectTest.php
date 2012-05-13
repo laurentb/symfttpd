@@ -11,8 +11,6 @@
 
 namespace Symfttpd\Tests\Project;
 
-use Symfttpd\Project\Symfony14;
-
 /**
  * ProjectTest class
  *
@@ -23,6 +21,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getOptions
      * @param $options
+     * @param $values
      */
     public function testInitialize($options, $values)
     {
@@ -31,6 +30,22 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($values['dirs'], $project->readableDirs);
         $this->assertEquals($values['files'], $project->readableFiles);
         $this->assertEquals($values['php'], $project->readablePhpFiles);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSetPathException()
+    {
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Configuration\OptionBag()));
+        $project->setRootDir(__DIR__.'/foo/bar');
+    }
+
+    public function testGetRootDir()
+    {
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Configuration\OptionBag()));
+        $project->setRootDir(sys_get_temp_dir());
+        $this->assertEquals(realpath(sys_get_temp_dir()), $project->getRootDir());
     }
 
     public function getOptions()
@@ -74,6 +89,26 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                 )
             ),
         );
+    }
+
+    /**
+     * @expectedException \Symfttpd\Project\Exception\ProjectException
+     * @expectedExceptionMessage The name must be set.
+     */
+    public function testGetName()
+    {
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Configuration\OptionBag()));
+        $project->getName();
+    }
+
+    /**
+     * @expectedException \Symfttpd\Project\Exception\ProjectException
+     * @expectedExceptionMessage The version must be set.
+     */
+    public function testGetVersion()
+    {
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Configuration\OptionBag()));
+        $project->getVersion();
     }
 }
 

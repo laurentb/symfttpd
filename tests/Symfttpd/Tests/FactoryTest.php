@@ -38,7 +38,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateProject()
     {
-        $project = Factory::createProject('symfony', '1.4');
+        $project = Factory::createProject('symfony', '1');
 
         $this->assertInstanceof('Symfttpd\\Project\\ProjectInterface', $project);
     }
@@ -49,18 +49,14 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateServerException()
     {
-        $project = $this->getMockBuilder('\Symfttpd\Project\Symfony14')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Configuration\OptionBag()));
 
         Factory::createServer('foo', $project);
     }
 
     public function testCreateServer()
     {
-        $project = $this->getMockBuilder('\Symfttpd\Project\Symfony14')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Configuration\OptionBag()));
 
         $server = Factory::createServer('lighttpd', $project);
 

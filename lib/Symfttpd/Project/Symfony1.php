@@ -30,7 +30,7 @@ class Symfony1 extends BaseProject
      *
      * @var string
      */
-    protected $version = '1.0';
+    protected $version = '1';
 
     /**
      * Return the cache directory of the project.
