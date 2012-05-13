@@ -25,6 +25,22 @@ interface ProjectInterface
     public function initialize();
 
     /**
+     * Return the project name.
+     *
+     * @abstract
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Return the project version.
+     *
+     * @abstract
+     * @return string
+     */
+    public function getVersion();
+
+    /**
      * Return the cache directory of the project.
      *
      * @abstract
