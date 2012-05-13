@@ -70,27 +70,26 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $this->project->setRootDir(sys_get_temp_dir().'/symfttpd-project-test');
-
-        $baseDir = $this->project->getRootDir();
+        $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
 
         $projectTree = array(
-            $baseDir.DIRECTORY_SEPARATOR.'apps',
-            $baseDir.DIRECTORY_SEPARATOR.'cache',
-            $baseDir.DIRECTORY_SEPARATOR.'config',
-            $baseDir.DIRECTORY_SEPARATOR.'lib',
-            $baseDir.DIRECTORY_SEPARATOR.'log',
-            $baseDir.DIRECTORY_SEPARATOR.'web',
-            $baseDir.DIRECTORY_SEPARATOR.'web/css',
-            $baseDir.DIRECTORY_SEPARATOR.'web/js',
+            $baseDir,
+            $baseDir.'/apps',
+            $baseDir.'/cache',
+            $baseDir.'/config',
+            $baseDir.'/lib',
+            $baseDir.'/log',
+            $baseDir.'/web',
+            $baseDir.'/web/css',
+            $baseDir.'/web/js',
         );
 
         $files = array(
-            $baseDir.DIRECTORY_SEPARATOR.'web/index.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/frontend_dev.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/backend_dev.php',
-            $baseDir.DIRECTORY_SEPARATOR.'web/robots.txt',
-            $baseDir.DIRECTORY_SEPARATOR.'log/frontend.log',
+            $baseDir.'/web/index.php',
+            $baseDir.'/web/frontend_dev.php',
+            $baseDir.'/web/backend_dev.php',
+            $baseDir.'/web/robots.txt',
+            $baseDir.'/log/frontend.log',
         );
 
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
@@ -98,6 +97,7 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
         $filesystem->mkdir($projectTree);
         $filesystem->touch($files);
 
+        $this->project->setRootDir($baseDir);
         $this->project->initialize();
 
         $this->assertContains('index.php', $this->project->readablePhpFiles);

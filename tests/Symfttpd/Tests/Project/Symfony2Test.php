@@ -70,11 +70,10 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $this->project->setRootDir(sys_get_temp_dir().'/symfttpd-project-test');
-
-        $baseDir = $this->project->getRootDir();
+        $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
 
         $projectTree = array(
+            $baseDir,
             $baseDir.'/app',
             $baseDir.'/app/cache',
             $baseDir.'/app/config',
@@ -94,6 +93,7 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
         $filesystem->mkdir($projectTree);
         $filesystem->touch($files);
 
+        $this->project->setRootDir($baseDir);
         $this->project->initialize();
 
         $this->assertContains('index.php', $this->project->readablePhpFiles);
