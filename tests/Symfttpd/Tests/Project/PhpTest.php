@@ -56,7 +56,7 @@ class PhpTest extends \PHPUnit_Framework_TestCase
 
     public function testInitialize()
     {
-        $this->project->setRootDir(sys_get_temp_dir());
+        $this->project->setRootDir(sys_get_temp_dir().'/symfttpd-project-test');
 
         $baseDir = $this->project->getRootDir();
 
