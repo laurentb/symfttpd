@@ -127,7 +127,7 @@ class Symfttpd
     public function findExecutables()
     {
         $this->findPhpCmd();
-        $this->findPhpcgiCmd();
+        $this->findPhpCgiCmd();
     }
 
     /**
@@ -156,7 +156,7 @@ class Symfttpd
      *
      * @throws \Symfttpd\Exception\ExecutableNotFoundException
      */
-    protected function findPhpcgiCmd()
+    protected function findPhpCgiCmd()
     {
         if (false === $this->configuration->has('php_cgi_cmd')) {
             $exeFinder = new ExecutableFinder();

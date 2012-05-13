@@ -76,8 +76,6 @@ class Factory
             throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
         }
 
-        $server = new $class($project);
-
-        return $server;
+        return new $class($project);
     }
 }
