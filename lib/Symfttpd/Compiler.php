@@ -31,20 +31,35 @@ class Compiler
 
         $phar->startBuffering();
 
+        // Add Symfttpd core files.
         $finder = new Finder();
         $finder->files()
             ->ignoreVCS(true)
             ->name('*.php')
-            ->name('*.conf')
-            ->notName('Compiler.php')
+            ->name('*.twig')
             ->in(__DIR__.'/..')
-            ->in(__DIR__.'/../../vendor/symfony')
+            ->notName('Compiler.php')
             ->exclude('Tests');
 
         foreach ($finder as $file) {
             $this->addFile($phar, $file);
         }
 
+        // Add vendors
+        $finder = new Finder();
+        $finder->files()
+            ->ignoreVCS(true)
+            ->name('*.php')
+            ->in(__DIR__.'/../../vendor/symfony')
+            ->in(__DIR__.'/../../vendor/twig')
+            ->exclude(__DIR__.'/../../vendor/twig/doc')
+            ->exclude(__DIR__.'/../../vendor/twig/test');
+
+        foreach ($finder as $file) {
+            $this->addFile($phar, $file);
+        }
+
+        // Add Composer generated files.
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/autoload.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_namespaces.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_classmap.php'));
