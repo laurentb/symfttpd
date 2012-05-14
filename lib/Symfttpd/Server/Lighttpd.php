@@ -116,7 +116,7 @@ class Lighttpd implements ServerInterface
     {
         $this->project = $project;
         $this->options = $options ?: new OptionBag();
-        $this->renderer = $renderer ?: new TwigRenderer();
+        $this->renderer = $renderer ?: new TwigRenderer($this->getTemplateDir());
 
         $this->setup();
 
@@ -290,7 +290,6 @@ class Lighttpd implements ServerInterface
     public function generateConfiguration(SymfttpdConfiguration $configuration)
     {
         $this->lighttpdConfig = $this->renderer->render(
-            $this->getTemplateDir(),
             $this->configFilename.'.twig',
             array(
                 'document_root' => $this->options->get('document_root'),
@@ -314,7 +313,6 @@ class Lighttpd implements ServerInterface
     public function generateRules(SymfttpdConfiguration $configuration)
     {
         $this->rules = $this->renderer->render(
-            $this->getTemplateDir(),
             $this->rulesFilename.'.twig',
             array(
                 'dirs'    => $this->options->get('dirs'),
@@ -328,6 +326,8 @@ class Lighttpd implements ServerInterface
     }
 
     /**
+     * Return the lighttpd templates directory.
+     *
      * @return string
      */
     public function getTemplateDir()

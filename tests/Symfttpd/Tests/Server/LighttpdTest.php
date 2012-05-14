@@ -261,7 +261,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedConfiguration($withRules = false)
     {
-        $renderer = new \Symfttpd\Renderer\TwigRenderer();
+        $renderer = new \Symfttpd\Renderer\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
 
         $baseDir = $this->getProject(false)->getRootDir();
         $rules = null;
@@ -270,7 +270,6 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         }
 
         return $renderer->render(
-            realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'),
             'lighttpd.conf.twig',
             array(
                 'document_root' => $baseDir.'/web',
@@ -287,10 +286,9 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedRules()
     {
-        $renderer = new \Symfttpd\Renderer\TwigRenderer();
+        $renderer = new \Symfttpd\Renderer\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
 
         return $renderer->render(
-            realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'),
             'rules.conf.twig',
             array(
                 'dirs'    => array('css', 'js'),

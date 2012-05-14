@@ -22,22 +22,20 @@ interface RendererInterface
      * Render a template.
      *
      * @abstract
-     * @param $skeletonDir
      * @param $template
      * @param array $parameters
      * @return mixed
      */
-    public function render($skeletonDir, $template, $parameters = array());
+    public function render($template, $parameters = array());
 
     /**
      * Render a template in a file.
      *
      * @abstract
-     * @param $skeletonDir
      * @param $template
      * @param $target
      * @param array $parameters
      * @return mixed
      */
-    public function renderFile($skeletonDir, $template, $target, $parameters = array());
+    public function renderFile($template, $target, $parameters = array());
 }

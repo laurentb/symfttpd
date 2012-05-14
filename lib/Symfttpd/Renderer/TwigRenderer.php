@@ -18,31 +18,38 @@ namespace Symfttpd\Renderer;
  */
 class TwigRenderer implements RendererInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function render($skeletonDir, $template, $parameters = array())
+    protected $twig;
+
+    public function __construct($skeletonDir)
     {
-        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem($skeletonDir), array(
+        $this->twig = new \Twig_Environment(new \Twig_Loader_Filesystem($skeletonDir), array(
             'debug'            => true,
             'cache'            => false,
             'strict_variables' => true,
             'autoescape'       => false,
         ));
 
-        $twig->addFunction('sys_get_temp_dir', new \Twig_Function_Function('sys_get_temp_dir'));
-        $twig->addFunction('in_array', new \Twig_Function_Function('in_array'));
+        // Add functions
+        $this->twig->addFunction('sys_get_temp_dir', new \Twig_Function_Function('sys_get_temp_dir'));
+        $this->twig->addFunction('in_array', new \Twig_Function_Function('in_array'));
 
-        $twig->addFilter('preg_quote', new \Twig_Filter_Function('preg_quote'));
-
-        return $twig->render($template, $parameters);
+        // Add filters
+        $this->twig->addFilter('preg_quote', new \Twig_Filter_Function('preg_quote'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function renderFile($skeletonDir, $template, $target, $parameters = array())
+    public function render($template, $parameters = array())
     {
-        file_put_contents($target, $this->render($skeletonDir, $template, $parameters));
+        return $this->twig->render($template, $parameters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function renderFile($template, $target, $parameters = array())
+    {
+        file_put_contents($target, $this->render($template, $parameters));
     }
 }
