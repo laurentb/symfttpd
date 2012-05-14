@@ -9,14 +9,16 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Renderer;
+namespace Symfttpd;
+
+use Symfttpd\Writer;
 
 /**
  * TwigRenderer class.
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class TwigRenderer implements RendererInterface
+class TwigRenderer
 {
     protected $twig;
 
@@ -43,13 +45,5 @@ class TwigRenderer implements RendererInterface
     public function render($template, $parameters = array())
     {
         return $this->twig->render($template, $parameters);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderFile($template, $target, $parameters = array())
-    {
-        file_put_contents($target, $this->render($template, $parameters));
     }
 }

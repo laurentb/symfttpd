@@ -106,7 +106,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testReadRulesFromFile()
     {
         $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
-        $this->server->writeRules();
+        $this->server->writeRules(true);
 
         $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
         $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
@@ -115,7 +115,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testReadConfigFromFile()
     {
         $this->server->generateConfiguration($this->getSymfttpdConfiguration());
-        $this->server->writeConfiguration();
+        $this->server->writeConfiguration(true);
 
         $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
         $this->assertEquals($this->getGeneratedConfiguration(), $lighttpd->readConfiguration());
@@ -124,7 +124,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testReadFromFile()
     {
         $this->server->generate($this->getSymfttpdConfiguration());
-        $this->server->write();
+        $this->server->write('all', true);
 
         $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
         $this->assertEquals($this->getGeneratedConfiguration(true), $lighttpd->readConfiguration());
@@ -133,8 +133,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfttpd\Configuration\Exception\ConfigurationException
-     * @expectedExceptionMessage The rules configuration has not been generated.
+     * @expectedException \Symfttpd\Exception\LoaderException
      */
     public function testReadRulesFromFileException()
     {
@@ -144,8 +143,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfttpd\Configuration\Exception\ConfigurationException
-     * @expectedExceptionMessage The lighttpd configuration has not been generated.
+     * @expectedException \Symfttpd\Exception\LoaderException
      */
     public function testReadConfigFromFileException()
     {
@@ -261,7 +259,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedConfiguration($withRules = false)
     {
-        $renderer = new \Symfttpd\Renderer\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
+        $renderer = new \Symfttpd\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
 
         $baseDir = $this->getProject(false)->getRootDir();
         $rules = null;
@@ -286,7 +284,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedRules()
     {
-        $renderer = new \Symfttpd\Renderer\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
+        $renderer = new \Symfttpd\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
 
         return $renderer->render(
             'rules.conf.twig',
