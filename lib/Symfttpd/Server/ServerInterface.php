@@ -69,7 +69,7 @@ interface ServerInterface
      * @abstract
      * @return mixed
      */
-    public function run();
+    public function start();
 
     /**
      * Return the restart file path.

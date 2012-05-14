@@ -457,8 +457,10 @@ class Lighttpd implements ServerInterface
     /**
      * Start the server.
      */
-    public function run()
+    public function start()
     {
+        // Remove an possible existing restart file
+        $this->removeRestartFile();
         $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
 
         $process = new \Symfony\Component\Process\Process($command, $this->project->getRootDir(), null, null, null);

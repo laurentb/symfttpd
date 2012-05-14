@@ -68,12 +68,6 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // @todo this should be transparent and not do here?
-        $symfttpd = $this->getSymfttpd();
-
-        $project = $symfttpd->getProject();
-        $project->initialize();
-
         $server = $this->getSymfttpd()->getServer();
         $server->options->add(array(
             // Lighttpd options
@@ -89,6 +83,7 @@ class SpawnCommand extends Command
         }
 
         // Creates the server configuration.
+        $this->getSymfttpd()->getProject()->initialize();
         $server->generate($this->getConfiguration());
         $server->write();
 
@@ -126,7 +121,7 @@ TEXT;
         if (true == $input->getOption('single_process')) {
             $output->writeln('<info>Symfttpd will run in a single process mode.</info>');
             // Run lighttpd
-            $server->run();
+            $server->start();
 
             $output->write('Terminated.');
 
@@ -176,11 +171,9 @@ TEXT;
     protected function spawn(ServerInterface $server, OutputInterface $output)
     {
         do {
-            $server->removeRestartFile();
-
             try {
                 // Run lighttpd
-                $server->run();
+                $server->start();
             } catch (\Exception $e) {
                 $output->writeln('<error>The server cannot start</error>');
                 $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
