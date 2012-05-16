@@ -9,11 +9,12 @@
 namespace Symfttpd;
 
 use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Factory;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfttpd\Renderer\TwigRenderer;
+use Symfttpd\Renderer\TwigExtension;
 
 /**
  * Symfttpd class
@@ -38,32 +39,55 @@ class Symfttpd extends \Pimple
         $this['configuration'] = $configuration;
 
         $this['project'] = $this->share(function ($c) use ($container) {
-            $config = $container['configuration'];
+            $config  = $container['configuration'];
+            $type    = $config->getProjectType();
+            $version = $config->getProjectVersion();
 
-            $project = Factory::createProject(
-                $config->getProjectType(),
-                $config->getProjectVersion(),
-                $config->getProjectOptions()
-            );
+            $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type).str_replace(array('.', '-', 'O'), '', $version));
 
-            // The root directory is where Symfttpd is running.
-            $project->setRootDir(getcwd());
+            if (!class_exists($class)) {
+                throw new \InvalidArgumentException(sprintf('"%s" in version "%s" is not supported.', $type, $version));
+            }
 
-            return $project;
+            return new $class(new OptionBag($config->getProjectOptions()), getcwd());
         });
 
-      $this['server'] = $this->share(function ($c) use ($container) {
-          $config = $container['configuration'];
+        $this['server'] = $this->share(function ($c) use ($container) {
+            $config = $container['configuration'];
+            $type   = $config->getServerType();
 
-          $server = Factory::createServer($config->getServerType(), $container['project']);
+            $class = sprintf('Symfttpd\\Server\\%s', ucfirst($type));
 
-          // BC with the 1.0 configuration version
-          if ($server instanceof \Symfttpd\Server\Lighttpd && $config->has('lighttpd_cmd')) {
-            $server->setCommand($config->get('lighttpd_cmd'));
-          }
+            if (!class_exists($class)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
+            }
 
-          return $server;
-      });
+            $server = new $class($container['project'], $container['renderer']);
+
+            // BC with the 1.0 configuration version
+            if ($server instanceof \Symfttpd\Server\Lighttpd && $config->has('lighttpd_cmd')) {
+                $server->setCommand($config->get('lighttpd_cmd'));
+            }
+
+            return $server;
+        });
+
+        $this['twig'] = $this->share(function ($c) use ($container) {
+            $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(array(getcwd())), array(
+                'debug'            => true,
+                'strict_variables' => true,
+                'auto_reload'      => true,
+                'cache'            => false,
+            ));
+
+            $twig->addExtension(new TwigExtension());
+
+            return $twig;
+        });
+
+        $this['renderer'] = $this->share(function ($c) use ($container) {
+            return new TwigRenderer($container['twig']);
+        });
     }
 
     /**

@@ -70,11 +70,11 @@ abstract class BaseProject implements ProjectInterface
     protected $rootDir;
 
     /**
-     * @var \Symfttpd\Configuration\OptionBag
+     * @var \Symfttpd\OptionBag
      */
     protected $options;
 
-    public function __construct(\Symfttpd\Configuration\OptionBag $options, $path = null)
+    public function __construct(\Symfttpd\OptionBag $options, $path = null)
     {
         $this->rootDir = $path;
 

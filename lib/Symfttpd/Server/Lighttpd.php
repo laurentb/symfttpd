@@ -15,12 +15,11 @@ use Symfttpd\Server\ServerInterface;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\Exception\ServerException;
 use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\Configuration\OptionBag;
-use Symfttpd\TwigRenderer;
+use Symfttpd\OptionBag;
+use Symfttpd\Renderer\TwigRenderer;
 use Symfttpd\Loader;
 use Symfttpd\Writer;
 use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Configuration\ConfigurationInterface;
 use Symfttpd\Configuration\Exception\ConfigurationException;
 use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfony\Component\Process\ExecutableFinder;
@@ -103,7 +102,7 @@ class Lighttpd implements ServerInterface
     public $project;
 
     /**
-     * @var RendererInterface
+     * @var TwigRenderer
      */
     public $renderer;
 
@@ -111,15 +110,15 @@ class Lighttpd implements ServerInterface
      * Constructor class
      *
      * @param null $workingDir
-     * @param null|\Symfttpd\Configuration\OptionBag $options
+     * @param null|\Symfttpd\OptionBag $options
      */
-    public function __construct(ProjectInterface $project, OptionBag $options = null)
+    public function __construct(ProjectInterface $project, TwigRenderer $renderer, OptionBag $options = null)
     {
-        $this->project = $project;
-        $this->options = $options ?: new OptionBag();
+        $this->project  = $project;
+        $this->renderer = $renderer;
+        $this->options  = $options ?: new OptionBag();
 
         // @todo thinking about injection... Pimple ?
-        $this->renderer = new TwigRenderer($this->getTemplateDir());
         $this->loader = new Loader();
         $this->writer = new Writer();
 

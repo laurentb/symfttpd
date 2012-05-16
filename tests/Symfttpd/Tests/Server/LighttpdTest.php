@@ -12,6 +12,8 @@
 namespace Symfttpd\Tests\Server;
 
 use Symfttpd\Server\Lighttpd;
+use Symfttpd\Renderer\TwigRenderer;
+use Symfttpd\Renderer\TwigExtension;
 
 /**
  * LighttpdTest class
@@ -20,6 +22,7 @@ use Symfttpd\Server\Lighttpd;
  */
 class LighttpdTest extends \PHPUnit_Framework_TestCase
 {
+    protected $renderer;
     /**
      * @var Symfttpd\Server\Lighttpd
      */
@@ -27,7 +30,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->server = new Lighttpd($this->getProject(), $this->getOptions());
+        $this->server = new Lighttpd($this->getProject(), $this->getRenderer(), $this->getOptions());
     }
 
     public function tearDown()
@@ -108,7 +111,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
         $this->server->writeRules(true);
 
-        $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
+        $lighttpd = new Lighttpd($this->getProject(false), $this->getRenderer(), $this->getOptions());
         $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
     }
 
@@ -117,7 +120,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generateConfiguration($this->getSymfttpdConfiguration());
         $this->server->writeConfiguration(true);
 
-        $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
+        $lighttpd = new Lighttpd($this->getProject(false), $this->getRenderer(), $this->getOptions());
         $this->assertEquals($this->getGeneratedConfiguration(), $lighttpd->readConfiguration());
     }
 
@@ -126,7 +129,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generate($this->getSymfttpdConfiguration());
         $this->server->write('all', true);
 
-        $lighttpd = new Lighttpd($this->getProject(false), $this->getOptions());
+        $lighttpd = new Lighttpd($this->getProject(false), $this->getRenderer(), $this->getOptions());
         $this->assertEquals($this->getGeneratedConfiguration(true), $lighttpd->readConfiguration());
         $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
         $this->assertEquals($this->getGeneratedConfiguration(true) . PHP_EOL . $this->getGeneratedRules(), $lighttpd->read());
@@ -137,7 +140,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadRulesFromFileException()
     {
-        $lighttpd = new Lighttpd($this->getProject(), $this->getOptions());
+        $lighttpd = new Lighttpd($this->getProject(), $this->getRenderer(), $this->getOptions());;
         $lighttpd->rotate(true);
         $lighttpd->readRules();
     }
@@ -147,7 +150,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadConfigFromFileException()
     {
-        $lighttpd = new Lighttpd($this->getProject(), $this->getOptions());
+        $lighttpd = new Lighttpd($this->getProject(), $this->getRenderer(), $this->getOptions());;
         $lighttpd->rotate();
         $lighttpd->readConfiguration();
     }
@@ -201,7 +204,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function getOptions()
     {
-        $configuration = new \Symfttpd\Configuration\OptionBag();
+        $configuration = new \Symfttpd\OptionBag();
         $configuration->add(array(
             'port' => 4042,
             'bind' => '127.0.0.1'
@@ -229,7 +232,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function getProject($reset = true)
     {
         $project = $this->getMockBuilder('\Symfttpd\Project\BaseProject')
-            ->setConstructorArgs(array(new \Symfttpd\Configuration\OptionBag(), sys_get_temp_dir().'/symfttd-test'))
+            ->setConstructorArgs(array(new \Symfttpd\OptionBag(), sys_get_temp_dir().'/symfttd-test'))
             ->getMockForAbstractClass();
 
         $project->expects($this->any())
@@ -259,15 +262,13 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedConfiguration($withRules = false)
     {
-        $renderer = new \Symfttpd\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
-
         $baseDir = $this->getProject(false)->getRootDir();
         $rules = null;
         if ($withRules) {
             $rules = $baseDir . '/cache/lighttpd/rules.conf';
         }
 
-        return $renderer->render(
+        return $this->getRenderer()->render(
             'lighttpd.conf.twig',
             array(
                 'document_root' => $baseDir.'/web',
@@ -284,9 +285,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedRules()
     {
-        $renderer = new \Symfttpd\TwigRenderer(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd'));
-
-        return $renderer->render(
+        return $this->getRenderer()->render(
             'rules.conf.twig',
             array(
                 'dirs'    => array('css', 'js'),
@@ -296,5 +295,16 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
                 'nophp'   => array(),
             )
         );
+    }
+
+    public function getRenderer()
+    {
+        if (null == $this->renderer) {
+            $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd')));
+            $twig->addExtension(new TwigExtension());
+            $this->renderer = new TwigRenderer($twig);
+        }
+
+        return $this->renderer;
     }
 }
