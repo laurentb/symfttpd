@@ -61,6 +61,8 @@ class Symfttpd extends \Pimple
           if ($server instanceof \Symfttpd\Server\Lighttpd && $config->has('lighttpd_cmd')) {
             $server->setCommand($config->get('lighttpd_cmd'));
           }
+
+          return $server;
       });
     }
 

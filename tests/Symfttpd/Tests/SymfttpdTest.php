@@ -53,7 +53,7 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
         ));
 
         $project = $this->getMock('\\Symfttpd\\Project\\Symfony1', array(), array(new \Symfttpd\Configuration\OptionBag()));
-        $this->symfttpd->setProject($project);
+        $this->symfttpd['project'] = $project;
 
         $this->assertInstanceof('Symfttpd\\Server\\ServerInterface', $this->symfttpd->getServer());
     }
