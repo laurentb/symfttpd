@@ -34,10 +34,25 @@ class TwigRenderer
     }
 
     /**
-     * {@inheritdoc}
+     * Render a template.
+     *
+     * @param $template
+     * @param array $parameters
+     * @return string
      */
     public function render($template, $parameters = array())
     {
         return $this->twig->render($template, $parameters);
+    }
+
+    /**
+     * Add a path in the twig loader.
+     *
+     * @param $path
+     * @return mixed
+     */
+    public function addPath($path)
+    {
+        return $this->twig->getLoader()->addPath($path);
     }
 }
