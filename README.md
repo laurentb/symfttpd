@@ -1,4 +1,4 @@
-# symfttpd - [![Build Status](https://secure.travis-ci.org/benja-M-1/symfttpd.png?branch=refactoring)](http://travis-ci.org/benja-M-1/symfttpd)
+# symfttpd - [![Build Status](https://secure.travis-ci.org/benja-M-1/symfttpd.png?branch=2.0.0)](http://travis-ci.org/benja-M-1/symfttpd)
 
 symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.
@@ -70,15 +70,15 @@ Options:
 
 Help:
  The help command displays help for a given command:
- 
+
    php symfttpd.phar help list
- 
+
  You can also output the help as XML by using the --xml option:
- 
+
    php symfttpd.phar help --xml list
 ```
 
-*Adapt paths to your environment*  
+*Adapt paths to your environment*
 *A webpage is under development to download the symfttpd.phar directly in your project*
 
 
