@@ -368,6 +368,26 @@ class Lighttpd implements ServerInterface
     }
 
     /**
+     * Return the lighttpd cache directory.
+     *
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->project->getCacheDir().'/'.$this->name;
+    }
+
+    /**
+     * Return the lighttpd log directory.
+     *
+     * @return string
+     */
+    public function getLogDir()
+    {
+        return $this->project->getLogDir().'/'.$this->name;
+    }
+
+    /**
      * Return the server command value
      *
      * @param null|\Symfony\Component\Process\ExecutableFinder $finder
@@ -421,31 +441,9 @@ class Lighttpd implements ServerInterface
             $process = new \Symfony\Component\Process\Process(null);
         }
 
-        $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
-
-        $process->setCommandLine($command);
+        $process->setCommandLine($this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile()));
         $process->setWorkingDirectory($this->project->getRootDir());
         $process->setTimeout(null);
         $process->run();
-    }
-
-    /**
-     * Return the lighttpd cache directory.
-     *
-     * @return string
-     */
-    public function getCacheDir()
-    {
-        return $this->project->getCacheDir().'/'.$this->name;
-    }
-
-    /**
-     * Return the lighttpd log directory.
-     *
-     * @return string
-     */
-    public function getLogDir()
-    {
-        return $this->project->getLogDir().'/'.$this->name;
     }
 }

@@ -77,11 +77,6 @@ abstract class BaseProject implements ProjectInterface
     public function __construct(\Symfttpd\OptionBag $options, $path = null)
     {
         $this->rootDir = $path;
-
-        $this->readableDirs = $options->get('project_readable_dirs', array());
-        $this->readableFiles = $options->get('project_readable_files', array());
-        $this->readablePhpFiles = $options->get('project_readable_phpfiles', array('index.php'));
-
         $this->options = $options;
     }
 
@@ -91,6 +86,11 @@ abstract class BaseProject implements ProjectInterface
      */
     public function scan()
     {
+        // Reset the default values.
+        $this->readableDirs = $this->options->get('project_readable_dirs', array());
+        $this->readableFiles = $this->options->get('project_readable_files', array());
+        $this->readablePhpFiles = $this->options->get('project_readable_phpfiles', array('index.php'));
+
         $iterator = new \DirectoryIterator($this->getWebDir());
 
         foreach ($iterator as $file) {
