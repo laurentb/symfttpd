@@ -23,6 +23,7 @@ use Symfttpd\Configuration\Exception\ConfigurationException;
  * ServerInterface interface
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
+ * @todo Complete this interface.
  */
 interface ServerInterface
 {

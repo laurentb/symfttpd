@@ -115,10 +115,32 @@ class Lighttpd implements ServerInterface
         $this->loader   = $loader;
         $this->writer   = $writer;
 
-        $this->options->set('pidfile', $this->getCacheDir().'/.sf');
-        $this->options->set('restartfile', $this->getCacheDir().'/.symfttpd_restart');
-
         $this->rotate();
+    }
+
+    /**
+     * Return the restartfile.
+     *
+     * If the server configuration (rules or base configuration)
+     * changed, it generates a restart file that means that
+     * the server must be restarted.
+     *
+     * @return mixed|null
+     */
+    public function getRestartFile()
+    {
+        return $this->getCacheDir().'/.symfttpd_restart';
+    }
+
+    /**
+     * Return the pidfile which contains the pid of the process
+     * of the server.
+     *
+     * @return mixed|null
+     */
+    public function getPidfile()
+    {
+        return $this->getCacheDir().'/.sf';
     }
 
     /**
@@ -385,31 +407,6 @@ class Lighttpd implements ServerInterface
 
         $process = new \Symfony\Component\Process\Process($command, $this->project->getRootDir(), null, null, null);
         $process->run();
-    }
-
-    /**
-     * Return the restartfile.
-     *
-     * If the server configuration (rules or base configuration)
-     * changed, it generates a restart file that means that
-     * the server must be restarted.
-     *
-     * @return mixed|null
-     */
-    public function getRestartFile()
-    {
-        return $this->options->get('restartfile');
-    }
-
-    /**
-     * Return the pidfile which contains the pid of the process
-     * of the server.
-     *
-     * @return mixed|null
-     */
-    public function getPidfile()
-    {
-        return $this->options->get('pidfile');
     }
 
     /**
