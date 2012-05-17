@@ -26,9 +26,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
-
-use Symfttpd\Project\Symfony14;
-
 /**
  * SpawnCommand class
  *
@@ -83,8 +80,6 @@ class SpawnCommand extends Command
         }
 
         // Creates the server configuration.
-        $this->getSymfttpd()->getProject()->scan();
-        $server->setup();
         $server->generate($this->getConfiguration());
         $server->write();
 
@@ -212,8 +207,7 @@ TEXT;
         $prevGenconf = null;
         while (false !== sleep(1)) {
             // Generate the configuration file.
-            $server->setup();
-            $server->generateRules($this->getSymfttpd()->getConfiguration());
+            $server->generateRules();
             $server->writeRules();
             $genconf = $server->readRules();
 
