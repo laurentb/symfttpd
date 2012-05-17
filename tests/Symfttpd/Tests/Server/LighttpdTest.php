@@ -34,7 +34,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $twig->addExtension(new TwigExtension());
         $this->renderer = new TwigRenderer($twig);
 
-        $this->server = $this->createLighttpd();
+        $this->server = $this->createLighttpd(true);
     }
 
     public function tearDown()
@@ -258,8 +258,6 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         if (true == $reset) {
             $this->createSymfonyProject($project);
         }
-
-        $project->scan();
 
         return $project;
     }

@@ -115,32 +115,10 @@ class Lighttpd implements ServerInterface
         $this->loader   = $loader;
         $this->writer   = $writer;
 
-        $this->setup();
-
         $this->options->set('pidfile', $this->getCacheDir().'/.sf');
         $this->options->set('restartfile', $this->getCacheDir().'/.symfttpd_restart');
 
         $this->rotate();
-    }
-
-    /**
-     * Update the options.
-     */
-    public function setup()
-    {
-        // Set the defaults settings
-        $this->options->merge(array(
-            // Lighttpd configuration options.
-            'document_root' => $this->project->getWebDir(),
-            'log_dir'       => $this->project->getLogDir().'/lighttpd',
-            'cache_dir'     => $this->project->getCacheDir().'/lighttpd',
-            // Rewrite rules options.
-            'nophp'         => array(),
-            'default'       => $this->project->getIndexFile(),
-            'phps'          => $this->project->readablePhpFiles,
-            'files'         => $this->project->readableFiles,
-            'dirs'          => $this->project->readableDirs,
-        ));
     }
 
     /**
@@ -266,11 +244,11 @@ class Lighttpd implements ServerInterface
         $this->lighttpdConfig = $this->renderer->render(
             $this->configFilename.'.twig',
             array(
-                'document_root' => $this->options->get('document_root'),
+                'document_root' => $this->project->getWebDir(),
                 'port'          => $this->options->get('port'),
                 'bind'          => $this->options->get('bind', null),
-                'error_log'     => $this->options->get('log_dir').'/error.log',
-                'access_log'    => $this->options->get('log_dir').'/access.log',
+                'error_log'     => $this->getLogDir().'/error.log',
+                'access_log'    => $this->getLogDir().'/access.log',
                 'pidfile'       => $this->getPidfile(),
                 'rules_file'    => null !== $this->rules ? $this->getRulesFile() : null,
                 'php_cgi_cmd'   => $configuration->get('php_cgi_cmd'),
@@ -285,14 +263,16 @@ class Lighttpd implements ServerInterface
      */
     public function generateRules(SymfttpdConfiguration $configuration)
     {
+        $this->project->scan();
+
         $this->rules = $this->renderer->render(
             $this->rulesFilename.'.twig',
             array(
-                'dirs'    => $this->options->get('dirs'),
-                'files'   => $this->options->get('files'),
-                'phps'    => $this->options->get('phps'),
-                'default' => $this->options->get('default'),
-                'nophp'   => $this->options->get('nophp'),
+                'dirs'    => $this->project->readableDirs,
+                'files'   => $this->project->readableFiles,
+                'phps'    => $this->project->readablePhpFiles,
+                'default' => $this->project->getIndexFile(),
+                'nophp'   => $this->options->get('nophp', array()),
             )
         );
     }
@@ -336,8 +316,8 @@ class Lighttpd implements ServerInterface
     public function rotate($clear = false, Filesystem $filesystem = null)
     {
         $directories = array(
-            $this->options->get('cache_dir'),
-            $this->options->get('log_dir'),
+            $this->getCacheDir(),
+            $this->getLogDir(),
         );
 
         $filesystem = $filesystem ?: new Filesystem();
@@ -482,8 +462,23 @@ class Lighttpd implements ServerInterface
         return $this->project;
     }
 
+    /**
+     * Return the lighttpd cache directory.
+     *
+     * @return string
+     */
     public function getCacheDir()
     {
         return $this->project->getCacheDir().'/'.$this->name;
+    }
+
+    /**
+     * Return the lighttpd log directory.
+     *
+     * @return string
+     */
+    public function getLogDir()
+    {
+        return $this->project->getLogDir().'/'.$this->name;
     }
 }

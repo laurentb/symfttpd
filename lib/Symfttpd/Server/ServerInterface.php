@@ -38,14 +38,6 @@ interface ServerInterface
     public function __construct(ProjectInterface $project, TwigRenderer $renderer, Loader $loader, Writer $writer, OptionBag $options);
 
     /**
-     * Set up the options of the server.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function setup();
-
-    /**
      * Return the command that will run the server.
      * It is lighttpd for the Lighttpd server for example.
      *
