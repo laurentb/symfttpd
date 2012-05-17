@@ -99,13 +99,6 @@ class Lighttpd implements ServerInterface
     protected $rules;
 
     /**
-     * The directory of the project.
-     *
-     * @var string
-     */
-    protected $workingDir;
-
-    /**
      * Constructor class
      *
      * @param \Symfttpd\Project\ProjectInterface $project
