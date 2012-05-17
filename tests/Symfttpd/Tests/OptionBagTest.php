@@ -9,9 +9,9 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Tests\Configuration;
+namespace Symfttpd\Tests;
 
-use Symfttpd\Configuration\OptionBag;
+use Symfttpd\OptionBag;
 
 /**
  * OptionBagTest class

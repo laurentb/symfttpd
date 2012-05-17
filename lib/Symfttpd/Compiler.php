@@ -56,22 +56,10 @@ class Compiler
             ->name('*.php')
             ->in(__DIR__.'/../../vendor/symfony')
             ->in(__DIR__.'/../../vendor/twig')
+            ->in(__DIR__.'/../../vendor/pimple')
             ->exclude(__DIR__.'/../../vendor/twig/doc')
-            ->exclude(__DIR__.'/../../vendor/twig/test');
-
-        foreach ($finder as $file) {
-            $this->addFile($phar, $file);
-        }
-
-        // Add vendors
-        $finder = new Finder();
-        $finder->files()
-            ->ignoreVCS(true)
-            ->name('*.php')
-            ->in(__DIR__.'/../../vendor/symfony')
-            ->in(__DIR__.'/../../vendor/twig')
-            ->exclude(__DIR__.'/../../vendor/twig/doc')
-            ->exclude(__DIR__.'/../../vendor/twig/test');
+            ->exclude(__DIR__.'/../../vendor/twig/test')
+            ->exclude(__DIR__.'/../../vendor/pimple/test');
 
         foreach ($finder as $file) {
             $this->addFile($phar, $file);

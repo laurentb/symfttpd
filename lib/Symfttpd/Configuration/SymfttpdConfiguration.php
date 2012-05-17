@@ -11,7 +11,7 @@
 
 namespace Symfttpd\Configuration;
 
-use Symfttpd\Configuration\OptionBag;
+use Symfttpd\OptionBag;
 use Symfttpd\Exception\ExecutableNotFoundException;
 
 /**

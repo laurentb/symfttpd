@@ -16,33 +16,43 @@ namespace Symfttpd\Renderer;
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class TwigRenderer implements RendererInterface
+class TwigRenderer
 {
     /**
-     * {@inheritdoc}
+     * @var \Twig_Environment
      */
-    public function render($skeletonDir, $template, $parameters = array())
+    protected $twig;
+
+    /**
+     * Constructor.
+     *
+     * @param \Twig_Environment $twig
+     */
+    public function __construct(\Twig_Environment $twig)
     {
-        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem($skeletonDir), array(
-            'debug'            => true,
-            'cache'            => false,
-            'strict_variables' => true,
-            'autoescape'       => false,
-        ));
-
-        $twig->addFunction('sys_get_temp_dir', new \Twig_Function_Function('sys_get_temp_dir'));
-        $twig->addFunction('in_array', new \Twig_Function_Function('in_array'));
-
-        $twig->addFilter('preg_quote', new \Twig_Filter_Function('preg_quote'));
-
-        return $twig->render($template, $parameters);
+        $this->twig = $twig;
     }
 
     /**
-     * {@inheritdoc}
+     * Render a template.
+     *
+     * @param $template
+     * @param array $parameters
+     * @return string
      */
-    public function renderFile($skeletonDir, $template, $target, $parameters = array())
+    public function render($template, $parameters = array())
     {
-        file_put_contents($target, $this->render($skeletonDir, $template, $parameters));
+        return $this->twig->render($template, $parameters);
+    }
+
+    /**
+     * Add a path in the twig loader.
+     *
+     * @param $path
+     * @return mixed
+     */
+    public function addPath($path)
+    {
+        return $this->twig->getLoader()->addPath($path);
     }
 }

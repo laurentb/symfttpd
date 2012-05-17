@@ -15,11 +15,11 @@ use Symfttpd\Server\ServerInterface;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\Exception\ServerException;
 use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\Configuration\OptionBag;
-use Symfttpd\Renderer\RendererInterface;
+use Symfttpd\OptionBag;
 use Symfttpd\Renderer\TwigRenderer;
+use Symfttpd\Loader;
+use Symfttpd\Writer;
 use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Configuration\ConfigurationInterface;
 use Symfttpd\Configuration\Exception\ConfigurationException;
 use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfony\Component\Process\ExecutableFinder;
@@ -102,7 +102,7 @@ class Lighttpd implements ServerInterface
     public $project;
 
     /**
-     * @var RendererInterface
+     * @var TwigRenderer
      */
     public $renderer;
 
@@ -110,15 +110,22 @@ class Lighttpd implements ServerInterface
      * Constructor class
      *
      * @param null $workingDir
-     * @param null|\Symfttpd\Configuration\OptionBag $options
+     * @param null|\Symfttpd\OptionBag $options
      */
-    public function __construct(ProjectInterface $project, OptionBag $options = null, RendererInterface $renderer = null)
+    public function __construct(ProjectInterface $project, TwigRenderer $renderer, OptionBag $options = null)
     {
-        $this->project = $project;
-        $this->options = $options ?: new OptionBag();
-        $this->renderer = $renderer ?: new TwigRenderer();
+        $this->project  = $project;
+        $this->renderer = $renderer;
+        $this->options  = $options ?: new OptionBag();
+
+        // @todo thinking about injection... Pimple ?
+        $this->loader = new Loader();
+        $this->writer = new Writer();
 
         $this->setup();
+
+        $this->rulesFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->rulesFilename;
+        $this->configFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->configFilename;
 
         $this->options->set('pidfile', $this->options->get('cache_dir').'/.sf');
         $this->options->set('restartfile', $this->options->get('cache_dir').'/.symfttpd_restart');
@@ -151,10 +158,13 @@ class Lighttpd implements ServerInterface
      *
      * @param string $separator
      * @return string
+     * @throws \Symfttpd\Exception\LoaderException
      */
     public function read($separator = PHP_EOL)
     {
-        return $this->readConfiguration().$separator.$this->readRules();
+        return $this->readConfiguration() .
+            $separator .
+            $this->readRules();
     }
 
     /**
@@ -163,23 +173,13 @@ class Lighttpd implements ServerInterface
      * if needed.
      *
      * @return string
-     * @throws Exception\ConfigurationException
+     * @throws \Symfttpd\Exception\LoaderException
      */
     public function readConfiguration()
     {
-        if (null !== $this->lighttpdConfig) {
-            return $this->lighttpdConfig;
+        if (null == $this->lighttpdConfig) {
+            $this->lighttpdConfig = $this->loader->load($this->configFile);
         }
-
-        if (null == $this->configFile) {
-            $this->configFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->configFilename;
-        }
-
-        if (false == file_exists($this->getConfigFile())) {
-            throw new ConfigurationException('The lighttpd configuration has not been generated.');
-        }
-
-        $this->lighttpdConfig = file_get_contents($this->getConfigFile());
 
         return $this->lighttpdConfig;
     }
@@ -190,23 +190,13 @@ class Lighttpd implements ServerInterface
      * if needed.
      *
      * @return string
-     * @throws Exception\ConfigurationException
+     * @throws \Symfttpd\Exception\LoaderException
      */
     public function readRules()
     {
-        if (null !== $this->rules) {
-            return $this->rules;
+        if (null == $this->rules) {
+            $this->rules = $this->loader->load($this->rulesFile);
         }
-
-        if (null == $this->rulesFile) {
-            $this->rulesFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->rulesFilename;
-        }
-
-        if (false == file_exists($this->rulesFile)) {
-            throw new ConfigurationException('The rules configuration has not been generated.');
-        }
-
-        $this->rules = file_get_contents($this->rulesFile);
 
         return $this->rules;
     }
@@ -214,59 +204,45 @@ class Lighttpd implements ServerInterface
     /**
      * Write the configurations files.
      *
-     * @param bool $force If false, does not overwrite the existing files.
-     * @throws \Symfttpd\Configuration\Exception\ConfigurationException
+     * @param string $type
+     * @param bool $force
      */
-    public function write($force = false)
+    public function write($type = 'all', $force = false)
     {
-        $file = '';
-        $type = count(func_get_args()) > 0 ? func_get_arg(0) : 'all';
-
         switch ($type) {
             case 'config':
             case 'configuration':
-                $file = $this->configFile;
-                $content = $this->lighttpdConfig;
+                $this->writer->write($this->lighttpdConfig, $this->configFile, $force);
                 break;
             case 'rules':
-                $file = $this->rulesFile;
-                $content = $this->rules;
+                $this->writer->write($this->rules, $this->rulesFile, $force);
                 break;
             case 'all':
             default:
-                $this->write('config');
-                $this->write('rules');
+                $this->write('config', true);
+                $this->write('rules', true);
                 break;
-        }
-
-        // Don't rewrite existing configuration if not forced to.
-        if (false === $force && file_exists($file)) {
-            return;
-        }
-
-        if ($type !== 'all' && false === file_put_contents($file, $content)) {
-            throw new ConfigurationException(sprintf("Cannot generate the lighttpd %s file.", $type));
         }
     }
 
     /**
      * Write the configuration file.
      *
-     * @throws Exception\ConfigurationException
+     * @param bool $force
      */
-    public function writeConfiguration()
+    public function writeConfiguration($force = false)
     {
-        $this->write('config');
+        $this->write('config', $force);
     }
 
     /**
      * Write the rules configuration file.
      *
-     * @throws Exception\ConfigurationException
+     * @param bool $force
      */
-    public function writeRules()
+    public function writeRules($force = false)
     {
-        $this->write('rules');
+        $this->write('rules', $force);
     }
 
     /**
@@ -290,7 +266,6 @@ class Lighttpd implements ServerInterface
     public function generateConfiguration(SymfttpdConfiguration $configuration)
     {
         $this->lighttpdConfig = $this->renderer->render(
-            $this->getTemplateDir(),
             $this->configFilename.'.twig',
             array(
                 'document_root' => $this->options->get('document_root'),
@@ -299,11 +274,10 @@ class Lighttpd implements ServerInterface
                 'error_log'     => $this->options->get('log_dir').'/error.log',
                 'access_log'    => $this->options->get('log_dir').'/access.log',
                 'pidfile'       => $this->getPidfile(),
-                'rules_file'    => $this->getRulesFile(),
+                'rules_file'    => null !== $this->rules ? $this->getRulesFile() : null,
                 'php_cgi_cmd'   => $configuration->get('php_cgi_cmd'),
             )
         );
-        $this->configFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->configFilename;
     }
 
     /**
@@ -314,7 +288,6 @@ class Lighttpd implements ServerInterface
     public function generateRules(SymfttpdConfiguration $configuration)
     {
         $this->rules = $this->renderer->render(
-            $this->getTemplateDir(),
             $this->rulesFilename.'.twig',
             array(
                 'dirs'    => $this->options->get('dirs'),
@@ -324,10 +297,11 @@ class Lighttpd implements ServerInterface
                 'nophp'   => $this->options->get('nophp'),
             )
         );
-        $this->rulesFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->rulesFilename;
     }
 
     /**
+     * Return the lighttpd templates directory.
+     *
      * @return string
      */
     public function getTemplateDir()

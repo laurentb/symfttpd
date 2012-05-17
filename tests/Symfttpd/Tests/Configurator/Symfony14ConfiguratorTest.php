@@ -24,7 +24,7 @@ class Symfony14ConfiguratorTest extends BaseTestCase
     {
         parent::setUp();
 
-        $this->project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\Configuration\OptionBag());
+        $this->project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\OptionBag());
 
         $this->filesystem = new Filesystem();
         $this->cleanUp();

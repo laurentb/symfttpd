@@ -9,42 +9,85 @@
 namespace Symfttpd;
 
 use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Factory;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfttpd\Renderer\TwigRenderer;
+use Symfttpd\Renderer\TwigExtension;
 
 /**
  * Symfttpd class
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class Symfttpd
+class Symfttpd extends \Pimple
 {
     const VERSION = '2.0.0-beta';
-
-    /**
-     * @var \Symfttpd\Configuration\SymfttpdConfiguration
-     */
-    protected $configuration;
-
-    /**
-     * @var \Symfttpd\Project\ProjectInterface
-     */
-    protected $project;
-
-    /**
-     * @var \Symfttpd\Server\ServerInterface
-     */
-    protected $server;
 
     /**
      * @param Configuration\SymfttpdConfiguration $configuration
      */
     public function __construct(SymfttpdConfiguration $configuration = null)
     {
-        $this->configuration = $configuration ?: new SymfttpdConfiguration();
+        $container = $this;
+
+        if (null == $configuration) {
+          $configuration = new SymfttpdConfiguration();
+        }
+
+        $this['configuration'] = $configuration;
+
+        $this['project'] = $this->share(function ($c) use ($container) {
+            $config  = $container['configuration'];
+            $type    = $config->getProjectType();
+            $version = $config->getProjectVersion();
+
+            $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type).str_replace(array('.', '-', 'O'), '', $version));
+
+            if (!class_exists($class)) {
+                throw new \InvalidArgumentException(sprintf('"%s" in version "%s" is not supported.', $type, $version));
+            }
+
+            return new $class(new OptionBag($config->getProjectOptions()), getcwd());
+        });
+
+        $this['server'] = $this->share(function ($c) use ($container) {
+            $config = $container['configuration'];
+            $type   = $config->getServerType();
+
+            $class = sprintf('Symfttpd\\Server\\%s', ucfirst($type));
+
+            if (!class_exists($class)) {
+                throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
+            }
+
+            $server = new $class($container['project'], $container['renderer']);
+
+            // BC with the 1.0 configuration version
+            if ($server instanceof \Symfttpd\Server\Lighttpd && $config->has('lighttpd_cmd')) {
+                $server->setCommand($config->get('lighttpd_cmd'));
+            }
+
+            return $server;
+        });
+
+        $this['twig'] = $this->share(function ($c) use ($container) {
+            $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(array(__DIR__.'/Resources')), array(
+                'debug'            => true,
+                'strict_variables' => true,
+                'auto_reload'      => true,
+                'cache'            => false,
+            ));
+
+            $twig->addExtension(new TwigExtension());
+
+            return $twig;
+        });
+
+        $this['renderer'] = $this->share(function ($c) use ($container) {
+            return new TwigRenderer($container['twig']);
+        });
     }
 
     /**
@@ -54,7 +97,7 @@ class Symfttpd
      */
     public function getConfiguration()
     {
-        return $this->configuration;
+        return $this['configuration'];
     }
 
     /**
@@ -64,18 +107,7 @@ class Symfttpd
      */
     public function getProject()
     {
-        if (null == $this->project) {
-            $this->project = Factory::createProject(
-                $this->configuration->getProjectType(),
-                $this->configuration->getProjectVersion(),
-                $this->configuration->getProjectOptions()
-            );
-
-            // The root directory is where Symfttpd is running.
-            $this->project->setRootDir(getcwd());
-        }
-
-        return $this->project;
+        return $this['project'];
     }
 
     /**
@@ -86,37 +118,7 @@ class Symfttpd
      */
     public function getServer()
     {
-        if (null == $this->server) {
-            $this->server = Factory::createServer($this->configuration->getServerType(), $this->getProject());
-
-            // BC with the 1.0 configuration version
-            if ($this->server instanceof \Symfttpd\Server\Lighttpd
-                && $this->configuration->has('lighttpd_cmd')) {
-                $this->server->setCommand($this->configuration->get('lighttpd_cmd'));
-            }
-        }
-
-        return $this->server;
-    }
-
-    /**
-     * Set the project.
-     *
-     * @param \Symfttpd\Project\ProjectInterface $project
-     */
-    public function setProject($project)
-    {
-        $this->project = $project;
-    }
-
-    /**
-     * Set the server.
-     *
-     * @param \Symfttpd\Server\ServerInterface $server
-     */
-    public function setServer($server)
-    {
-        $this->server = $server;
+        return $this['server'];
     }
 
     /**
@@ -138,7 +140,7 @@ class Symfttpd
      */
     protected function findPhpCmd()
     {
-        if (false === $this->configuration->has('php_cmd')) {
+        if (false === $this['configuration']->has('php_cmd')) {
             $phpFinder = new PhpExecutableFinder();
             $cmd = $phpFinder->find();
 
@@ -146,7 +148,7 @@ class Symfttpd
                 throw new \Symfttpd\Exception\ExecutableNotFoundException('php executable not found');
             }
 
-            $this->configuration->set('php_cmd', $cmd);
+            $this['configuration']->set('php_cmd', $cmd);
         }
     }
 
@@ -158,7 +160,7 @@ class Symfttpd
      */
     protected function findPhpCgiCmd()
     {
-        if (false === $this->configuration->has('php_cgi_cmd')) {
+        if (false === $this['configuration']->has('php_cgi_cmd')) {
             $exeFinder = new ExecutableFinder();
             $exeFinder->addSuffix('');
             $cmd = $exeFinder->find('php-cgi');
@@ -167,7 +169,7 @@ class Symfttpd
                 throw new \Symfttpd\Exception\ExecutableNotFoundException('php-cgi executable not found.');
             }
 
-            $this->configuration->set('php_cgi_cmd', $cmd);
+            $this['configuration']->set('php_cgi_cmd', $cmd);
         }
     }
 }

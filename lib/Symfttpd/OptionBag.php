@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Configuration;
+namespace Symfttpd;
 
 /**
  * OptionBag class

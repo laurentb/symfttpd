@@ -24,7 +24,7 @@ class TestProject extends \Symfttpd\Project\BaseProject
 
     protected $filesystem;
 
-    public function __construct(\Symfttpd\Configuration\OptionBag $options, $path = null)
+    public function __construct(\Symfttpd\OptionBag $options, $path = null)
     {
         if (null == $path) {
             $path = sys_get_temp_dir().'/symfttpd-project-test';

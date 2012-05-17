@@ -24,7 +24,7 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->project = new Symfony1(new \Symfttpd\Configuration\OptionBag());
+        $this->project = new Symfony1(new \Symfttpd\OptionBag());
     }
 
     /**
