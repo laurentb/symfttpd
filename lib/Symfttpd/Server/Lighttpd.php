@@ -16,7 +16,6 @@ use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\Exception\ServerException;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\OptionBag;
-use Symfttpd\Renderer\TwigRenderer;
 use Symfttpd\Loader;
 use Symfttpd\Writer;
 use Symfttpd\Configuration\SymfttpdConfiguration;
@@ -37,9 +36,9 @@ class Lighttpd implements ServerInterface
     public $project;
 
     /**
-     * @var TwigRenderer
+     * @var \Twig_Environment
      */
-    public $renderer;
+    public $twig;
 
     /**
      * @var \Symfttpd\Loader
@@ -109,18 +108,21 @@ class Lighttpd implements ServerInterface
      * Constructor class
      *
      * @param \Symfttpd\Project\ProjectInterface $project
-     * @param \Symfttpd\Renderer\TwigRenderer $renderer
+     * @param \Twig_Environment $twig
      * @param \Symfttpd\Loader $loader
      * @param \Symfttpd\Writer $writer
      * @param \Symfttpd\OptionBag $options
      */
-    public function __construct(ProjectInterface $project, TwigRenderer $renderer, Loader $loader, Writer $writer, OptionBag $options)
+    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
     {
         $this->project  = $project;
-        $this->renderer = $renderer;
+        $this->twig = $twig;
         $this->options  = $options;
         $this->loader   = $loader;
         $this->writer   = $writer;
+
+        // Add the lighttpd templates directory to twig loader.
+        $this->twig->getLoader()->addPath(__DIR__.'/../Resources/templates/lighttpd');
 
         $this->rotate();
     }
@@ -270,8 +272,8 @@ class Lighttpd implements ServerInterface
      */
     public function generateConfiguration(SymfttpdConfiguration $configuration)
     {
-        $this->lighttpdConfig = $this->renderer->render(
-            $this->configFilename.'.twig',
+        $this->lighttpdConfig = $this->twig->render(
+            $this->name.'/'.$this->configFilename.'.twig',
             array(
                 'document_root' => $this->project->getWebDir(),
                 'port'          => $this->options->get('port'),
@@ -286,14 +288,14 @@ class Lighttpd implements ServerInterface
     }
 
     /**
-     * Generate the lighttpd rules configuration.
+     * Generate the lighttpd rewrite rules.
      */
     public function generateRules()
     {
         $this->project->scan();
 
-        $this->rules = $this->renderer->render(
-            $this->rulesFilename.'.twig',
+        $this->rules = $this->twig->render(
+            $this->name.'/'.$this->rulesFilename.'.twig',
             array(
                 'dirs'    => $this->project->readableDirs,
                 'files'   => $this->project->readableFiles,

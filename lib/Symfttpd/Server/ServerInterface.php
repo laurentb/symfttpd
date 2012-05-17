@@ -12,7 +12,6 @@
 namespace Symfttpd\Server;
 
 use Symfttpd\Project\ProjectInterface;
-use Symfttpd\Renderer\TwigRenderer;
 use Symfttpd\Loader;
 use Symfttpd\Writer;
 use Symfttpd\OptionBag;
@@ -30,13 +29,13 @@ interface ServerInterface
     /**
      * Server constructor.
      *
-     * @param ProjectInterface $project
-     * @param TwigRenderer $renderer
-     * @param Loader $loader
-     * @param Writer $writer
-     * @param OptionBag $options
+     * @param \Symfttpd\Project\ProjectInterface $project
+     * @param \Twig_Environment $twig
+     * @param \Symfttpd\Loader $loader
+     * @param \Symfttpd\Writer $writer
+     * @param \Symfttpd\OptionBag $options
      */
-    public function __construct(ProjectInterface $project, TwigRenderer $renderer, Loader $loader, Writer $writer, OptionBag $options);
+    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options);
 
     /**
      * Return the command that will run the server.

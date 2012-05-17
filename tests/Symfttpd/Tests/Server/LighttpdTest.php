@@ -12,8 +12,7 @@
 namespace Symfttpd\Tests\Server;
 
 use Symfttpd\Server\Lighttpd;
-use Symfttpd\Renderer\TwigRenderer;
-use Symfttpd\Renderer\TwigExtension;
+use Symfttpd\TwigExtension;
 
 /**
  * LighttpdTest class
@@ -30,9 +29,8 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd')));
-        $twig->addExtension(new TwigExtension());
-        $this->renderer = new TwigRenderer($twig);
+        $this->renderer = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates')));
+        $this->renderer->addExtension(new TwigExtension());
 
         $this->server = $this->createLighttpd(true);
     }

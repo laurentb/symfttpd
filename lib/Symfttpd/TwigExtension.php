@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Renderer;
+namespace Symfttpd;
 
 /**
  * Class TwigExtension description
