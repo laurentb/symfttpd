@@ -1,12 +1,8 @@
 {
     "name": "laurentb/symfttpd",
     "description": "PHP webserver",
-    "keywords": [
-        "symfony",
-        "server",
-        "webserver"
-    ],
-    "type": "project",
+    "keywords": ["symfony", "server", "webserver"],
+    "type": "library",
     "authors": [
         {
             "name":     "Laurent Bachelier",
@@ -21,11 +17,11 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/console":    "dev-master",
-        "symfony/process":    "dev-master",
-        "symfony/finder":     "dev-master",
-        "symfony/filesystem": "dev-master",
-        "twig/twig":          "v1.8.0",
+        "symfony/console":    "2.1.*",
+        "symfony/process":    "2.1.*",
+        "symfony/finder":     "2.0.13",
+        "symfony/filesystem": "2.1.*",
+        "twig/twig":          ">=1.8,<2.0-dev",
         "pimple/pimple":      "1.0.0"
     },
     "autoload": {
@@ -33,7 +29,10 @@
             "Symfttpd": "lib/"
         }
     },
-    "bin": [
-        "bin/symfttpd"
-    ]
+    "bin": ["bin/symfttpd"],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.0"
+        }
+    }
 }
