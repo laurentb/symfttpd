@@ -75,8 +75,10 @@ class SpawnCommand extends Command
         // Kill other running server in the current project.
         if (true == $input->getOption('kill')) {
             // Kill existing symfttpd instance if found.
-            $server->removeRestartFile();
-            \Symfttpd\Utils\PosixTools::killPid($server->getPidfile(), $output);
+            if (file_exists($server->getRestartFile())) {
+                \Symfttpd\Utils\PosixTools::killPid($server->getPidfile(), $output);
+                unlink($server->getRestartFile());
+            }
         }
 
         // Creates the server configuration.
@@ -93,7 +95,7 @@ class SpawnCommand extends Command
         $host = in_array($bind, array(false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
 
         $apps = array();
-        foreach ($this->getSymfttpd()->getProject()->readablePhpFiles as $file) {
+        foreach ($server->getProject()->readablePhpFiles as $file) {
             if (preg_match('/.+\.php$/', $file)) {
                 $apps[$file] = ' http://' . $host . ':' . $server->options->get('port') . '/<info>' . $file . '</info>';
             }
@@ -209,8 +211,7 @@ TEXT;
         $prevGenconf = null;
         while (false !== sleep(1)) {
             // Generate the configuration file.
-            $server->generateRules();
-            $genconf = $server->readRules();
+            $genconf = $server->generateRules();
 
             if ($prevGenconf !== null && $prevGenconf !== $genconf) {
                 // This sleep() is so that if a HTTP request just created a file in web/,

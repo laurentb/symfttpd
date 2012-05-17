@@ -128,6 +128,16 @@ class Lighttpd implements ServerInterface
     }
 
     /**
+     * Return the project.
+     *
+     * @return \Symfttpd\Project\ProjectInterface
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /**
      * Return the restartfile.
      *
      * If the server configuration (rules or base configuration)
@@ -268,7 +278,8 @@ class Lighttpd implements ServerInterface
     /**
      * Generate the lighttpd configuration file.
      *
-     * @param SymfttpdConfiguration $configuration
+     * @param \Symfttpd\Configuration\SymfttpdConfiguration $configuration
+     * @return string
      */
     public function generateConfiguration(SymfttpdConfiguration $configuration)
     {
@@ -285,10 +296,14 @@ class Lighttpd implements ServerInterface
                 'php_cgi_cmd'   => $configuration->get('php_cgi_cmd'),
             )
         );
+
+        return $this->lighttpdConfig;
     }
 
     /**
      * Generate the lighttpd rewrite rules.
+     *
+     * @return string
      */
     public function generateRules()
     {
@@ -304,6 +319,8 @@ class Lighttpd implements ServerInterface
                 'nophp'   => $this->options->get('nophp', array()),
             )
         );
+
+        return $this->rules;
     }
 
     /**

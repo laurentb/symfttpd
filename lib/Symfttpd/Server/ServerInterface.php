@@ -38,6 +38,14 @@ interface ServerInterface
     public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options);
 
     /**
+     * Return the project.
+     *
+     * @abstract
+     * @return \Symfttpd\Project\ProjectInterface
+     */
+    public function getProject();
+
+    /**
      * Return the command that will run the server.
      * It is lighttpd for the Lighttpd server for example.
      *
@@ -47,6 +55,8 @@ interface ServerInterface
     public function getCommand();
 
     /**
+     * Set the command that runs the server.
+     *
      * @abstract
      * @param $command
      * @return mixed
@@ -54,13 +64,31 @@ interface ServerInterface
     public function setCommand($command);
 
     /**
-     * Read the configuration.
+     * Generate the configuration file of the server
+     * and the rewrite rules.
      *
      * @abstract
      * @param SymfttpdConfiguration $configuration
-     * @return mixed
+     * @return string
      */
     public function generate(SymfttpdConfiguration $configuration);
+
+    /**
+     * Generate the rewrite rules.
+     *
+     * @abstract
+     * @return string
+     */
+    public function generateRules();
+
+    /**
+     * Generate the configuration file for the server.
+     *
+     * @abstract
+     * @param \Symfttpd\Configuration\SymfttpdConfiguration $configuration
+     * @return string
+     */
+    public function generateConfiguration(SymfttpdConfiguration $configuration);
 
     /**
      * Write the configuration in the directory.
@@ -70,6 +98,22 @@ interface ServerInterface
      * @throws Exception\ConfigurationException
      */
     public function write();
+
+    /**
+     * Write the rewrite rules.
+     *
+     * @abstract
+     * @return mixed
+     */
+    public function writeRules();
+
+    /**
+     * Write the configuration file.
+     *
+     * @abstract
+     * @return mixed
+     */
+    public function writeConfiguration();
 
     /**
      * Run the server command to start it.
@@ -83,7 +127,7 @@ interface ServerInterface
      * Return the restart file path.
      *
      * @abstract
-     * @return mixed
+     * @return string
      */
     public function getRestartFile();
 
@@ -92,7 +136,15 @@ interface ServerInterface
      * the pid of the process of the server.
      *
      * @abstract
-     * @return mixed
+     * @return string
      */
     public function getPidfile();
+
+    /**
+     * Return the log directory of the server.
+     *
+     * @abstract
+     * @return string
+     */
+    public function getLogDir();
 }
