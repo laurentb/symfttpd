@@ -100,10 +100,10 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new SymfttpdConfiguration(array(
             'want' => null,
             'project_type' => 'foo',
-            'project_version' => '1.4',
+            'project_version' => '1',
         ));
 
-        $this->assertEquals('1.4', $configuration->getProjectVersion());
+        $this->assertEquals('1', $configuration->getProjectVersion());
     }
 
     public function testGetProjectVersionBC()
@@ -114,7 +114,7 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
             'project_version' => null,
         ));
 
-        $this->assertEquals('1.4', $configuration->getProjectVersion());
+        $this->assertEquals('1', $configuration->getProjectVersion());
     }
 
 

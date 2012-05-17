@@ -100,7 +100,7 @@ class SymfttpdConfiguration extends OptionBag
         // BC with the 1.0 configuration version
         if (true == $this->has('want')
             && false == $this->has('project_version')) {
-            return $this->get('want');
+            return substr($this->get('want'), 0, 1);
         }
 
         if (false == $this->has('project_version')) {
