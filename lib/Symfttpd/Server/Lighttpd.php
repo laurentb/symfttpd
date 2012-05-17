@@ -107,20 +107,28 @@ class Lighttpd implements ServerInterface
     public $renderer;
 
     /**
+     * @var \Symfttpd\Loader
+     */
+    public $loader;
+
+    /**
+     * @var \Symfttpd\Writer
+     */
+    public $writer;
+
+    /**
      * Constructor class
      *
      * @param null $workingDir
      * @param null|\Symfttpd\OptionBag $options
      */
-    public function __construct(ProjectInterface $project, TwigRenderer $renderer, OptionBag $options = null)
+    public function __construct(ProjectInterface $project, TwigRenderer $renderer, Loader $loader, Writer $writer, OptionBag $options)
     {
         $this->project  = $project;
         $this->renderer = $renderer;
-        $this->options  = $options ?: new OptionBag();
-
-        // @todo thinking about injection... Pimple ?
-        $this->loader = new Loader();
-        $this->writer = new Writer();
+        $this->options  = $options;
+        $this->loader   = $loader;
+        $this->writer   = $writer;
 
         $this->setup();
 

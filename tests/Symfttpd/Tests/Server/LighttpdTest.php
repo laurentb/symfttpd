@@ -30,7 +30,11 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->server = new Lighttpd($this->getProject(), $this->getRenderer(), $this->getOptions());
+        $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd')));
+        $twig->addExtension(new TwigExtension());
+        $this->renderer = new TwigRenderer($twig);
+
+        $this->server = $this->createLighttpd();
     }
 
     public function tearDown()
@@ -111,7 +115,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
         $this->server->writeRules(true);
 
-        $lighttpd = new Lighttpd($this->getProject(false), $this->getRenderer(), $this->getOptions());
+        $lighttpd = $this->createLighttpd(false);
         $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
     }
 
@@ -120,7 +124,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generateConfiguration($this->getSymfttpdConfiguration());
         $this->server->writeConfiguration(true);
 
-        $lighttpd = new Lighttpd($this->getProject(false), $this->getRenderer(), $this->getOptions());
+        $lighttpd = $this->createLighttpd(false);
         $this->assertEquals($this->getGeneratedConfiguration(), $lighttpd->readConfiguration());
     }
 
@@ -129,7 +133,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->generate($this->getSymfttpdConfiguration());
         $this->server->write('all', true);
 
-        $lighttpd = new Lighttpd($this->getProject(false), $this->getRenderer(), $this->getOptions());
+        $lighttpd = $this->createLighttpd(false);
         $this->assertEquals($this->getGeneratedConfiguration(true), $lighttpd->readConfiguration());
         $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
         $this->assertEquals($this->getGeneratedConfiguration(true) . PHP_EOL . $this->getGeneratedRules(), $lighttpd->read());
@@ -140,7 +144,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadRulesFromFileException()
     {
-        $lighttpd = new Lighttpd($this->getProject(), $this->getRenderer(), $this->getOptions());;
+        $lighttpd = $this->createLighttpd();
         $lighttpd->rotate(true);
         $lighttpd->readRules();
     }
@@ -150,7 +154,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
      */
     public function testReadConfigFromFileException()
     {
-        $lighttpd = new Lighttpd($this->getProject(), $this->getRenderer(), $this->getOptions());;
+        $lighttpd = $this->createLighttpd();
         $lighttpd->rotate();
         $lighttpd->readConfiguration();
     }
@@ -268,7 +272,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
             $rules = $baseDir . '/cache/lighttpd/rules.conf';
         }
 
-        return $this->getRenderer()->render(
+        return $this->renderer->render(
             'lighttpd.conf.twig',
             array(
                 'document_root' => $baseDir.'/web',
@@ -285,7 +289,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function getGeneratedRules()
     {
-        return $this->getRenderer()->render(
+        return $this->renderer->render(
             'rules.conf.twig',
             array(
                 'dirs'    => array('css', 'js'),
@@ -297,14 +301,14 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function getRenderer()
+    public function createLighttpd($reset = true)
     {
-        if (null == $this->renderer) {
-            $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates/lighttpd')));
-            $twig->addExtension(new TwigExtension());
-            $this->renderer = new TwigRenderer($twig);
-        }
-
-        return $this->renderer;
+        return new Lighttpd(
+            $this->getProject($reset),
+            $this->renderer,
+            new \Symfttpd\Loader(),
+            new \Symfttpd\Writer(),
+            $this->getOptions()
+        );
     }
 }
