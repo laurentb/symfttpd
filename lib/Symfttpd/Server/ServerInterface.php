@@ -88,13 +88,6 @@ interface ServerInterface
     public function getRestartFile();
 
     /**
-     * Delete the restart file if exists.
-     *
-     * @abstract
-     */
-    public function removeRestartFile();
-
-    /**
      * Return the pidfile which contains
      * the pid of the process of the server.
      *

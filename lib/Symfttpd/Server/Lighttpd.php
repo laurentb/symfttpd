@@ -33,22 +33,22 @@ class Lighttpd implements ServerInterface
     /**
      * @var ProjectInterface
      */
-    public $project;
+    protected $project;
 
     /**
      * @var \Twig_Environment
      */
-    public $twig;
+    protected $twig;
 
     /**
      * @var \Symfttpd\Loader
      */
-    public $loader;
+    protected $loader;
 
     /**
      * @var \Symfttpd\Writer
      */
-    public $writer;
+    protected $writer;
 
     /**
      * The server options :
@@ -116,7 +116,7 @@ class Lighttpd implements ServerInterface
     public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
     {
         $this->project  = $project;
-        $this->twig = $twig;
+        $this->twig     = $twig;
         $this->options  = $options;
         $this->loader   = $loader;
         $this->writer   = $writer;
@@ -407,34 +407,26 @@ class Lighttpd implements ServerInterface
 
     /**
      * Start the server.
+     *
+     * @param null|\Symfony\Component\Process\Process $process
      */
-    public function start()
+    public function start(\Symfony\Component\Process\Process $process = null)
     {
         // Remove an possible existing restart file
-        $this->removeRestartFile();
-        $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
-
-        $process = new \Symfony\Component\Process\Process($command, $this->project->getRootDir());
-        $process->setTimeout(null);
-        $process->run();
-    }
-
-    /**
-     * Delete the restart file if exists.
-     */
-    public function removeRestartFile()
-    {
         if (file_exists($this->getRestartFile())) {
             unlink($this->getRestartFile());
         }
-    }
 
-    /**
-     * @return \Symfttpd\Project\ProjectInterface
-     */
-    public function getProject()
-    {
-        return $this->project;
+        if (null == $process) {
+            $process = new \Symfony\Component\Process\Process(null);
+        }
+
+        $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
+
+        $process->setCommandLine($command);
+        $process->setWorkingDirectory($this->project->getRootDir());
+        $process->setTimeout(null);
+        $process->run();
     }
 
     /**
