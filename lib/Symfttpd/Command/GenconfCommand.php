@@ -44,8 +44,20 @@ EOT
         $this->addArgument('type', InputArgument::OPTIONAL, 'The config file type (config, rules, all).', 'rules');
 
         // Configure options.
-        $this->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to /web if not present.');
+        $this->addOption('path', 'p', InputOption::VALUE_OPTIONAL, 'Path of the web directory. Autodected to /web if not present.', getcwd())
+            ->addOption('output', 'o', InputOption::VALUE_NONE, 'Directly output the generated configuration.')
+            ->addOption('port', null, InputOption::VALUE_OPTIONAL, 'The port to listen', 4042)
+            ->addOption('bind', null, InputOption::VALUE_OPTIONAL, 'The address to bind', '127.0.0.1');
     }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        // Don't print the Symfttpd version if ouput option is set.
+        if (null == $input->getOption('output')) {
+            parent::initialize($input, $output);
+        }
+    }
+
 
     /**
      * @param \Symfony\Component\Console\Input\InputInterface $input
@@ -54,48 +66,60 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Starting generating symfttpd configuration.');
-
-        $symfttpd = $this->getSymfttpd();
-
-        $project = $symfttpd->getProject();
-        $project->setRootDir(getcwd());
-        $project->scan();
-
-        $server = $this->getSymfttpd()->getServer();
-
-        if (null !== $input->getOption('path')) {
-            $server->options->set('document_root', $input->getOption('path'));
+        if (true === $input->getOption('output')) {
+            // Set the output to null to not print any comment.
+            $output = new \Symfony\Component\Console\Output\NullOutput();
         }
 
+        $output->writeln('Starting generating symfttpd configuration.');
+
+        $server = $this->getSymfttpd()->getServer();
+        $server->options->set('port', $input->getOption('port'));
+        $server->options->set('bind', $input->getOption('bind'));
+        $server->getProject()->setRootDir($input->getOption('path'));
+
         try {
-            switch ($input->getArgument('type'))
-            {
+            switch ($input->getArgument('type')) {
                 case 'config':
                     $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.',
                         $server->getConfigFilename(),
-                        $server->options->get('cache_dir')
+                        $server->getCacheDir()
                     ));
                     $server->generateConfiguration($this->getSymfttpd()->getConfiguration());
                     break;
                 case 'rules':
                     $output->writeln(sprintf('Generate <comment>%s</comment> in <info>"%s"</info>.',
                         $server->getRulesFilename(),
-                        $server->options->get('cache_dir')
+                        $server->getCacheDir()
                     ));
-                    $server->generateRules($this->getSymfttpd()->getConfiguration());
+                    $server->generateRules();
                     break;
                 default:
                     $output->writeln(sprintf(
                         'Generate <comment>%s</comment> and <comment>%s</comment> in <info>"%s"</info>.',
                         $server->getConfigFilename(),
                         $server->getRulesFilename(),
-                        $server->options->get('cache_dir')
+                        $server->getCacheDir()
                     ));
                     $server->generate($this->getSymfttpd()->getConfiguration());
             }
 
-            $server->write($input->getArgument('type'), true);
+            if (null == $input->getOption('output')) {
+                $server->write($input->getArgument('type'), true);
+            } else {
+                switch ($input->getArgument('type')) {
+                    case 'config':
+                        print $server->readConfiguration().PHP_EOL;
+                        break;
+                    case 'rules':
+                        print $server->readRules().PHP_EOL;
+                        break;
+                    default:
+                        print $server->read().PHP_EOL;
+                        break;
+                }
+            }
+
         } catch (ConfigurationException $e) {
             $output->writeln('<error>An error occured while file generation.</error>');
             $output->writeln('<error>'.$e->getMessage().'</error>');
