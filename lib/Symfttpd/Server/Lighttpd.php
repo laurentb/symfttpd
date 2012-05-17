@@ -116,7 +116,6 @@ class Lighttpd implements ServerInterface
     {
         $this->project  = $project;
         $this->renderer = $renderer;
-        $this->renderer->addPath($this->getTemplateDir());
         $this->options  = $options ?: new OptionBag();
 
         // @todo thinking about injection... Pimple ?
