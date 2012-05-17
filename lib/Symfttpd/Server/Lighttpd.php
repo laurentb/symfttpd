@@ -31,6 +31,36 @@ use Symfony\Component\Process\ExecutableFinder;
  */
 class Lighttpd implements ServerInterface
 {
+    /**
+     * @var ProjectInterface
+     */
+    public $project;
+
+    /**
+     * @var TwigRenderer
+     */
+    public $renderer;
+
+    /**
+     * @var \Symfttpd\Loader
+     */
+    public $loader;
+
+    /**
+     * @var \Symfttpd\Writer
+     */
+    public $writer;
+
+    /**
+     * @var OptionBag
+     */
+    public $options;
+
+    /**
+     * Server name.
+     *
+     * @var string
+     */
     public $name = 'lighttpd';
 
     /**
@@ -55,13 +85,6 @@ class Lighttpd implements ServerInterface
     protected $lighttpdConfig;
 
     /**
-     * The path to the configuration file.
-     *
-     * @var string
-     */
-    protected $configFile;
-
-    /**
      * The file that configures rewriting rules (mainly) for lighttpd.
      *
      * @var string
@@ -76,13 +99,6 @@ class Lighttpd implements ServerInterface
     protected $rules;
 
     /**
-     * The generated rules file used by lighttpd.
-     *
-     * @var string
-     */
-    protected $rulesFile;
-
-    /**
      * The directory of the project.
      *
      * @var string
@@ -90,37 +106,13 @@ class Lighttpd implements ServerInterface
     protected $workingDir;
 
     /**
-     * The collection of configuration options.
-     *
-     * @var OptionBag
-     */
-    public $options;
-
-    /**
-     * @var ProjectInterface
-     */
-    public $project;
-
-    /**
-     * @var TwigRenderer
-     */
-    public $renderer;
-
-    /**
-     * @var \Symfttpd\Loader
-     */
-    public $loader;
-
-    /**
-     * @var \Symfttpd\Writer
-     */
-    public $writer;
-
-    /**
      * Constructor class
      *
-     * @param null $workingDir
-     * @param null|\Symfttpd\OptionBag $options
+     * @param \Symfttpd\Project\ProjectInterface $project
+     * @param \Symfttpd\Renderer\TwigRenderer $renderer
+     * @param \Symfttpd\Loader $loader
+     * @param \Symfttpd\Writer $writer
+     * @param \Symfttpd\OptionBag $options
      */
     public function __construct(ProjectInterface $project, TwigRenderer $renderer, Loader $loader, Writer $writer, OptionBag $options)
     {
@@ -132,11 +124,8 @@ class Lighttpd implements ServerInterface
 
         $this->setup();
 
-        $this->rulesFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->rulesFilename;
-        $this->configFile = $this->options->get('cache_dir').DIRECTORY_SEPARATOR.$this->configFilename;
-
-        $this->options->set('pidfile', $this->options->get('cache_dir').'/.sf');
-        $this->options->set('restartfile', $this->options->get('cache_dir').'/.symfttpd_restart');
+        $this->options->set('pidfile', $this->getCacheDir().'/.sf');
+        $this->options->set('restartfile', $this->getCacheDir().'/.symfttpd_restart');
 
         $this->rotate();
     }
@@ -186,7 +175,7 @@ class Lighttpd implements ServerInterface
     public function readConfiguration()
     {
         if (null == $this->lighttpdConfig) {
-            $this->lighttpdConfig = $this->loader->load($this->configFile);
+            $this->lighttpdConfig = $this->loader->load($this->getConfigFile());
         }
 
         return $this->lighttpdConfig;
@@ -203,7 +192,7 @@ class Lighttpd implements ServerInterface
     public function readRules()
     {
         if (null == $this->rules) {
-            $this->rules = $this->loader->load($this->rulesFile);
+            $this->rules = $this->loader->load($this->getRulesFile());
         }
 
         return $this->rules;
@@ -220,10 +209,18 @@ class Lighttpd implements ServerInterface
         switch ($type) {
             case 'config':
             case 'configuration':
-                $this->writer->write($this->lighttpdConfig, $this->configFile, $force);
+                $this->writer->write(
+                    $this->lighttpdConfig,
+                    $this->getConfigFile(),
+                    $force
+                );
                 break;
             case 'rules':
-                $this->writer->write($this->rules, $this->rulesFile, $force);
+                $this->writer->write(
+                    $this->rules,
+                    $this->getRulesFile(),
+                    $force
+                );
                 break;
             case 'all':
             default:
@@ -365,7 +362,7 @@ class Lighttpd implements ServerInterface
      */
     public function getConfigFile()
     {
-        return $this->configFile;
+        return $this->getCacheDir().'/'.$this->configFilename;
     }
 
     /**
@@ -375,7 +372,7 @@ class Lighttpd implements ServerInterface
      */
     public function getRulesFile()
     {
-        return $this->rulesFile;
+        return $this->getCacheDir().'/'.$this->rulesFilename;
     }
 
     /**
@@ -490,5 +487,10 @@ class Lighttpd implements ServerInterface
     public function getProject()
     {
         return $this->project;
+    }
+
+    public function getCacheDir()
+    {
+        return $this->project->getCacheDir().'/'.$this->name;
     }
 }
