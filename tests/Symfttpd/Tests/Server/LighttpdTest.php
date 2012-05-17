@@ -90,16 +90,6 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->server->getCommand($finder);
     }
 
-    public function testGetConfigurationTemplate()
-    {
-        $this->assertStringEndsWith('Resources/templates/lighttpd/lighttpd.conf.php', $this->server->getConfigurationTemplate());
-    }
-
-    public function testGetRulesTemplate()
-    {
-        $this->assertStringEndsWith('Resources/templates/lighttpd/rules.conf.php', $this->server->getRulesTemplate());
-    }
-
     public function testGetConfigFilename()
     {
         $this->assertEquals('lighttpd.conf', $this->server->getConfigFilename());

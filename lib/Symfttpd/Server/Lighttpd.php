@@ -230,7 +230,7 @@ class Lighttpd implements ServerInterface
      */
     public function generate(SymfttpdConfiguration $configuration)
     {
-        $this->generateRules($configuration);
+        $this->generateRules();
         $this->generateConfiguration($configuration);
     }
 
@@ -258,10 +258,8 @@ class Lighttpd implements ServerInterface
 
     /**
      * Generate the lighttpd rules configuration.
-     *
-     * @param SymfttpdConfiguration $configuration
      */
-    public function generateRules(SymfttpdConfiguration $configuration)
+    public function generateRules()
     {
         $this->project->scan();
 
@@ -275,36 +273,6 @@ class Lighttpd implements ServerInterface
                 'nophp'   => $this->options->get('nophp', array()),
             )
         );
-    }
-
-    /**
-     * Return the lighttpd templates directory.
-     *
-     * @return string
-     */
-    public function getTemplateDir()
-    {
-        return __DIR__ . sprintf('/../Resources/templates/lighttpd');
-    }
-
-    /**
-     * Return the configuration template path.
-     *
-     * @return string
-     */
-    public function getConfigurationTemplate()
-    {
-        return $this->getTemplateDir().sprintf('/%s.php', $this->configFilename);
-    }
-
-    /**
-     * Return the rules template path.
-     *
-     * @return string
-     */
-    public function getRulesTemplate()
-    {
-        return $this->getTemplateDir().sprintf('/%s.php', $this->rulesFilename);
     }
 
     /**
