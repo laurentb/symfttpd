@@ -72,7 +72,7 @@ class Symfttpd extends \Pimple
         });
 
         $this['twig'] = $this->share(function ($c) use ($container) {
-            $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(array(__DIR__.'/Resources')), array(
+            $twig = new \Twig_Environment(new \Twig_Loader_Filesystem(array(__DIR__.'/Resources/templates')), array(
                 'debug'            => true,
                 'strict_variables' => true,
                 'auto_reload'      => true,
