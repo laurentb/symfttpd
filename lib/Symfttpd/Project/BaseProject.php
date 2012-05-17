@@ -81,7 +81,7 @@ abstract class BaseProject implements ProjectInterface
     }
 
     /**
-     * scan readable files, dirs and php executable files
+     * Scan readable files, dirs and php executable files
      * as index.php.
      */
     public function scan()

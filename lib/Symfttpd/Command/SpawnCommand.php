@@ -80,7 +80,7 @@ class SpawnCommand extends Command
         }
 
         // Creates the server configuration.
-        $server->generate($this->getConfiguration());
+        $server->generate($this->getSymfttpd()->getConfiguration());
         $server->write();
 
         if (false == $server->options->get('bind')) {
@@ -126,10 +126,12 @@ TEXT;
 
         $multitail = null;
         if ($input->getOption('tail')) {
-            $logDir = $server->options->get('log_dir');
+            $tailAccess = new Tail($server->getLogDir() . '/' . $server->options->get('access_log', 'access.log'));
+            $tailError  = new Tail($server->getLogDir() . '/' . $server->options->get('error_log', 'error.log'));
+
             $multitail = new MultiTail(new OutputFormatter(true));
-            $multitail->add('access', new Tail($logDir . '/access.log'), new OutputFormatterStyle('blue'));
-            $multitail->add('error', new Tail($logDir . '/error.log'), new OutputFormatterStyle('red', null, array('bold')));
+            $multitail->add('access', $tailAccess, new OutputFormatterStyle('blue'));
+            $multitail->add('error', $tailError, new OutputFormatterStyle('red', null, array('bold')));
             // We have to do it before the fork to capture the startup messages
             $multitail->consume();
         }
@@ -183,8 +185,8 @@ TEXT;
                 $output->writeln('<comment>Something in web/ changed. Restarting lighttpd.</comment>');
 
                 // Regenerate the lighttpd configuration
-                $server->generateConfiguration($this->getSymfttpd()->getConfiguration());
-                $server->writeConfiguration();
+                $server->generate($this->getSymfttpd()->getConfiguration());
+                $server->write();
             }
         } while (file_exists($server->getRestartFile()));
 
@@ -199,16 +201,15 @@ TEXT;
      *
      * @param \Symfttpd\Server\ServerInterface $server
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\TailInterface $multitail
+     * @param null|\Symfttpd\Tail\TailInterface $tail
      */
-    public function watch(ServerInterface $server, OutputInterface $output, TailInterface $multitail = null)
+    public function watch(ServerInterface $server, OutputInterface $output, TailInterface $tail = null)
     {
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
         $prevGenconf = null;
         while (false !== sleep(1)) {
             // Generate the configuration file.
             $server->generateRules();
-            $server->writeRules();
             $genconf = $server->readRules();
 
             if ($prevGenconf !== null && $prevGenconf !== $genconf) {
@@ -221,30 +222,15 @@ TEXT;
 
                 // Kill the current server process.
                 \Symfttpd\Utils\PosixTools::killPid($server->getPidfile(), $output);
+
+                // Write the new rules.
+                $server->writeRules();
             }
             $prevGenconf = $genconf;
 
-            if ($multitail instanceof MultiTail) {
-                $multitail->consume();
+            if ($tail instanceof TailInterface) {
+                $tail->consume();
             }
         }
-    }
-
-    /**
-     * Return the project path.
-     *
-     * @return string
-     */
-    protected function getProjectPath()
-    {
-        return getcwd();
-    }
-
-    /**
-     * @return \Symfttpd\Configuration\SymfttpdConfiguration
-     */
-    public function getConfiguration()
-    {
-        return $this->getSymfttpd()->getConfiguration();
     }
 }
