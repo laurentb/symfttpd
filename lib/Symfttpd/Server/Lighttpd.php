@@ -52,6 +52,13 @@ class Lighttpd implements ServerInterface
     public $writer;
 
     /**
+     * The server options :
+     * - restartfile: the name of the file that tells the server to restart (.symfttpd_restart)
+     * - pidfile:     the pidfile of the lighttpd server (.sf)
+     * - nophp:       the list of files accessibles from the web
+     * - access_log:  the name of the access_log file (access.log)
+     * - error_log:   the name of the error_log file (error.log)
+     *
      * @var OptionBag
      */
     public $options;
@@ -85,7 +92,7 @@ class Lighttpd implements ServerInterface
     protected $lighttpdConfig;
 
     /**
-     * The file that configures rewriting rules (mainly) for lighttpd.
+     * The file that configures rewriting rules for lighttpd.
      *
      * @var string
      */
@@ -129,7 +136,7 @@ class Lighttpd implements ServerInterface
      */
     public function getRestartFile()
     {
-        return $this->getCacheDir().'/.symfttpd_restart';
+        return $this->getCacheDir().'/'.$this->options->get('restartfile', '.symfttpd_restart');
     }
 
     /**
@@ -140,7 +147,7 @@ class Lighttpd implements ServerInterface
      */
     public function getPidfile()
     {
-        return $this->getCacheDir().'/.sf';
+        return $this->getCacheDir().'/'.$this->options->get('restartfile', '.sf');
     }
 
     /**
@@ -269,8 +276,8 @@ class Lighttpd implements ServerInterface
                 'document_root' => $this->project->getWebDir(),
                 'port'          => $this->options->get('port'),
                 'bind'          => $this->options->get('bind', null),
-                'error_log'     => $this->getLogDir().'/error.log',
-                'access_log'    => $this->getLogDir().'/access.log',
+                'error_log'     => $this->getLogDir().'/'.$this->options->get('error_log', 'error.log'),
+                'access_log'    => $this->getLogDir().'/'.$this->options->get('access_log', 'access.log'),
                 'pidfile'       => $this->getPidfile(),
                 'rules_file'    => null !== $this->rules ? $this->getRulesFile() : null,
                 'php_cgi_cmd'   => $configuration->get('php_cgi_cmd'),
