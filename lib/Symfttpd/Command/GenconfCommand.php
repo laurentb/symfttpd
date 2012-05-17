@@ -95,8 +95,7 @@ EOT
                     $server->generate($this->getSymfttpd()->getConfiguration());
             }
 
-            $server->write($input->getArgument('type'));
-
+            $server->write($input->getArgument('type'), true);
         } catch (ConfigurationException $e) {
             $output->writeln('<error>An error occured while file generation.</error>');
             $output->writeln('<error>'.$e->getMessage().'</error>');
