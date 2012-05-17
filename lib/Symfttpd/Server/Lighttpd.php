@@ -414,7 +414,8 @@ class Lighttpd implements ServerInterface
         $this->removeRestartFile();
         $command = $this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile());
 
-        $process = new \Symfony\Component\Process\Process($command, $this->project->getRootDir(), null, null, null);
+        $process = new \Symfony\Component\Process\Process($command, $this->project->getRootDir());
+        $process->setTimeout(null);
         $process->run();
     }
 
