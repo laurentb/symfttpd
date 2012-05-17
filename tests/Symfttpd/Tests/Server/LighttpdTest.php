@@ -255,7 +255,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
             $this->createSymfonyProject($project);
         }
 
-        $project->initialize();
+        $project->scan();
 
         return $project;
     }

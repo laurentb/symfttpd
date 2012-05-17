@@ -68,7 +68,7 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals(realpath(sys_get_temp_dir()), $this->project->getRootDir());
     }
 
-    public function testInitialize()
+    public function testScan()
     {
         $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
 
@@ -98,7 +98,7 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
         $filesystem->touch($files);
 
         $this->project->setRootDir($baseDir);
-        $this->project->initialize();
+        $this->project->scan();
 
         $this->assertContains('index.php', $this->project->readablePhpFiles);
         $this->assertContains('frontend_dev.php', $this->project->readablePhpFiles);

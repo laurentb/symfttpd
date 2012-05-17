@@ -55,7 +55,7 @@ class MksymlinksCommand extends Command
 
         $project = $symfttpd->getProject();
         $project->setRootDir($input->getOption('path'));
-        $project->initialize();
+        $project->scan();
 
         $type    = $input->getArgument('type');
         $version = $input->getOption('ver');

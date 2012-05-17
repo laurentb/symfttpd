@@ -83,7 +83,7 @@ class SpawnCommand extends Command
         }
 
         // Creates the server configuration.
-        $this->getSymfttpd()->getProject()->initialize();
+        $this->getSymfttpd()->getProject()->scan();
         $server->setup();
         $server->generate($this->getConfiguration());
         $server->write();

@@ -86,10 +86,10 @@ abstract class BaseProject implements ProjectInterface
     }
 
     /**
-     * Initialize readable files, dirs and php executable files
+     * scan readable files, dirs and php executable files
      * as index.php.
      */
-    public function initialize()
+    public function scan()
     {
         $iterator = new \DirectoryIterator($this->getWebDir());
 

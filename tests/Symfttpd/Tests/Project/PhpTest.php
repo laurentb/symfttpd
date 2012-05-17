@@ -54,7 +54,7 @@ class PhpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('index.php', $this->project->getIndexFile());
     }
 
-    public function testInitialize()
+    public function testScan()
     {
         $this->project->setRootDir(sys_get_temp_dir().'/symfttpd-project-test');
 
@@ -70,7 +70,7 @@ class PhpTest extends \PHPUnit_Framework_TestCase
         $filesystem->mkdir($baseDir);
         $filesystem->touch($files);
 
-        $this->project->initialize();
+        $this->project->scan();
 
         $this->assertContains('index.php', $this->project->readablePhpFiles);
         $this->assertEmpty($this->project->readableDirs);

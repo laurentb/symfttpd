@@ -60,7 +60,7 @@ EOT
 
         $project = $symfttpd->getProject();
         $project->setRootDir(getcwd());
-        $project->initialize();
+        $project->scan();
 
         $server = $this->getSymfttpd()->getServer();
 

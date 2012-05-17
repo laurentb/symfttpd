@@ -23,10 +23,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      * @param $options
      * @param $values
      */
-    public function testInitialize($options, $values)
+    public function testScan($options, $values)
     {
         $project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\OptionBag($options));
-        $project->initialize();
+        $project->scan();
         $this->assertEquals($values['dirs'], $project->readableDirs);
         $this->assertEquals($values['files'], $project->readableFiles);
         $this->assertEquals($values['php'], $project->readablePhpFiles);
