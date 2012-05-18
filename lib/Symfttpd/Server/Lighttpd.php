@@ -309,7 +309,7 @@ class Lighttpd extends BaseServer
                 'files'   => $this->project->readableFiles,
                 'phps'    => $this->project->readablePhpFiles,
                 'default' => $this->project->getIndexFile(),
-                'nophp'   => $this->project->get('project_nophp', array('uploads')),
+                'nophp'   => $this->project->options->get('project_nophp', array('uploads')),
             )
         );
 
