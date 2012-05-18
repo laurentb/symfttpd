@@ -141,4 +141,20 @@ class SymfttpdConfiguration extends OptionBag
 
         return $options;
     }
+
+    /**
+     * Return the options of the server.
+     *
+     * @return array
+     */
+    public function getServerOptions()
+    {
+        $options = array();
+
+        foreach (\Symfttpd\Server\BaseServer::$configurationKeys as $key) {
+            $options[$key] = $this->get($key, null);
+        }
+
+        return $options;
+    }
 }

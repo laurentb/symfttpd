@@ -60,7 +60,14 @@ class Symfttpd extends \Pimple
                 throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
             }
 
-            $server = new $class($container['project'], $container['twig'], $container['loader'], $container['writer'], new OptionBag());
+            // Create the server class.
+            $server = new $class(
+                $container['project'],
+                $container['twig'],
+                $container['loader'],
+                $container['writer'],
+                new OptionBag($config->getServerOptions())
+            );
 
             // BC with the 1.0 configuration version
             if ($server instanceof \Symfttpd\Server\Lighttpd && $config->has('lighttpd_cmd')) {

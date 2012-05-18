@@ -11,7 +11,7 @@
 
 namespace Symfttpd\Server;
 
-use Symfttpd\Server\ServerInterface;
+use Symfttpd\Server\BaseServer;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\OptionBag;
@@ -26,7 +26,7 @@ use Symfony\Component\Process\ExecutableFinder;
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class Lighttpd implements ServerInterface
+class Lighttpd extends BaseServer
 {
     /**
      * @var ProjectInterface
@@ -52,7 +52,6 @@ class Lighttpd implements ServerInterface
      * The server options :
      * - restartfile: the name of the file that tells the server to restart (.symfttpd_restart)
      * - pidfile:     the pidfile of the lighttpd server (.sf)
-     * - nophp:       the list of files accessibles from the web
      * - access_log:  the name of the access_log file (access.log)
      * - error_log:   the name of the error_log file (error.log)
      *
@@ -314,7 +313,6 @@ class Lighttpd implements ServerInterface
                 'files'   => $this->project->readableFiles,
                 'phps'    => $this->project->readablePhpFiles,
                 'default' => $this->project->getIndexFile(),
-                'nophp'   => $this->options->get('nophp', array()),
             )
         );
 

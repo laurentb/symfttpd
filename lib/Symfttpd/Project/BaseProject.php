@@ -72,7 +72,7 @@ abstract class BaseProject implements ProjectInterface
     /**
      * @var \Symfttpd\OptionBag
      */
-    protected $options;
+    public $options;
 
     public function __construct(\Symfttpd\OptionBag $options, $path = null)
     {
