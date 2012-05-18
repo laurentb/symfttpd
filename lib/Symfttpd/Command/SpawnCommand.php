@@ -15,13 +15,10 @@ use Symfttpd\Symfttpd;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
 use Symfttpd\Tail\TailInterface;
-use Symfttpd\Console\Application;
 use Symfttpd\Command\Command;
 use Symfttpd\Server\ServerInterface;
-use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -146,7 +143,7 @@ TEXT;
             {
                 exit(0);
             }
-        } else if (0 === $pid) {
+        } elseif (0 === $pid) {
             // Child process
             $this->spawn($server, $output);
         } else {

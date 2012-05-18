@@ -13,13 +13,11 @@ namespace Symfttpd\Server;
 
 use Symfttpd\Server\ServerInterface;
 use Symfttpd\Project\ProjectInterface;
-use Symfttpd\Server\Exception\ServerException;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\OptionBag;
 use Symfttpd\Loader;
 use Symfttpd\Writer;
 use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Configuration\Exception\ConfigurationException;
 use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfony\Component\Process\ExecutableFinder;
 

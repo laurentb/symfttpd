@@ -10,7 +10,6 @@ namespace Symfttpd;
 
 use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfttpd\Project\ProjectInterface;
-use Symfttpd\Server\ServerInterface;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfttpd\TwigExtension;

@@ -17,8 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfttpd\Symfttpd;
-use Symfttpd\Configuration\LighttpdConfiguration;
-use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfttpd\Configuration\Exception\ConfigurationException;
 
 /**

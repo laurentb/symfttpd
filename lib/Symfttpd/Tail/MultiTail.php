@@ -13,7 +13,6 @@ namespace Symfttpd\Tail;
 
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
-use Symfony\Component\Console\Formatter\OutputFormatterStyleInterface;
 
 /**
  * MultiTail class
