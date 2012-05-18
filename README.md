@@ -36,7 +36,7 @@ Clone this repository and checkout the refactoring branch
 ```
 benjamin:~/dev benjamin $ git clone git://github.com/benja-M-1/symfttpd.git
 benjamin:~/dev benjamin $ cd symfttpd
-benjamin:~/dev/symfttpd benjamin $ git checkout origin/refactoring
+benjamin:~/dev/symfttpd benjamin $ git checkout origin/2.0.0
 ```
 
 Install vendors with composer
