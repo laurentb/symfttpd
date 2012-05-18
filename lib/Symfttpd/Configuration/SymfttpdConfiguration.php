@@ -53,7 +53,7 @@ class SymfttpdConfiguration extends OptionBag
             if (file_exists($config)) {
                 require $config;
                 if (isset($options)) {
-                    $this->options = array_merge($this->options, $options);
+                    $this->options = array_merge($options, $this->options);
                     unset($options);
                 }
             }

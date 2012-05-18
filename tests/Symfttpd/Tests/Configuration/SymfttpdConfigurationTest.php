@@ -106,6 +106,17 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1', $configuration->getProjectVersion());
     }
 
+    public function testGetPhpProjectVersion()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'want' => null,
+            'project_type' => 'php',
+            'project_version' => '1',
+        ));
+
+        $this->assertEquals(null, $configuration->getProjectVersion());
+    }
+
     public function testGetProjectVersionBC()
     {
         $configuration = new SymfttpdConfiguration(array(
@@ -136,5 +147,43 @@ class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals('foo', $configuration->getServerType());
+    }
+
+    public function testGetProjectOptions()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'foo' => 'bar',
+            'baz' => array('foo', 'bar'),
+            'project_readable_dirs'     => array('uploads', 'foo', 'bar'),
+            'project_readable_files'    => array('authors.txt'),
+            'project_readable_phpfiles' => array('index.php', 'frontend_dev.php'),
+            'project_readable_restrict' => false,
+        ));
+
+        $this->assertArrayHasKey('project_readable_dirs', $configuration->getProjectOptions());
+        $this->assertArrayHasKey('project_readable_files', $configuration->getProjectOptions());
+        $this->assertArrayHasKey('project_readable_phpfiles', $configuration->getProjectOptions());
+        $this->assertArrayHasKey('project_readable_restrict', $configuration->getProjectOptions());
+        $this->assertArrayNotHasKey('foo', $configuration->getProjectOptions());
+        $this->assertArrayNotHasKey('baz', $configuration->getProjectOptions());
+    }
+
+    public function testGetServerOptions()
+    {
+        $configuration = new SymfttpdConfiguration(array(
+            'foo' => 'bar',
+            'baz' => array('foo', 'bar'),
+            'server_pidfile'     => 'lighttpd_pid',
+            'server_restartfile' => 'lighttpd_restart',
+            'server_access_log'  => 'access_log',
+            'server_error_log'   => 'error_log',
+        ));
+
+        $this->assertArrayHasKey('server_pidfile', $configuration->getServerOptions());
+        $this->assertArrayHasKey('server_restartfile', $configuration->getServerOptions());
+        $this->assertArrayHasKey('server_access_log', $configuration->getServerOptions());
+        $this->assertArrayHasKey('server_error_log', $configuration->getServerOptions());
+        $this->assertArrayNotHasKey('foo', $configuration->getServerOptions());
+        $this->assertArrayNotHasKey('baz', $configuration->getServerOptions());
     }
 }

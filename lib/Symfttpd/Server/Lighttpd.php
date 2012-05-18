@@ -49,11 +49,7 @@ class Lighttpd extends BaseServer
     protected $writer;
 
     /**
-     * The server options :
-     * - restartfile: the name of the file that tells the server to restart (.symfttpd_restart)
-     * - pidfile:     the pidfile of the lighttpd server (.sf)
-     * - access_log:  the name of the access_log file (access.log)
-     * - error_log:   the name of the error_log file (error.log)
+     * The server options
      *
      * @var OptionBag
      */

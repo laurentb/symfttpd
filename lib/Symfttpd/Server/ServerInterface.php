@@ -16,7 +16,6 @@ use Symfttpd\Loader;
 use Symfttpd\Writer;
 use Symfttpd\OptionBag;
 use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Configuration\Exception\ConfigurationException;
 
 /**
  * ServerInterface interface
@@ -95,7 +94,6 @@ interface ServerInterface
      *
      * @abstract
      * @return mixed
-     * @throws Exception\ConfigurationException
      */
     public function write();
 
