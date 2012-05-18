@@ -25,6 +25,7 @@ abstract class BaseProject implements ProjectInterface
         'project_readable_files',    // readable files by the server in the web dir (robots.txt).
         'project_readable_phpfiles', // executable php files in the web directory (index.php)
         'project_readable_restrict', // true if no other php files are readable than configured ones or index file.
+        'project_nophp',             // deny PHP execution in the specified directories (default being uploads).
     );
 
     /**
