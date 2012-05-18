@@ -21,7 +21,16 @@ use Symfttpd\TwigExtension;
  */
 class LighttpdTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Symfttpd\Filesystem\Filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * @var \Twig_Environment
+     */
     protected $renderer;
+
     /**
      * @var Symfttpd\Server\Lighttpd
      */
@@ -29,6 +38,8 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->filesystem = new \Symfttpd\Filesystem\Filesystem();
+
         $this->renderer = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates')));
         $this->renderer->addExtension(new TwigExtension());
 
@@ -147,6 +158,65 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $lighttpd->readConfiguration();
     }
 
+    public function testGetProject()
+    {
+        $this->assertInstanceOf('\\Symfttpd\\Project\\ProjectInterface', $this->server->getProject());
+    }
+
+    public function testGetRestartFile()
+    {
+        $cacheDir = $this->server->getProject()->getCacheDir().'/lighttpd/.symfttpd_restart';
+        $this->assertEquals($cacheDir, $this->server->getRestartFile());
+
+        $this->server->options->set('server_restartfile', 'lighttpd_restartfile');
+        $cacheDir = $this->server->getProject()->getCacheDir().'/lighttpd/lighttpd_restartfile';
+        $this->assertEquals($cacheDir, $this->server->getRestartFile());
+    }
+
+    public function testGetPidfile()
+    {
+        $cacheDir = $this->server->getProject()->getCacheDir().'/lighttpd/.sf';
+        $this->assertEquals($cacheDir, $this->server->getPidfile());
+
+        $this->server->options->set('server_pidfile', 'lighttpd_pifile');
+        $cacheDir = $this->server->getProject()->getCacheDir().'/lighttpd/lighttpd_pifile';
+        $this->assertEquals($cacheDir, $this->server->getPidfile());
+    }
+
+    public function testStart()
+    {
+        $process = $this->getMock('\\Symfony\\Component\\Process\\Process', array('run'), array(null));
+        $process->expects($this->once())
+            ->method('run')
+            ->will($this->returnValue(0));
+
+        $this->server->setCommand('lighttpd');
+
+        $process = $this->server->start($process);
+
+        $this->assertEquals(null, $process->getTimeout());
+        $this->assertEquals($this->server->getProject()->getRootDir(), $process->getWorkingDirectory());
+    }
+
+    public function testStartWithRestartfile()
+    {
+        $this->filesystem->mkdir($this->server->getCacheDir());
+        $this->filesystem->touch($this->server->getRestartFile());
+
+        $process = $this->getMock('\\Symfony\\Component\\Process\\Process', array('run'), array(null));
+        $process->expects($this->once())
+            ->method('run')
+            ->will($this->returnValue(0));
+
+        $this->server->setCommand('lighttpd');
+
+        $this->assertTrue(file_exists($this->server->getRestartFile()));
+
+        $this->server->start($process);
+
+        $this->assertFalse(file_exists($this->server->getRestartFile()));
+    }
+
     /**
      * Create a symfony1 project architecture
      *
@@ -183,10 +253,9 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
             $baseDir . DIRECTORY_SEPARATOR . 'log/frontend.log',
         );
 
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
-        $filesystem->remove($projectTree);
-        $filesystem->mkdir($projectTree);
-        $filesystem->touch($files);
+        $this->filesystem->remove($projectTree);
+        $this->filesystem->mkdir($projectTree);
+        $this->filesystem->touch($files);
     }
 
     /**

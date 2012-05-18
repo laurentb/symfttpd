@@ -141,7 +141,7 @@ class Lighttpd extends BaseServer
      */
     public function getRestartFile()
     {
-        return $this->getCacheDir().'/'.$this->options->get('restartfile', '.symfttpd_restart');
+        return $this->getCacheDir().'/'.$this->options->get('server_restartfile', '.symfttpd_restart');
     }
 
     /**
@@ -152,7 +152,7 @@ class Lighttpd extends BaseServer
      */
     public function getPidfile()
     {
-        return $this->getCacheDir().'/'.$this->options->get('restartfile', '.sf');
+        return $this->getCacheDir().'/'.$this->options->get('server_pidfile', '.sf');
     }
 
     /**
@@ -282,8 +282,8 @@ class Lighttpd extends BaseServer
                 'document_root' => $this->project->getWebDir(),
                 'port'          => $this->options->get('port'),
                 'bind'          => $this->options->get('bind', null),
-                'error_log'     => $this->getLogDir().'/'.$this->options->get('error_log', 'error.log'),
-                'access_log'    => $this->getLogDir().'/'.$this->options->get('access_log', 'access.log'),
+                'error_log'     => $this->getLogDir().'/'.$this->options->get('server_error_log', 'error.log'),
+                'access_log'    => $this->getLogDir().'/'.$this->options->get('server_access_log', 'access.log'),
                 'pidfile'       => $this->getPidfile(),
                 'rules_file'    => null !== $this->rules ? $this->getRulesFile() : null,
                 'php_cgi_cmd'   => $configuration->get('php_cgi_cmd'),
@@ -438,6 +438,7 @@ class Lighttpd extends BaseServer
      * Start the server.
      *
      * @param null|\Symfony\Component\Process\Process $process
+     * @return null|\Symfony\Component\Process\Process
      */
     public function start(\Symfony\Component\Process\Process $process = null)
     {
@@ -454,5 +455,7 @@ class Lighttpd extends BaseServer
         $process->setWorkingDirectory($this->project->getRootDir());
         $process->setTimeout(null);
         $process->run();
+
+        return $process;
     }
 }
