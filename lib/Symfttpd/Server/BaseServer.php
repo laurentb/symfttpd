@@ -65,10 +65,10 @@ abstract class BaseServer implements ServerInterface
 
     /**
      * @param \Symfttpd\Project\ProjectInterface $project
-     * @param \Twig_Environment $twig
-     * @param \Symfttpd\Loader $loader
-     * @param \Symfttpd\Writer $writer
-     * @param \Symfttpd\OptionBag $options
+     * @param \Twig_Environment                  $twig
+     * @param \Symfttpd\Loader                   $loader
+     * @param \Symfttpd\Writer                   $writer
+     * @param \Symfttpd\OptionBag                $options
      */
     public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
     {

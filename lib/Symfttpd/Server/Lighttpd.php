@@ -74,10 +74,10 @@ class Lighttpd extends BaseServer
      * Constructor class
      *
      * @param \Symfttpd\Project\ProjectInterface $project
-     * @param \Twig_Environment $twig
-     * @param \Symfttpd\Loader $loader
-     * @param \Symfttpd\Writer $writer
-     * @param \Symfttpd\OptionBag $options
+     * @param \Twig_Environment                  $twig
+     * @param \Symfttpd\Loader                   $loader
+     * @param \Symfttpd\Writer                   $writer
+     * @param \Symfttpd\OptionBag                $options
      */
     public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
     {
@@ -176,7 +176,7 @@ class Lighttpd extends BaseServer
      * Write the configurations files.
      *
      * @param string $type
-     * @param bool $force
+     * @param bool   $force
      */
     public function write($type = 'all', $force = false)
     {

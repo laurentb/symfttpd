@@ -45,7 +45,7 @@ class MksymlinksCommand extends Command
     /**
      * Create symbolic links.
      *
-     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @throws \Symfttpd\Configurator\Exception\ConfiguratorNotFoundException
      */

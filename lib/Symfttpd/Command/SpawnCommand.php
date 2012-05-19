@@ -56,7 +56,7 @@ class SpawnCommand extends Command
     /**
      * Run the Symttpd configured server.
      *
-     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @throws \InvalidArgumentException
      */
@@ -161,7 +161,7 @@ TEXT;
      * rules changed. In this case it will create a file that
      * will tell to the fork that the server must be restarted.
      *
-     * @param \Symfttpd\Server\ServerInterface $server
+     * @param \Symfttpd\Server\ServerInterface                  $server
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @return bool
      */
@@ -198,9 +198,9 @@ TEXT;
      * web directory for instance), it creates the restart file used in the
      * spawn to tell it to restart the server.
      *
-     * @param \Symfttpd\Server\ServerInterface $server
+     * @param \Symfttpd\Server\ServerInterface                  $server
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param null|\Symfttpd\Tail\TailInterface $tail
+     * @param null|\Symfttpd\Tail\TailInterface                 $tail
      */
     public function watch(ServerInterface $server, OutputInterface $output, TailInterface $tail = null)
     {
