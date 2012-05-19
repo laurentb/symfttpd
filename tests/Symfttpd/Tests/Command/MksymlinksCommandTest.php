@@ -1,9 +1,12 @@
 <?php
 /**
- * MksymlinksCommandTest class.
+ * This file is part of the Symfttpd Project
  *
- * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
- * @since 24/10/11
+ * (c) Laurent Bachelier <laurent@bachelier.name>
+ * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace Symfttpd\Tests\Command;
@@ -14,6 +17,12 @@ use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
+/**
+ * MksymlinksCommandTest class.
+ *
+ * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ * @since 24/10/11
+ */
 class MksymlinksCommandTest extends Test
 {
     public function setUp()

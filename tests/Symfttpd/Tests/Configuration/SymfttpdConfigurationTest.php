@@ -1,15 +1,24 @@
 <?php
 /**
- * SymfttpdConfigurationTest class
+ * This file is part of the Symfttpd Project
  *
- * @author Benjamin Grandfond <benjaming@theodo.fr>
- * @since 28/04/12
+ * (c) Laurent Bachelier <laurent@bachelier.name>
+ * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace Symfttpd\Tests\Configuration;
 
 use Symfttpd\Configuration\SymfttpdConfiguration;
 
+/**
+ * SymfttpdConfigurationTest class
+ *
+ * @author Benjamin Grandfond <benjaming@theodo.fr>
+ * @since 28/04/12
+ */
 class SymfttpdConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     protected $configuration;

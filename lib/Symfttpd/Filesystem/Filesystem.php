@@ -1,20 +1,20 @@
 <?php
-
-/*
- * This file is part of the Symfony package.
+/**
+ * This file is part of the Symfttpd Project
  *
- * (c) Fabien Potencier <fabien@symfony.com>
+ * (c) Laurent Bachelier <laurent@bachelier.name>
+ * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace Symfttpd\Filesystem;
 
 /**
- * Provides basic utility to manipulate the file system.
+ * Filesystem extension
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Laurent Bachelier <laurent@bachelier.name>
  */
 class Filesystem extends \Symfony\Component\Filesystem\Filesystem
 {

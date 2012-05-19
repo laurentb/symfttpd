@@ -8,24 +8,23 @@
  * file that was distributed with this source code.
  */
 
-/**
- * ProjectValidatorTest class.
- * 
- * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
- * @since 25/10/11
- */
-
 namespace Symfttpd\Tests\Validator;
 
 use Symfttpd\Validator\ProjectTypeValidator;
 
+/**
+ * ProjectValidatorTest class.
+ *
+ * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ * @since 25/10/11
+ */
 class ProjectTypeValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ProjectTypeValidator $validator
      */
     protected $validator;
-    
+
     public function setUp()
     {
         $this->validator = ProjectTypeValidator::getInstance();
