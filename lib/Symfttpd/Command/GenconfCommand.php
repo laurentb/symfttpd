@@ -48,6 +48,10 @@ EOT
             ->addOption('bind', null, InputOption::VALUE_OPTIONAL, 'The address to bind', '127.0.0.1');
     }
 
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         // Don't print the Symfttpd version if ouput option is set.
@@ -55,7 +59,6 @@ EOT
             parent::initialize($input, $output);
         }
     }
-
 
     /**
      * @param \Symfony\Component\Console\Input\InputInterface $input
@@ -107,13 +110,13 @@ EOT
             } else {
                 switch ($input->getArgument('type')) {
                     case 'config':
-                        print $server->readConfiguration().PHP_EOL;
+                        print $server->readConfiguration();
                         break;
                     case 'rules':
-                        print $server->readRules().PHP_EOL;
+                        print $server->readRules();
                         break;
                     default:
-                        print $server->read().PHP_EOL;
+                        print $server->read();
                         break;
                 }
             }

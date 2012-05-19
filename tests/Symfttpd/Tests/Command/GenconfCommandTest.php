@@ -8,12 +8,12 @@
 
 namespace Symfttpd\Tests\Command;
 
-use Symfttpd\Tests\Test as BaseTestCase;
 use Symfttpd\Command\GenconfCommand;
 use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tester\ApplicationTester;
 
-class GenconfCommandTest extends BaseTestCase
+class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Symfttpd\Filesystem\Filesystem $filesystem
@@ -25,43 +25,204 @@ class GenconfCommandTest extends BaseTestCase
      */
     protected $command;
 
-    /**
-     * @var Symfony\Component\Console\Tester\CommandTester
-     */
-    protected $tester;
-
     public function setUp()
     {
-        parent::setUp();
-        $this->fixtures = sys_get_temp_dir();
+        $this->fixtures = sys_get_temp_dir().'/symfttpd-test';
 
         $this->filesystem = new Filesystem();
-        $this->filesystem->remove($this->fixtures.'/cache/lighttpd/lighttpd.conf');
+        $this->filesystem->mkdir(array(
+            $this->fixtures.'/cache/lighttpd/',
+            $this->fixtures.'/log/lighttpd/',
+            $this->fixtures.'/web',
+        ));
 
         $this->command = new GenconfCommand();
-        $this->tester  = new CommandTester($this->command);
     }
 
     public function tearDown()
     {
-        //$this->filesystem->remove($this->fixtures.'/cache/lighttpd/lighttpd.conf');
-        $this->filesystem->remove($this->fixtures.'/web');
+        $this->filesystem->remove($this->fixtures);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The path "/foo" does not exist
+     */
     public function testExecuteException()
     {
-        $this->markTestSkipped('Will be rewrite');
-        $this->setExpectedException('\InvalidArgumentException');
-        $this->tester->execute(array('--path' => $this->fixtures.'/web'), array('interactive' => false));
+        $tester = new CommandTester($this->command);
+        $tester->execute(array('type' => 'all', '--path' => '/foo'), array('interactive' => false));
     }
 
-    public function testExecute()
+    /**
+     * @dataProvider getExecutionType
+     * @param $type
+     */
+    public function testExecuteWrite($type, $generateMethod, $output)
     {
-        $this->markTestSkipped('Will be rewrite');
-        $this->filesystem->mkdir($this->fixtures.'/web');
-        $this->tester->execute(array('--path' => $this->fixtures.'/web', '--output-dir' => $this->fixtures), array('interactive' => false));
+        $config = $this->getMock('\\Symfttpd\\Configuration\\SymfttpdConfiguration');
+        $symfttpd = new \Symfttpd\Symfttpd($config);
 
-        $this->assertContains('The configuration file has been well generated.', $this->tester->getDisplay());
-        $this->assertTrue(file_exists($this->fixtures.'/cache/lighttpd/lighttpd.conf'));
+        $twig_loader = $this->getMock('\\Twig_Loader_Filesystem', array('addPath'), array(''));
+        $twig_loader->expects($this->once())
+            ->method('addPath');
+
+        $twig = $this->getMock('\\Twig_Environment', array('getLoader'), array($twig_loader));
+        $twig->expects($this->once())
+            ->method('getLoader')
+            ->will($this->returnValue($twig_loader));
+
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(), '', false);
+
+        $loader = $this->getMock('\\Symfttpd\\Loader');
+        $writer = $this->getMock('\\Symfttpd\\Writer');
+
+        $server = $this->getMockBuilder('\\Symfttpd\\Server\\Lighttpd')
+            ->setMethods(array($generateMethod, 'write', 'getProject', 'getConfigFilename', 'getRulesFilename', 'getCacheDir'))
+            ->setConstructorArgs(array(
+                $project,
+                $twig,
+                $loader,
+                $writer,
+                new \Symfttpd\OptionBag())
+            )
+            ->getMock();
+
+        $server->expects($this->once())
+            ->method('getProject')
+            ->will($this->returnValue($project));
+
+        if ($type !== 'rules') {
+            $server->expects($this->once())
+                ->method('getConfigFilename')
+                ->will($this->returnValue('lighttpd.conf'));
+
+            $server->expects($this->once())
+                ->method($generateMethod)
+                ->with($config);
+        }
+
+        if ($type !== 'config') {
+            $server->expects($this->once())
+                ->method('getRulesFilename')
+                ->will($this->returnValue('rules.conf'));
+
+            $server->expects($this->once())
+                ->method($generateMethod);
+        }
+
+        $server->expects($this->atLeastOnce())
+            ->method('getCacheDir');
+
+        $server->expects($this->once())
+            ->method('write')
+            ->with($this->equalTo($type));
+
+        $symfttpd['server']  = $server;
+
+        $application = new \Symfttpd\Console\Application();
+        $application->setAutoExit(false);
+        $application->setSymfftpd($symfttpd);
+        $application->add($this->command);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'genconf', 'type' => $type, '--path' => $this->fixtures.'/web'), array('interactive' => false));
+
+        $this->assertContains($output, $tester->getDisplay());
+        $this->assertContains('The configuration file has been well generated.', $tester->getDisplay());
+    }
+
+    public function getExecutionType()
+    {
+        return array(
+            array('all', 'generate', 'Generate lighttpd.conf and rules.conf'),
+            array('config', 'generateConfiguration', 'Generate lighttpd.conf'),
+            array('rules', 'generateRules', 'Generate rules.conf'),
+        );
+    }
+
+    /**
+     * @dataProvider getExecutionReadType
+     * @param $type
+     */
+    public function testExecuteRead($type, $generateMethod, $readMethod)
+    {
+        $config = $this->getMock('\\Symfttpd\\Configuration\\SymfttpdConfiguration');
+        $symfttpd = new \Symfttpd\Symfttpd($config);
+
+        $twig_loader = $this->getMock('\\Twig_Loader_Filesystem', array('addPath'), array(''));
+        $twig_loader->expects($this->once())
+            ->method('addPath');
+
+        $twig = $this->getMock('\\Twig_Environment', array('getLoader'), array($twig_loader));
+        $twig->expects($this->once())
+            ->method('getLoader')
+            ->will($this->returnValue($twig_loader));
+
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(), '', false);
+
+        $loader = $this->getMock('\\Symfttpd\\Loader');
+        $writer = $this->getMock('\\Symfttpd\\Writer');
+
+        $server = $this->getMockBuilder('\\Symfttpd\\Server\\Lighttpd')
+            ->setMethods(array($generateMethod, $readMethod, 'getProject', 'getConfigFilename', 'getRulesFilename', 'getCacheDir'))
+            ->setConstructorArgs(array(
+                $project,
+                $twig,
+                $loader,
+                $writer,
+                new \Symfttpd\OptionBag())
+            )
+            ->getMock();
+
+        $server->expects($this->once())
+            ->method('getProject')
+            ->will($this->returnValue($project));
+
+        if ($type !== 'rules') {
+            $server->expects($this->once())
+                ->method('getConfigFilename')
+                ->will($this->returnValue('lighttpd.conf'));
+
+            $server->expects($this->once())
+                ->method($generateMethod)
+                ->with($config);
+        }
+
+        if ($type !== 'config') {
+            $server->expects($this->once())
+                ->method('getRulesFilename')
+                ->will($this->returnValue('rules.conf'));
+
+            $server->expects($this->once())
+                ->method($generateMethod);
+        }
+
+        $server->expects($this->atLeastOnce())
+            ->method('getCacheDir');
+
+        $server->expects($this->once())
+            ->method($readMethod);
+
+        $symfttpd['server']  = $server;
+
+        $application = new \Symfttpd\Console\Application();
+        $application->setAutoExit(false);
+        $application->setSymfftpd($symfttpd);
+        $application->add($this->command);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'genconf', 'type' => $type, '--path' => $this->fixtures.'/web', '--output' => true), array('interactive' => false));
+
+        $this->assertEmpty($tester->getDisplay());
+    }
+
+    public function getExecutionReadType()
+    {
+        return array(
+            array('all', 'generate', 'read'),
+            array('config', 'generateConfiguration', 'readConfiguration'),
+            array('rules', 'generateRules', 'readRules'),
+        );
     }
 }

@@ -133,13 +133,13 @@ abstract class BaseProject implements ProjectInterface
      */
     public function setRootDir($rootDir)
     {
-        $rootDir = realpath($rootDir);
+        $realDir = realpath($rootDir);
 
-        if (false == $rootDir) {
-            throw new \InvalidArgumentException(sprintf('The path "%s"does not exist', $rootDir));
+        if (false == $realDir) {
+            throw new \InvalidArgumentException(sprintf('The path "%s" does not exist', $rootDir));
         }
 
-        $this->rootDir = $rootDir;
+        $this->rootDir = $realDir;
     }
 
     /**

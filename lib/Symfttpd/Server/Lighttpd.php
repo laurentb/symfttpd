@@ -29,33 +29,6 @@ use Symfony\Component\Process\ExecutableFinder;
 class Lighttpd extends BaseServer
 {
     /**
-     * @var ProjectInterface
-     */
-    protected $project;
-
-    /**
-     * @var \Twig_Environment
-     */
-    protected $twig;
-
-    /**
-     * @var \Symfttpd\Loader
-     */
-    protected $loader;
-
-    /**
-     * @var \Symfttpd\Writer
-     */
-    protected $writer;
-
-    /**
-     * The server options
-     *
-     * @var OptionBag
-     */
-    public $options;
-
-    /**
      * Server name.
      *
      * @var string
@@ -108,11 +81,7 @@ class Lighttpd extends BaseServer
      */
     public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
     {
-        $this->project  = $project;
-        $this->twig     = $twig;
-        $this->options  = $options;
-        $this->loader   = $loader;
-        $this->writer   = $writer;
+        parent::__construct($project, $twig, $loader, $writer, $options);
 
         // Add the lighttpd templates directory to twig loader.
         $this->twig->getLoader()->addPath(__DIR__.'/../Resources/templates/lighttpd');
