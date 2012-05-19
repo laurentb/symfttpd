@@ -113,7 +113,7 @@ TEXT;
 
         flush();
 
-        if (true == $input->getOption('single_process')) {
+        if (false == $input->hasOption('single_process') || true == $input->getOption('single_process')) {
             $output->writeln('<info>Symfttpd will run in a single process mode.</info>');
             // Run lighttpd
             $server->start();
@@ -181,7 +181,7 @@ TEXT;
 
                 return false;
             } else {
-                $output->writeln('<comment>Something in web/ changed. Restarting lighttpd.</comment>');
+                $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $server->name));
 
                 // Regenerate the lighttpd configuration
                 $server->generate($this->getSymfttpd()->getConfiguration());

@@ -1,9 +1,12 @@
 <?php
 /**
- * ConfigurationGeneratorCommandTest class
+ * This file is part of the Symfttpd Project
  *
- * @author Benjamin Grandfond <benjaming@theodo.fr>
- * @since 28/10/11
+ * (c) Laurent Bachelier <laurent@bachelier.name>
+ * (c) Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
 namespace Symfttpd\Tests\Command;
@@ -13,6 +16,11 @@ use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
+/**
+ * GenconfCommand test class
+ *
+ * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ */
 class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
