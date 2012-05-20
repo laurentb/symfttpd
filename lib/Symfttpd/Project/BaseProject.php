@@ -26,6 +26,9 @@ abstract class BaseProject implements ProjectInterface
         'project_readable_phpfiles', // executable php files in the web directory (index.php)
         'project_readable_restrict', // true if no other php files are readable than configured ones or index file.
         'project_nophp',             // deny PHP execution in the specified directories (default being uploads).
+        'project_log_dir',
+        'project_cache_dir',
+        'project_web_dir',
     );
 
     /**
@@ -79,6 +82,10 @@ abstract class BaseProject implements ProjectInterface
     {
         $this->rootDir = $path;
         $this->options = $options;
+
+        $this->validate('project_readable_dirs');
+        $this->validate('project_readable_files');
+        $this->validate('project_readable_phpfiles');
     }
 
     /**
@@ -97,9 +104,9 @@ abstract class BaseProject implements ProjectInterface
         foreach ($iterator as $file) {
             $name = $file->getFilename();
             if ($name[0] != '.') {
-                if ($file->isDir()) {
+                if ($file->isDir() && false == in_array($name, $this->readableDirs)) {
                     $this->readableDirs[] = $name;
-                } elseif (!preg_match('/\.php$/', $name)) {
+                } elseif (!preg_match('/\.php$/', $name) && false == in_array($name, $this->readableFiles)) {
                     $this->readableFiles[] = $name;
                 } else {
                     if (false === $this->options->has('project_readable_restrict')
@@ -113,6 +120,24 @@ abstract class BaseProject implements ProjectInterface
         sort($this->readableDirs);
         sort($this->readableFiles);
         sort($this->readablePhpFiles);
+    }
+
+    /**
+     * Validate an option that contains file or directories.
+     *
+     * @param $option
+     */
+    public function validate($option)
+    {
+        $options = $this->options->get($option, array());
+
+        foreach ($options as $name => $value) {
+            if (false == file_exists($this->getWebDir().'/'.$value)) {
+                unset($options[$name]);
+            }
+        }
+
+        $this->options->set($option, $options);
     }
 
     /**
