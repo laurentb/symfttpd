@@ -77,7 +77,7 @@ class OptionBag implements \IteratorAggregate
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->options) && null !== $this->options[$name] ;
+        return array_key_exists($name, $this->options) && false === empty($this->options[$name]) ;
     }
 
     /**

@@ -18,6 +18,16 @@ namespace Symfttpd\Tests\Project;
  */
 class ProjectTest extends \PHPUnit_Framework_TestCase
 {
+    public function setUp()
+    {
+        $this->project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\OptionBag());
+
+    }
+    public function tearDown()
+    {
+        $this->project->removeProject();
+    }
+
     /**
      * @dataProvider getOptions
      * @param $options

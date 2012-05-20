@@ -103,7 +103,7 @@ class TestProject extends \Symfttpd\Project\BaseProject
         ));
 
         $this->filesystem->touch(array(
-            $this->getIndexFile(),
+            $this->getWebDir().'/'.$this->getIndexFile(),
             $this->getWebDir().'/class.php',
             $this->getWebDir().'/phpinfo.php',
             $this->getWebDir().'/authors.txt',
@@ -117,7 +117,7 @@ class TestProject extends \Symfttpd\Project\BaseProject
     public function removeProject()
     {
         $this->filesystem->remove(array(
-            $this->getIndexFile(),
+            $this->getWebDir().'/'.$this->getIndexFile(),
             $this->getWebDir().'/class.php',
             $this->getWebDir().'/phpinfo.php',
             $this->getWebDir().'/authors.txt',
