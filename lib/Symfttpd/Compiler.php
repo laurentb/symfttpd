@@ -25,6 +25,12 @@ use Symfony\Component\Process\Process;
  */
 class Compiler
 {
+    /**
+     * Compile symfttpd.
+     *
+     * @param string $pharFile
+     * @throws \RuntimeException
+     */
     public function compile($pharFile = 'symfttpd.phar')
     {
         if (file_exists($pharFile)) {
