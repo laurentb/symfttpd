@@ -35,11 +35,12 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testScan($options, $values)
     {
-        $project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\OptionBag($options));
-        $project->scan();
-        $this->assertEquals($values['dirs'], $project->readableDirs);
-        $this->assertEquals($values['files'], $project->readableFiles);
-        $this->assertEquals($values['php'], $project->readablePhpFiles);
+        $this->project->options->clear();
+        $this->project->options->add($options);
+        $this->project->scan();
+        $this->assertEquals($values['dirs'], $this->project->readableDirs);
+        $this->assertEquals($values['files'], $this->project->readableFiles);
+        $this->assertEquals($values['php'], $this->project->readablePhpFiles);
     }
 
     /**

@@ -11,7 +11,6 @@
 
 namespace Symfttpd\Tests\Configurator;
 
-use Symfttpd\Tests\Test as BasetestCase;
 use Symfttpd\Configurator\Symfony14Configurator;
 use Symfttpd\Configuration\SymfttpdConfiguration;
 use Symfttpd\Filesystem\Filesystem;
@@ -22,7 +21,7 @@ use Symfttpd\Filesystem\Filesystem;
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  * @since 06/11/11
  */
-class Symfony14ConfiguratorTest extends BaseTestCase
+class Symfony14ConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
     protected $filesystem,
               $project,
@@ -31,8 +30,7 @@ class Symfony14ConfiguratorTest extends BaseTestCase
 
     public function setUp()
     {
-        parent::setUp();
-
+        $this->fixtures = sys_get_temp_dir();
         $this->project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\OptionBag());
 
         $this->filesystem = new Filesystem();
@@ -45,7 +43,7 @@ class Symfony14ConfiguratorTest extends BaseTestCase
 
     public function tearDown()
     {
-        $this->cleanUp();
+        $this->filesystem->remove($this->project->getRootDir());
     }
 
     public function testConfigure()

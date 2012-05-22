@@ -39,6 +39,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->filesystem = new \Symfttpd\Filesystem\Filesystem();
+        $this->tmp = sys_get_temp_dir().'/symfttd-test';
 
         $this->renderer = new \Twig_Environment(new \Twig_Loader_Filesystem(realpath(__DIR__ . '/../../../../lib/Symfttpd/Resources/templates')));
         $this->renderer->addExtension(new TwigExtension());
@@ -49,7 +50,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $filesystem = new \Symfttpd\Filesystem\Filesystem();
-        $filesystem->remove($this->getProject()->getRootDir());
+        $filesystem->remove($this->tmp);
     }
 
     public function testGenerateAndReadRule()
@@ -293,20 +294,20 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function getProject($reset = true)
     {
         $project = $this->getMockBuilder('\Symfttpd\Project\BaseProject')
-            ->setConstructorArgs(array(new \Symfttpd\OptionBag(), sys_get_temp_dir().'/symfttd-test'))
+            ->setConstructorArgs(array(new \Symfttpd\OptionBag(), $this->tmp))
             ->getMockForAbstractClass();
 
         $project->expects($this->any())
             ->method('getWebDir')
-            ->will($this->returnValue(sys_get_temp_dir().'/symfttd-test/web'));
+            ->will($this->returnValue($this->tmp.'/web'));
 
         $project->expects($this->any())
             ->method('getLogDir')
-            ->will($this->returnValue(sys_get_temp_dir().'/symfttd-test/log'));
+            ->will($this->returnValue($this->tmp.'/log'));
 
         $project->expects($this->any())
             ->method('getCacheDir')
-            ->will($this->returnValue(sys_get_temp_dir().'/symfttd-test/cache'));
+            ->will($this->returnValue($this->tmp.'/cache'));
 
         $project->expects($this->any())
             ->method('getIndexFile')

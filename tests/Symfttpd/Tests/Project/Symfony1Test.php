@@ -70,10 +70,11 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
 
     public function testScan()
     {
+        $filesystem = new \Symfttpd\Filesystem\Filesystem();
+
         $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
 
         $projectTree = array(
-            $baseDir,
             $baseDir.'/apps',
             $baseDir.'/cache',
             $baseDir.'/config',
@@ -92,7 +93,6 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
             $baseDir.'/log/frontend.log',
         );
 
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
         $filesystem->remove($projectTree);
         $filesystem->mkdir($projectTree);
         $filesystem->touch($files);
@@ -108,6 +108,8 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
         $this->assertContains('js', $this->project->readableDirs);
 
         $this->assertContains('robots.txt', $this->project->readableFiles);
+
+        $filesystem->remove($projectTree);
     }
 
     public function testGetName()

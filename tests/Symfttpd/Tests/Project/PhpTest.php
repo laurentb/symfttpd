@@ -56,7 +56,14 @@ class PhpTest extends \PHPUnit_Framework_TestCase
 
     public function testScan()
     {
-        $this->project->setRootDir(sys_get_temp_dir().'/symfttpd-project-test');
+        $filesystem = new \Symfttpd\Filesystem\Filesystem();
+
+        $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
+
+        $filesystem->remove($baseDir);
+        $filesystem->mkdir($baseDir);
+
+        $this->project->setRootDir($baseDir);
 
         $baseDir = $this->project->getRootDir();
 
@@ -65,9 +72,6 @@ class PhpTest extends \PHPUnit_Framework_TestCase
             $baseDir.DIRECTORY_SEPARATOR.'robots.txt',
         );
 
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
-        $filesystem->remove($baseDir);
-        $filesystem->mkdir($baseDir);
         $filesystem->touch($files);
 
         $this->project->scan();
@@ -75,6 +79,8 @@ class PhpTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('index.php', $this->project->readablePhpFiles);
         $this->assertEmpty($this->project->readableDirs);
         $this->assertContains('robots.txt', $this->project->readableFiles);
+
+        $filesystem->remove($baseDir);
     }
 
     public function testGetName()

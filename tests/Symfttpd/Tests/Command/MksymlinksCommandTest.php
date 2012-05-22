@@ -11,7 +11,6 @@
 
 namespace Symfttpd\Tests\Command;
 
-use Symfttpd\Tests\Test;
 use Symfttpd\Command\MksymlinksCommand;
 use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -23,12 +22,11 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  * @since 24/10/11
  */
-class MksymlinksCommandTest extends Test
+class MksymlinksCommandTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        parent::setUp();
-
+        $this->fixtures = sys_get_temp_dir();
         $this->filesystem = new Filesystem();
 
         $this->command = new MksymlinksCommand();

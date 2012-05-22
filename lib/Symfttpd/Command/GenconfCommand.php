@@ -74,10 +74,10 @@ EOT
 
         $output->writeln('Starting generating symfttpd configuration.');
 
+        $this->getSymfttpd()->getProject()->setRootDir($input->getOption('path'));
         $server = $this->getSymfttpd()->getServer();
         $server->options->set('port', $input->getOption('port'));
         $server->options->set('bind', $input->getOption('bind'));
-        $server->getProject()->setRootDir($input->getOption('path'));
 
         try {
             switch ($input->getArgument('type')) {
