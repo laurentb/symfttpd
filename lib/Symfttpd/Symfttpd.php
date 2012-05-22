@@ -24,7 +24,7 @@ use Symfttpd\TwigExtension;
  */
 class Symfttpd extends \Pimple
 {
-    const VERSION = '2.0.0-beta';
+    const VERSION = '@package_version@';
 
     /**
      * @param Configuration\SymfttpdConfiguration $configuration
