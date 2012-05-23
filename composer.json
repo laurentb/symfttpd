@@ -3,6 +3,7 @@
     "description": "PHP webserver",
     "keywords": ["symfony", "server", "webserver"],
     "type": "library",
+    "licence": "MIT",
     "authors": [
         {
             "name":     "Laurent Bachelier",

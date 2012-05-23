@@ -14,5 +14,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfttpd\Compiler;
 
+error_reporting(-1);
+ini_set('display_errors', 1);
+
 $compiler = new Compiler();
 $compiler->compile();
