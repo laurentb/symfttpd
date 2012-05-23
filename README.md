@@ -48,6 +48,8 @@ benjamin:~/dev/symfttpd benjamin $ php composer.phar install
 
 Then complie symfttpd in your project to create an executable .phar file
 
+**In order to compile you have to set the `phar.readonly` setting to `Off` in you php.ini file.**
+
 ```
 benjamin:~/dev/project benjamin $ php ../symfttpd/bin/compile
 benjamin:~/dev/project benjamin $ php symfttpd.phar --help
