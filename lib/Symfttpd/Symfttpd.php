@@ -156,7 +156,7 @@ class Symfttpd extends \Pimple
             $phpFinder = new PhpExecutableFinder();
             $cmd = $phpFinder->find();
 
-            if (null == $cmd) {
+            if (false == $cmd) {
                 throw new \Symfttpd\Exception\ExecutableNotFoundException('php executable not found');
             }
 
@@ -177,7 +177,7 @@ class Symfttpd extends \Pimple
             $exeFinder->addSuffix('');
             $cmd = $exeFinder->find('php-cgi');
 
-            if (null == $cmd) {
+            if (false == $cmd) {
                 throw new \Symfttpd\Exception\ExecutableNotFoundException('php-cgi executable not found.');
             }
 
