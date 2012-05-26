@@ -51,7 +51,7 @@ class Application extends BaseApplication
     /**
      * @param \Symfttpd\Symfttpd $symfttpd
      */
-    public function setSymfftpd(Symfttpd $symfttpd)
+    public function setSymfttpd(Symfttpd $symfttpd)
     {
         $this->symfttpd = $symfttpd;
     }

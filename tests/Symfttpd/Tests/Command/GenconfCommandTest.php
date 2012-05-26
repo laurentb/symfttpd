@@ -111,7 +111,7 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 
         $application = new \Symfttpd\Console\Application();
         $application->setAutoExit(false);
-        $application->setSymfftpd($symfttpd);
+        $application->setSymfttpd($symfttpd);
         $application->add($this->command);
 
         $tester = new ApplicationTester($application);
@@ -178,7 +178,7 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 
         $application = new \Symfttpd\Console\Application();
         $application->setAutoExit(false);
-        $application->setSymfftpd($symfttpd);
+        $application->setSymfttpd($symfttpd);
         $application->add($this->command);
 
         $tester = new ApplicationTester($application);

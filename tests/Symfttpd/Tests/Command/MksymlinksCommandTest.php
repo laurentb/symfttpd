@@ -33,7 +33,7 @@ class MksymlinksCommandTest extends \PHPUnit_Framework_TestCase
 
         $application = new \Symfttpd\Console\Application();
         $application->setAutoExit(false);
-        $application->setSymfftpd($this->getSymfttpd());
+        $application->setSymfttpd($this->getSymfttpd());
         $application->add($this->command);
 
         $this->tester  = new ApplicationTester($application);
