@@ -38,6 +38,7 @@ class Symfttpd extends \Pimple
         }
 
         $this['configuration'] = $configuration;
+        $this->findExecutables();
 
         $this['project'] = $this->share(function ($c) use ($container) {
             $config  = $container['configuration'];
@@ -156,7 +157,7 @@ class Symfttpd extends \Pimple
             $phpFinder = new PhpExecutableFinder();
             $cmd = $phpFinder->find();
 
-            if (false == $cmd) {
+            if (false == (boolean) $cmd) {
                 throw new \Symfttpd\Exception\ExecutableNotFoundException('php executable not found');
             }
 
@@ -177,7 +178,7 @@ class Symfttpd extends \Pimple
             $exeFinder->addSuffix('');
             $cmd = $exeFinder->find('php-cgi');
 
-            if (false == $cmd) {
+            if (false == (boolean) $cmd) {
                 throw new \Symfttpd\Exception\ExecutableNotFoundException('php-cgi executable not found.');
             }
 
