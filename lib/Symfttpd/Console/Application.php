@@ -34,8 +34,6 @@ class Application extends BaseApplication
     public function __construct()
     {
         parent::__construct('Symfttpd', Symfttpd::VERSION);
-
-        $this->symfttpd = new Symfttpd(new SymfttpdConfiguration());
     }
 
     /**
@@ -45,6 +43,10 @@ class Application extends BaseApplication
      */
     public function getSymfttpd()
     {
+        if (null == $this->symfttpd) {
+            $this->symfttpd = new Symfttpd(new SymfttpdConfiguration());
+        }
+
         return $this->symfttpd;
     }
 
