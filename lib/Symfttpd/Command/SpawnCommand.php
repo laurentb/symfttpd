@@ -89,7 +89,7 @@ class SpawnCommand extends Command
         }
 
         $bind = $server->options->get('bind');
-        $host = in_array($bind, array(false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
+        $host = in_array($bind, array(null, false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
 
         $apps = array();
         foreach ($server->getProject()->readablePhpFiles as $file) {
