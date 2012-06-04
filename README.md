@@ -113,7 +113,7 @@ need it, or deal with permissions, then this tool is for you.
 
 After configuring symfttpd you only have to run the following:
 
-    benjamin:~/dev/project benjamin $ php symfttpd.phar
+    benjamin:~/dev/project benjamin $ php symfttpd.phar spawn -t
 
 It will display something like that:
 
