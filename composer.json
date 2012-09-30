@@ -18,11 +18,11 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/console":    "2.1.*",
-        "symfony/process":    "2.1.*",
-        "symfony/finder":     "2.1.*",
-        "symfony/filesystem": "2.1.*",
-        "twig/twig":          ">=1.8,<2.0-dev",
+        "symfony/console":    "2.2.*",
+        "symfony/process":    "2.2.*",
+        "symfony/finder":     "2.2.*",
+        "symfony/filesystem": "2.2.*",
+        "twig/twig":          ">=1.10,<2.0-dev",
         "pimple/pimple":      "1.0.0"
     },
     "autoload": {
@@ -35,5 +35,6 @@
         "branch-alias": {
             "dev-master": "2.0.0"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
