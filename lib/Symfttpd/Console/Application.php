@@ -30,9 +30,13 @@ class Application extends BaseApplication
     /**
      * Constructor
      * Initialize a Symfttpd object.
+     *
+     * @param \Symfttpd\Symfttpd $symfttpd
      */
-    public function __construct()
+    public function __construct(Symfttpd $symfttpd)
     {
+        $this->symfttpd = $symfttpd;
+
         parent::__construct('Symfttpd', Symfttpd::VERSION);
     }
 
@@ -43,10 +47,6 @@ class Application extends BaseApplication
      */
     public function getSymfttpd()
     {
-        if (null == $this->symfttpd) {
-            $this->symfttpd = new Symfttpd(new SymfttpdConfiguration());
-        }
-
         return $this->symfttpd;
     }
 
@@ -56,5 +56,16 @@ class Application extends BaseApplication
     public function setSymfttpd(Symfttpd $symfttpd)
     {
         $this->symfttpd = $symfttpd;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function add(Command $command)
+    {
+        $command->setSymfttpd($this->symfttpd);
+
+        return parent::add($command);
     }
 }

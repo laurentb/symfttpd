@@ -26,17 +26,30 @@ use Symfony\Component\Console\Command\Command as BaseCommand;
 class Command extends BaseCommand
 {
     /**
+     * @var \Symfttpd\Symfttpd $symfttpd
+     */
+    public $symfttpd;
+
+    /**
      * Return the current Symfttpd instance.
      *
      * @return \Symfttpd\Symfttpd
      */
     public function getSymfttpd()
     {
-        if ($this->getApplication() instanceof Application) {
-            return $this->getApplication()->getSymfttpd();
+        if (null === $this->symfttpd) {
+            throw new \RuntimeException('The command does not know Symfttpd.');
         }
 
-        return new Symfttpd(new SymfttpdConfiguration());
+        return $this->symfttpd;
+    }
+
+    /**
+     * @param \Symfttpd\Symfttpd $symfttpd
+     */
+    public function setSymfttpd(Symfttpd $symfttpd)
+    {
+        $this->symfttpd = $symfttpd;
     }
 
     /**
