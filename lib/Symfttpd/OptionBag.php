@@ -11,12 +11,14 @@
 
 namespace Symfttpd;
 
+use Symfttpd\OptionBagInterface;
+
 /**
  * OptionBag class
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class OptionBag implements \IteratorAggregate
+class OptionBag implements OptionBagInterface
 {
     /**
      * @var array
