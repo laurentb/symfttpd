@@ -119,7 +119,7 @@ class SymfttpdFile
             if (file_exists($file)) {
                 require $file;
                 if (isset($options)) {
-                    $configuration = array_merge($options, $configuration);
+                    $configuration = array_merge($configuration, $options);
                     unset($options);
                 }
             }
