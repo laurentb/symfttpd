@@ -59,7 +59,7 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
 
     public function testGetIndexFile()
     {
-        $this->assertEquals('index.php', $this->project->getIndexFile());
+        $this->assertEquals('app.php', $this->project->getIndexFile());
     }
 
     public function testGetRootDir()
