@@ -24,7 +24,7 @@ class PhpTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->project = new Php(new \Symfttpd\OptionBag());
+        $this->project = new Php(new \Symfttpd\Config());
     }
 
     /**
