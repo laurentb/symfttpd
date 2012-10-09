@@ -20,8 +20,18 @@ use Symfttpd\Project\Exception\ProjectException;
  */
 abstract class BaseProject implements ProjectInterface
 {
+    /**
+     * The name of the project framework.
+     *
+     * @var string
+     */
     protected $name;
 
+    /**
+     * The version of the project framework.
+     *
+     * @var string
+     */
     protected $version;
 
     /**
@@ -66,6 +76,8 @@ abstract class BaseProject implements ProjectInterface
     /**
      * Scan readable files, dirs and php executable files
      * as index.php.
+     *
+     * @todo: move this in a dedicated class.
      */
     public function scan()
     {
