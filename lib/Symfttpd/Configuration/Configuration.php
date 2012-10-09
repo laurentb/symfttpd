@@ -164,17 +164,8 @@ class Configuration implements ConfigurationInterface
                     }
                 }
 
+                sort($dirs);
                 $v['project_readable_dirs'] = $dirs;
-
-                // Validate readable php files.
-                $files = $v['project_readable_phpfiles'];
-                foreach ($files as $key => $file) {
-                    if (!strpos($file, '.php') || !file_exists($baseDir.DIRECTORY_SEPARATOR.$file)) {
-                        unset($files[$key]);
-                    }
-                }
-
-                $v['project_readable_phpfiles'] = $files;
 
                 // Validate readable files
                 $files = $v['project_readable_files'];
@@ -184,6 +175,7 @@ class Configuration implements ConfigurationInterface
                     }
                 }
 
+                sort($files);
                 $v['project_readable_files'] = $files;
 
                 // Validate not executable php files
@@ -195,6 +187,20 @@ class Configuration implements ConfigurationInterface
                 }
 
                 $v['project_nophp'] = $dirs;
+
+                // Validate readable php files.
+                $files = $v['project_readable_phpfiles'];
+                foreach ($files as $key => $file) {
+                    if (!strpos($file, '.php')
+                        || !file_exists($baseDir.DIRECTORY_SEPARATOR.$file)
+                        || in_array($file, $v['project_readable_files'])
+                    ) {
+                        unset($files[$key]);
+                    }
+                }
+
+                sort($files);
+                $v['project_readable_phpfiles'] = $files;
 
                 return $v;
             })
