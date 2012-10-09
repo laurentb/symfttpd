@@ -20,7 +20,7 @@ interface ProjectInterface
 {
     /**
      * @param \Symfttpd\Config $options
-     * @param null $path
+     * @param null             $path
      */
     public function __construct(\Symfttpd\Config $options, $path = null);
 

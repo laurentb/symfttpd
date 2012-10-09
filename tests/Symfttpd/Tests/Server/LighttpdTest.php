@@ -58,7 +58,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testGenerateAndReadRule()
     {
         $this->server->generateRules();
-        $this->assertEquals($this->getGeneratedRules(), (string)$this->server->readRules());
+        $this->assertEquals($this->getGeneratedRules(), (string) $this->server->readRules());
     }
 
     public function testGenerateAndReadConfiguration()

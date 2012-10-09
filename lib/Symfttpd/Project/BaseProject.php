@@ -22,11 +22,6 @@ abstract class BaseProject implements ProjectInterface
 {
     protected $name;
 
-    /**
-     * The version of the project framework.
-     *
-     * @var string
-     */
     protected $version;
 
     /**

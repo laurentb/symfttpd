@@ -56,8 +56,8 @@ class SpawnCommand extends Command
     /**
      * Run the Symttpd configured server.
      *
-     * @param \Symfony\Component\Console\Input\InputInterface   $input
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param  \Symfony\Component\Console\Input\InputInterface   $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output
      * @throws \InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -139,8 +139,7 @@ TEXT;
         $process = null;
         if ($pid) {
             $this->watch($server, $output, $multitail);
-            if (pcntl_waitpid($pid, $status, WNOHANG))
-            {
+            if (pcntl_waitpid($pid, $status, WNOHANG)) {
                 exit(0);
             }
         } elseif (0 === $pid) {
@@ -161,8 +160,8 @@ TEXT;
      * rules changed. In this case it will create a file that
      * will tell to the fork that the server must be restarted.
      *
-     * @param \Symfttpd\Server\ServerInterface                  $server
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param  \Symfttpd\Server\ServerInterface                  $server
+     * @param  \Symfony\Component\Console\Output\OutputInterface $output
      * @return bool
      */
     protected function spawn(ServerInterface $server, OutputInterface $output)

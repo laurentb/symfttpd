@@ -47,7 +47,6 @@ class Tail implements TailInterface
         $first = $this->first;
         $this->first = false;
         if (!is_readable($this->path)) {
-
             return null;
         }
 

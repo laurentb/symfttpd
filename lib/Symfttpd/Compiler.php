@@ -28,7 +28,7 @@ class Compiler
     /**
      * Compile symfttpd.
      *
-     * @param string $pharFile
+     * @param  string            $pharFile
      * @throws \RuntimeException
      */
     public function compile($pharFile = 'symfttpd.phar')
@@ -116,11 +116,10 @@ class Compiler
         $phar->addFromString('bin/symfttpd', $content);
     }
 
-
     /**
      * Removes whitespace from a PHP source string while preserving line numbers.
      *
-     * @param string $source A PHP string
+     * @param  string $source A PHP string
      * @return string The PHP string with the whitespace removed
      */
     private function stripWhitespace($source)

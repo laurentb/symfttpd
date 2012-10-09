@@ -122,4 +122,3 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1', $this->project->getVersion());
     }
 }
-

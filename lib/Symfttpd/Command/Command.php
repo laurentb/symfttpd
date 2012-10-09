@@ -12,8 +12,6 @@
 namespace Symfttpd\Command;
 
 use Symfttpd\Symfttpd;
-use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Command\Command as BaseCommand;

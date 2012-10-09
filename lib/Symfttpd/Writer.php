@@ -23,7 +23,7 @@ class Writer
     /**
      * @param $content
      * @param $file
-     * @param bool $force
+     * @param  bool            $force
      * @return mixed
      * @throws WriterException
      */

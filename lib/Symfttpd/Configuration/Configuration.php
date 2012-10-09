@@ -158,7 +158,7 @@ class Configuration implements ConfigurationInterface
 
                 // Validate readable dirs
                 $dirs = $v['project_readable_dirs'];
-                foreach($dirs as $key => $dir) {
+                foreach ($dirs as $key => $dir) {
                     if (!file_exists($baseDir.DIRECTORY_SEPARATOR.$dir)) {
                         unset($dirs[$key]);
                     }
@@ -168,7 +168,7 @@ class Configuration implements ConfigurationInterface
 
                 // Validate readable php files.
                 $files = $v['project_readable_phpfiles'];
-                foreach($files as $key => $file) {
+                foreach ($files as $key => $file) {
                     if (!strpos($file, '.php') || !file_exists($baseDir.DIRECTORY_SEPARATOR.$file)) {
                         unset($files[$key]);
                     }
@@ -178,7 +178,7 @@ class Configuration implements ConfigurationInterface
 
                 // Validate readable files
                 $files = $v['project_readable_files'];
-                foreach($files as $key => $file) {
+                foreach ($files as $key => $file) {
                     if (!file_exists($baseDir.DIRECTORY_SEPARATOR.$file)) {
                         unset($files[$key]);
                     }
@@ -188,7 +188,7 @@ class Configuration implements ConfigurationInterface
 
                 // Validate not executable php files
                 $dirs = $v['project_nophp'];
-                foreach($dirs as $key => $dir) {
+                foreach ($dirs as $key => $dir) {
                     if (!file_exists($dir)) {
                         unset($dirs[$key]);
                     }

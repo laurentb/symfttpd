@@ -111,4 +111,3 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2', $this->project->getVersion());
     }
 }
-

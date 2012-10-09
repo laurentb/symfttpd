@@ -89,7 +89,6 @@ class Symfttpd
         return $this->server;
     }
 
-
     /**
      * Find executables.
      *

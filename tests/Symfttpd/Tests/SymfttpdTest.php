@@ -14,7 +14,6 @@ namespace Symfttpd\Tests;
 use Symfttpd\Config;
 use Symfttpd\Factory;
 use Symfttpd\Symfttpd;
-use Symfttpd\Tests\Configuration\MockConfigurationFactory;
 
 /**
  * SymfttpdTest class

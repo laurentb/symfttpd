@@ -93,4 +93,3 @@ class PhpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->project->getVersion());
     }
 }
-

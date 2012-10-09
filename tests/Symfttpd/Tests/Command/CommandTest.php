@@ -12,10 +12,7 @@
 namespace Symfttpd\Tests\Command;
 
 use Symfttpd\Command\Command;
-use Symfttpd\Console\Application;
-use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * CommandTest class

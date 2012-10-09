@@ -105,7 +105,7 @@ class Config implements \IteratorAggregate
      * Return an entry.
      *
      * @param $name
-     * @param null $default
+     * @param  null       $default
      * @return null|mixed
      */
     public function get($name, $default = null)

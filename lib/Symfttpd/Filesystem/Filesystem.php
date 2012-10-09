@@ -56,8 +56,7 @@ class Filesystem extends \Symfony\Component\Filesystem\Filesystem
         $minPathLength = min(strlen($from), strlen($to));
 
         // count how many chars the strings have in common
-        for ($i = 0; $i < $minPathLength; $i++)
-        {
+        for ($i = 0; $i < $minPathLength; $i++) {
             if ($from[$i] != $to[$i]) {
                 break;
             }
