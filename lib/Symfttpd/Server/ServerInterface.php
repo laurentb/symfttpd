@@ -11,11 +11,10 @@
 
 namespace Symfttpd\Server;
 
-use Symfttpd\Project\ProjectInterface;
+use Symfttpd\Config;
 use Symfttpd\Loader;
+use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Writer;
-use Symfttpd\OptionBag;
-use Symfttpd\Configuration\SymfttpdConfiguration;
 
 /**
  * ServerInterface interface
@@ -32,9 +31,9 @@ interface ServerInterface
      * @param \Twig_Environment                  $twig
      * @param \Symfttpd\Loader                   $loader
      * @param \Symfttpd\Writer                   $writer
-     * @param \Symfttpd\OptionBag                $options
+     * @param \Symfttpd\Config                   $config
      */
-    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options);
+    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, Config $config);
 
     /**
      * Return the project.
@@ -67,10 +66,9 @@ interface ServerInterface
      * and the rewrite rules.
      *
      * @abstract
-     * @param SymfttpdConfiguration $configuration
      * @return string
      */
-    public function generate(SymfttpdConfiguration $configuration);
+    public function generate();
 
     /**
      * Generate the rewrite rules.
@@ -84,10 +82,9 @@ interface ServerInterface
      * Generate the configuration file for the server.
      *
      * @abstract
-     * @param \Symfttpd\Configuration\SymfttpdConfiguration $configuration
      * @return string
      */
-    public function generateConfiguration(SymfttpdConfiguration $configuration);
+    public function generateConfiguration();
 
     /**
      * Write the configuration in the directory.

@@ -11,10 +11,10 @@
 
 namespace Symfttpd\Server;
 
-use Symfttpd\Server\ServerInterface;
-use Symfttpd\Project\ProjectInterface;
-use Symfttpd\OptionBag;
+use Symfttpd\Config;
 use Symfttpd\Loader;
+use Symfttpd\Project\ProjectInterface;
+use Symfttpd\Server\ServerInterface;
 use Symfttpd\Writer;
 
 /**
@@ -45,36 +45,24 @@ abstract class BaseServer implements ServerInterface
     protected $writer;
 
     /**
-     * The server options
+     * The server config
      *
-     * @var OptionBag
+     * @var \Symfttpd\Config
      */
-    public $options;
-
-    /**
-     * Return the keys for the server configuration.
-     *
-     * @var array
-     */
-    static public $configurationKeys = array(
-        'server_pidfile',     // The pidfile stores the PID of the server process.
-        'server_restartfile', // The file that tells the spawn command to restart the server.
-        'server_access_log',  // The server access log file of the server.
-        'server_error_log',   // The server error log file of the server.
-    );
+    public $config;
 
     /**
      * @param \Symfttpd\Project\ProjectInterface $project
      * @param \Twig_Environment                  $twig
      * @param \Symfttpd\Loader                   $loader
      * @param \Symfttpd\Writer                   $writer
-     * @param \Symfttpd\OptionBag                $options
+     * @param \Symfttpd\Config                   $config
      */
-    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
+    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, Config $config)
     {
         $this->project  = $project;
         $this->twig     = $twig;
-        $this->options  = $options;
+        $this->config   = $config;
         $this->loader   = $loader;
         $this->writer   = $writer;
     }

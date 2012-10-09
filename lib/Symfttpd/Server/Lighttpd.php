@@ -11,15 +11,14 @@
 
 namespace Symfttpd\Server;
 
-use Symfttpd\Server\BaseServer;
-use Symfttpd\Project\ProjectInterface;
-use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\OptionBag;
-use Symfttpd\Loader;
-use Symfttpd\Writer;
-use Symfttpd\Configuration\SymfttpdConfiguration;
-use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfttpd\Config;
+use Symfttpd\Exception\ExecutableNotFoundException;
+use Symfttpd\Filesystem\Filesystem;
+use Symfttpd\Loader;
+use Symfttpd\Project\ProjectInterface;
+use Symfttpd\Server\BaseServer;
+use Symfttpd\Writer;
 
 /**
  * Lighttpd class
@@ -77,11 +76,11 @@ class Lighttpd extends BaseServer
      * @param \Twig_Environment                  $twig
      * @param \Symfttpd\Loader                   $loader
      * @param \Symfttpd\Writer                   $writer
-     * @param \Symfttpd\OptionBag                $options
+     * @param \Symfttpd\OptionBag                $config
      */
-    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
+    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, Config $config)
     {
-        parent::__construct($project, $twig, $loader, $writer, $options);
+        parent::__construct($project, $twig, $loader, $writer, $config);
 
         // Add the lighttpd templates directory to twig loader.
         $this->twig->getLoader()->addPath(__DIR__.'/../Resources/templates/lighttpd');
@@ -110,7 +109,7 @@ class Lighttpd extends BaseServer
      */
     public function getRestartFile()
     {
-        return $this->getCacheDir().'/'.$this->options->get('server_restartfile', '.symfttpd_restart');
+        return $this->getCacheDir().'/'.$this->config->get('server_restartfile', '.symfttpd_restart');
     }
 
     /**
@@ -121,7 +120,7 @@ class Lighttpd extends BaseServer
      */
     public function getPidfile()
     {
-        return $this->getCacheDir().'/'.$this->options->get('server_pidfile', '.sf');
+        return $this->getCacheDir().'/'.$this->config->get('server_pidfile', '.sf');
     }
 
     /**
@@ -231,31 +230,30 @@ class Lighttpd extends BaseServer
      *
      * @param SymfttpdConfiguration $configuration
      */
-    public function generate(SymfttpdConfiguration $configuration)
+    public function generate()
     {
         $this->generateRules();
-        $this->generateConfiguration($configuration);
+        $this->generateConfiguration();
     }
 
     /**
      * Generate the lighttpd configuration file.
      *
-     * @param \Symfttpd\Configuration\SymfttpdConfiguration $configuration
      * @return string
      */
-    public function generateConfiguration(SymfttpdConfiguration $configuration)
+    public function generateConfiguration()
     {
         $this->lighttpdConfig = $this->twig->render(
             $this->name.'/'.$this->configFilename.'.twig',
             array(
                 'document_root' => $this->project->getWebDir(),
-                'port'          => $this->options->get('port'),
-                'bind'          => $this->options->get('bind', null),
-                'error_log'     => $this->getLogDir().'/'.$this->options->get('server_error_log', 'error.log'),
-                'access_log'    => $this->getLogDir().'/'.$this->options->get('server_access_log', 'access.log'),
+                'port'          => $this->config->get('port'),
+                'bind'          => $this->config->get('bind', null),
+                'error_log'     => $this->getLogDir().'/'.$this->config->get('server_error_log', 'error.log'),
+                'access_log'    => $this->getLogDir().'/'.$this->config->get('server_access_log', 'access.log'),
                 'pidfile'       => $this->getPidfile(),
                 'rules_file'    => null !== $this->rules ? $this->getRulesFile() : null,
-                'php_cgi_cmd'   => $configuration->get('php_cgi_cmd'),
+                'php_cgi_cmd'   => $this->config->get('php_cgi_cmd'),
             )
         );
 
@@ -278,7 +276,7 @@ class Lighttpd extends BaseServer
                 'files'   => $this->project->readableFiles,
                 'phps'    => $this->project->readablePhpFiles,
                 'default' => $this->project->getIndexFile(),
-                'nophp'   => $this->project->options->get('project_nophp', array('uploads')),
+                'nophp'   => $this->config->get('project_nophp', array('uploads')),
             )
         );
 
