@@ -65,7 +65,9 @@ class Application extends BaseApplication
      */
     public function add(Command $command)
     {
-        $command->setSymfttpd($this->symfttpd);
+        if ($command instanceof \Symfttpd\Command\Command) {
+            $command->setSymfttpd($this->getSymfttpd());
+        }
 
         return parent::add($command);
     }
