@@ -62,12 +62,14 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $server = $this->getSymfttpd()->getServer();
-        $server->options->add(array(
+        $configuration = $this->symfttpd->getConfig();
+        $configuration->add(array(
             // Lighttpd options
             'port' => $input->getOption('port'),
             'bind' => true == $input->getOption('all') ? false : $input->getOption('bind')
         ));
+
+        $server = $this->getSymfttpd()->getServer();
 
         // Kill other running server in the current project.
         if (true == $input->getOption('kill')) {
@@ -79,22 +81,22 @@ class SpawnCommand extends Command
         }
 
         // Creates the server configuration.
-        $server->generate($this->getSymfttpd()->getConfiguration());
+        $server->generate();
         $server->write();
 
-        if (false == $server->options->get('bind')) {
+        if (false == $configuration->get('bind')) {
             $boundAddress = 'all-interfaces';
         } else {
-            $boundAddress = $server->options->get('bind');
+            $boundAddress = $configuration->get('bind');
         }
 
-        $bind = $server->options->get('bind');
+        $bind = $configuration->get('bind');
         $host = in_array($bind, array(null, false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
 
         $apps = array();
         foreach ($server->getProject()->readablePhpFiles as $file) {
             if (preg_match('/.+\.php$/', $file)) {
-                $apps[$file] = ' http://' . $host . ':' . $server->options->get('port') . '/<info>' . $file . '</info>';
+                $apps[$file] = ' http://' . $host . ':' . $configuration->get('port') . '/<info>' . $file . '</info>';
             }
         }
 
@@ -109,7 +111,7 @@ Available applications:
 
 TEXT;
         $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
-        $output->write(sprintf($text, $boundAddress, $server->options->get('port'), implode("\n", $apps)));
+        $output->write(sprintf($text, $boundAddress, $configuration->get('port'), implode("\n", $apps)));
 
         flush();
 
@@ -125,8 +127,8 @@ TEXT;
 
         $multitail = null;
         if ($input->getOption('tail')) {
-            $tailAccess = new Tail($server->getLogDir() . '/' . $server->options->get('access_log', 'access.log'));
-            $tailError  = new Tail($server->getLogDir() . '/' . $server->options->get('error_log', 'error.log'));
+            $tailAccess = new Tail($server->getLogDir() . '/' . $configuration->get('access_log', 'access.log'));
+            $tailError  = new Tail($server->getLogDir() . '/' . $configuration->get('error_log', 'error.log'));
 
             $multitail = new MultiTail(new OutputFormatter(true));
             $multitail->add('access', $tailAccess, new OutputFormatterStyle('blue'));
