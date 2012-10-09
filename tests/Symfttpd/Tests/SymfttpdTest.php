@@ -11,7 +11,10 @@
 
 namespace Symfttpd\Tests;
 
+use Symfttpd\Config;
+use Symfttpd\Factory;
 use Symfttpd\Symfttpd;
+use Symfttpd\Tests\Configuration\MockConfigurationFactory;
 
 /**
  * SymfttpdTest class
@@ -27,16 +30,19 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->symfttpd = new Symfttpd($this->getConfigurationMock());
+        $this->symfttpd = new Symfttpd(new Config(array()));
     }
 
     public function testGetProject()
     {
-        $this->symfttpd = new Symfttpd(new \Symfttpd\Tests\Fixtures\TestConfiguration());
-        $this->symfttpd->getConfiguration()->add(array(
+        $factory = new Factory();
+
+        $this->symfttpd = new Symfttpd();
+        $this->symfttpd->setConfig(new Config(array(
             'project_type' => 'symfony',
             'project_version' => '1'
-        ));
+        )));
+        $this->symfttpd->setProject($factory->createProject($this->symfttpd->getConfig()));
 
         $project = $this->symfttpd->getProject();
 
@@ -45,14 +51,17 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
 
     public function testGetServer()
     {
-        $this->symfttpd = new Symfttpd(new \Symfttpd\Tests\Fixtures\TestConfiguration());
-        $this->symfttpd->getConfiguration()->add(array(
+        $factory = new Factory();
+
+        $this->symfttpd = new Symfttpd();
+
+        $this->symfttpd->setConfig(new Config(array(
             'project_type' => 'symfony',
             'project_version' => '1',
             'server_type' => 'lighttpd'
-        ));
+        )));
 
-        $project = $this->getMock('\\Symfttpd\\Project\\Symfony1', array(), array(new \Symfttpd\OptionBag()));
+        $project = $this->getMock('\\Symfttpd\\Project\\Symfony1', array(), array(new Config()));
         $project->expects($this->any())
             ->method('getLogDir')
             ->will($this->returnValue(sys_get_temp_dir()));
@@ -61,22 +70,9 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
             ->method('getCacheDir')
             ->will($this->returnValue(sys_get_temp_dir()));
 
-        $this->symfttpd['project'] = $project;
+        $this->symfttpd->setProject($project);
+        $this->symfttpd->setServer($factory->createServer($this->symfttpd->getConfig(), $project));
 
         $this->assertInstanceof('Symfttpd\\Server\\ServerInterface', $this->symfttpd->getServer());
-    }
-
-    /**
-     * Return a SymfttpdConfiguration mock.
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    public function getConfigurationMock()
-    {
-        $configuration = $this->getMockBuilder('\\Symfttpd\\Configuration\\SymfttpdConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return $configuration;
     }
 }
