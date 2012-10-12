@@ -146,7 +146,7 @@ TEXT;
         if (true == $input->getOption('profile')) {
             $end = microtime(true) - $start;
 
-            $output->writeln(sprintf('<info>%s ms</info>', round($end * 1000)));
+            $output->writeln(sprintf('<info>Configuration loaded in %s ms.</info>', round($end * 1000)));
         }
 
         $pid = pcntl_fork();
