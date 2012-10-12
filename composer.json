@@ -23,8 +23,7 @@
         "symfony/finder":     "2.2.*",
         "symfony/filesystem": "2.2.*",
         "symfony/config":     "2.2.*",
-        "twig/twig":          ">=1.10,<2.0-dev",
-        "pimple/pimple":      "1.0.0"
+        "twig/twig":          ">=1.10,<2.0-dev"
     },
     "autoload": {
         "psr-0": {
