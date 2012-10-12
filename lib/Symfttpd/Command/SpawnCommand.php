@@ -108,7 +108,7 @@ class SpawnCommand extends Command
 
         // Pretty information. Nothing interesting code-wise.
         $text = <<<TEXT
-lighttpd started on <info>%s</info>, port <info>%s</info>.
+%s started on <info>%s</info>, port <info>%s</info>.
 
 Available applications:
 %s
@@ -117,7 +117,7 @@ Available applications:
 
 TEXT;
         $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
-        $output->write(sprintf($text, $boundAddress, $configuration->get('port'), implode("\n", $apps)));
+        $output->write(sprintf($text, $server->name, $boundAddress, $configuration->get('port'), implode("\n", $apps)));
 
         flush();
 
