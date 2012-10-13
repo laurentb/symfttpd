@@ -47,7 +47,6 @@ class SpawnCommand extends Command
             ->addOption('all', 'a', InputOption::VALUE_NONE, 'Bind on all addresses')
             ->addOption('tail', 't', InputOption::VALUE_NONE, 'Print the log in the console')
             ->addOption('kill', 'K', InputOption::VALUE_NONE, 'Kill existing running symfttpd')
-            ->addOption('profile', null, InputOption::VALUE_NONE, 'Profile the command')
         ;
 
         if (function_exists('pcntl_fork')) {
@@ -64,10 +63,6 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (true == $input->getOption('profile')) {
-            $start = microtime(true);
-        }
-
         $configuration = $this->symfttpd->getConfig();
         $configuration->add(array(
             // Lighttpd options
@@ -141,12 +136,6 @@ TEXT;
             $multitail->add('error', $tailError, new OutputFormatterStyle('red', null, array('bold')));
             // We have to do it before the fork to capture the startup messages
             $multitail->consume();
-        }
-
-        if (true == $input->getOption('profile')) {
-            $end = microtime(true) - $start;
-
-            $output->writeln(sprintf('<info>Configuration loaded in %s ms.</info>', round($end * 1000)));
         }
 
         $pid = pcntl_fork();
