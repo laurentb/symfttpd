@@ -172,16 +172,6 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\\Symfttpd\\Project\\ProjectInterface', $this->server->getProject());
     }
 
-    public function testGetRestartFile()
-    {
-        $cacheDir = $this->server->getProject()->getCacheDir() . '/lighttpd/.symfttpd_restart';
-        $this->assertEquals($cacheDir, $this->server->getRestartFile());
-
-        $this->server->config->set('server_restartfile', 'lighttpd_restartfile');
-        $cacheDir = $this->server->getProject()->getCacheDir() . '/lighttpd/lighttpd_restartfile';
-        $this->assertEquals($cacheDir, $this->server->getRestartFile());
-    }
-
     public function testGetPidfile()
     {
         $cacheDir = $this->server->getProject()->getCacheDir() . '/lighttpd/.sf';

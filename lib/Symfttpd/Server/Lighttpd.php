@@ -101,20 +101,6 @@ class Lighttpd extends BaseServer
     }
 
     /**
-     * Return the restartfile.
-     *
-     * If the server configuration (rules or base configuration)
-     * changed, it generates a restart file that means that
-     * the server must be restarted.
-     *
-     * @return mixed|null
-     */
-    public function getRestartFile()
-    {
-        return $this->getCacheDir().'/'.$this->config->get('server_restartfile', '.symfttpd_restart');
-    }
-
-    /**
      * Return the pidfile which contains the pid of the process
      * of the server.
      *
