@@ -195,7 +195,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testStart()
     {
         $this->markTestSkipped();
-        
+
         $process = $this->getMock('\\Symfony\\Component\\Process\\Process', array('run'), array(null));
         $process->expects($this->once())
             ->method('run')

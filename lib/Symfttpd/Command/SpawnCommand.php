@@ -18,7 +18,6 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfttpd\Config;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
-use Symfttpd\Tail\TailInterface;
 use Symfttpd\Command\Command;
 use Symfttpd\Server\ServerInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -62,7 +61,6 @@ class SpawnCommand extends Command
     {
         $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
     }
-
 
     /**
      * Run the Symttpd configured server.
@@ -152,6 +150,7 @@ Available applications:
 <important>Press Ctrl+C to stop serving.</important>
 
 TEXT;
+
         return sprintf($text, $server->name, $boundAddress, $configuration->get('port'), implode("\n", $apps));
     }
 

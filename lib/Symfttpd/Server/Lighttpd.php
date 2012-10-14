@@ -12,8 +12,6 @@
 namespace Symfttpd\Server;
 
 use Symfony\Component\Process\ExecutableFinder;
-use Spork\EventDispatcher\EventDispatcher;
-use Spork\ProcessManager;
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Config;
