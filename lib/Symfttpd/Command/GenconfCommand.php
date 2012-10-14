@@ -106,7 +106,7 @@ EOT
             }
 
             if (null == $input->getOption('output')) {
-                $server->write($input->getArgument('type'), true);
+                $server->write(true);
             } else {
                 switch ($input->getArgument('type')) {
                     case 'config':

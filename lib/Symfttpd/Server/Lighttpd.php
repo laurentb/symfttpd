@@ -179,50 +179,10 @@ class Lighttpd extends BaseServer
      * @param string $type
      * @param bool   $force
      */
-    public function write($type = 'all', $force = false)
+    public function write($force = false)
     {
-        switch ($type) {
-            case 'config':
-            case 'configuration':
-                $this->writer->write(
-                    $this->lighttpdConfig,
-                    $this->getConfigFile(),
-                    $force
-                );
-                break;
-            case 'rules':
-                $this->writer->write(
-                    $this->rules,
-                    $this->getRulesFile(),
-                    $force
-                );
-                break;
-            case 'all':
-            default:
-                $this->write('config', true);
-                $this->write('rules', true);
-                break;
-        }
-    }
-
-    /**
-     * Write the configuration file.
-     *
-     * @param bool $force
-     */
-    public function writeConfiguration($force = false)
-    {
-        $this->write('config', $force);
-    }
-
-    /**
-     * Write the rules configuration file.
-     *
-     * @param bool $force
-     */
-    public function writeRules($force = false)
-    {
-        $this->write('rules', $force);
+        $this->writer->write($this->lighttpdConfig, $this->getConfigFile(), $force);
+        $this->writer->write($this->rules, $this->getRulesFile(), $force);
     }
 
     /**
@@ -441,12 +401,17 @@ class Lighttpd extends BaseServer
         }
     }
 
+    /**
+     * Start the server.
+     *
+     * @param $output
+     */
     public function doStart($output)
     {
         try {
             // Regenerate the lighttpd configuration
             $this->generate();
-            $this->write();
+            $this->write(true);
 
             $process = new \Symfony\Component\Process\Process(null);
             $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($this->getConfigFile()));

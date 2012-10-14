@@ -118,7 +118,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testReadRulesFromFile()
     {
         $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
-        $this->server->writeRules(true);
+        $this->server->write(true);
 
         $lighttpd = $this->createLighttpd(false);
         $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
@@ -127,7 +127,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function testReadConfigFromFile()
     {
         $this->server->generateConfiguration();
-        $this->server->writeConfiguration(true);
+        $this->server->write(true);
 
         $lighttpd = $this->createLighttpd(false);
         $this->assertEquals($this->getGeneratedConfiguration(), $lighttpd->readConfiguration());

@@ -97,22 +97,6 @@ interface ServerInterface
     public function write();
 
     /**
-     * Write the rewrite rules.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function writeRules();
-
-    /**
-     * Write the configuration file.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function writeConfiguration();
-
-    /**
      * Run the server command to start it.
      *
      * @abstract
