@@ -1,34 +1,32 @@
 {
-    "hash": "3d0b5dfae178d47f68cf3d354a33f3a4",
+    "hash": "f2529ff82f609acec467a4eb07795663",
     "packages": [
         {
-            "name": "pimple/pimple",
-            "version": "1.0.0",
+            "name": "kriswallsmith/spork",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "git://github.com/fabpot/Pimple.git",
-                "reference": "v1.0.0"
+                "url": "https://github.com/kriswallsmith/spork.git",
+                "reference": "e6a3ec2fc4d74a174148b539ab8c3c7cebefed0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Pimple/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://github.com/kriswallsmith/spork/zipball/e6a3ec2fc4d74a174148b539ab8c3c7cebefed0e",
+                "reference": "e6a3ec2fc4d74a174148b539ab8c3c7cebefed0e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.3.0",
+                "symfony/event-dispatcher": "*",
+                "ext-pcntl": "*",
+                "ext-posix": "*"
             },
-            "time": "2012-05-08 13:57:24",
+            "time": "1339256178",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "installation-source": "dist",
+            "installation-source": "source",
             "autoload": {
                 "psr-0": {
-                    "Pimple": "lib/"
+                    "Spork": "src/"
                 }
             },
             "license": [
@@ -36,16 +34,13 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "name": "Kris Wallsmith",
+                    "email": "kris.wallsmith@gmail.com",
+                    "homepage": "http://kriswallsmith.net/"
                 }
             ],
-            "description": "Pimple is a simple Dependency Injection Container for PHP 5.3",
-            "homepage": "http://pimple.sensiolabs.org",
-            "keywords": [
-                "dependency injection",
-                "container"
-            ]
+            "description": "Asynchronous PHP",
+            "homepage": "https://github.com/kriswallsmith/spork"
         },
         {
             "name": "symfony/config",
@@ -101,18 +96,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "3d40994abcbbfa9e69fc91bc48215109a4fc837a"
+                "reference": "4a74ab0170585fd25d925ff94582f68b0037f016"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/zipball/3d40994abcbbfa9e69fc91bc48215109a4fc837a",
-                "reference": "3d40994abcbbfa9e69fc91bc48215109a4fc837a",
+                "url": "https://github.com/symfony/Console/zipball/4a74ab0170585fd25d925ff94582f68b0037f016",
+                "reference": "4a74ab0170585fd25d925ff94582f68b0037f016",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1349553479",
+            "time": "1350206314",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -139,6 +134,60 @@
                 }
             ],
             "description": "Symfony Console Component",
+            "homepage": "http://symfony.com"
+        },
+        {
+            "name": "symfony/event-dispatcher",
+            "version": "dev-master",
+            "target-dir": "Symfony/Component/EventDispatcher",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/EventDispatcher",
+                "reference": "24a1039d52b6b9f533cb73dcb96c7748262db686"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/symfony/EventDispatcher/zipball/24a1039d52b6b9f533cb73dcb96c7748262db686",
+                "reference": "24a1039d52b6b9f533cb73dcb96c7748262db686",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/dependency-injection": "2.2.*"
+            },
+            "suggest": {
+                "symfony/dependency-injection": "2.2.*",
+                "symfony/http-kernel": "2.2.*"
+            },
+            "time": "1349553479",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.2-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\EventDispatcher\\": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony EventDispatcher Component",
             "homepage": "http://symfony.com"
         },
         {
@@ -195,18 +244,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder",
-                "reference": "a25e652916f703f5b6857914e0be5c9e48e0e5a2"
+                "reference": "be47860ddba8647f966c4e5eed06024f31785d43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Finder/zipball/a25e652916f703f5b6857914e0be5c9e48e0e5a2",
-                "reference": "a25e652916f703f5b6857914e0be5c9e48e0e5a2",
+                "url": "https://github.com/symfony/Finder/zipball/be47860ddba8647f966c4e5eed06024f31785d43",
+                "reference": "be47860ddba8647f966c4e5eed06024f31785d43",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1349553479",
+            "time": "1350156028",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -288,18 +337,18 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Twig.git",
-                "reference": "5d7baaf767ec3b8f6599738e7c98bde6c25cf7c1"
+                "reference": "82334f876f06b76b28d60ef547ff0ccee8bc1de8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/zipball/5d7baaf767ec3b8f6599738e7c98bde6c25cf7c1",
-                "reference": "5d7baaf767ec3b8f6599738e7c98bde6c25cf7c1",
+                "url": "https://github.com/fabpot/Twig/zipball/82334f876f06b76b28d60ef547ff0ccee8bc1de8",
+                "reference": "82334f876f06b76b28d60ef547ff0ccee8bc1de8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "1349508092",
+            "time": "1350154884",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -337,7 +386,7 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ]
+    "stability-flags": {
+        "kriswallsmith/spork": 20
+    }
 }

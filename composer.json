@@ -1,19 +1,19 @@
 {
-    "name": "laurentb/symfttpd",
+    "name": "benjam1/symfttpd",
     "description": "PHP webserver",
-    "keywords": ["symfony", "server", "webserver"],
+    "keywords": ["symfony", "server", "webserver", "lighttpd"],
     "type": "library",
     "licence": "MIT",
     "authors": [
         {
-            "name":     "Laurent Bachelier",
-            "email":    "laurent@bachelier.name",
-            "homepage": "http://laurent.bachelier.name"
-        },
-        {
             "name":     "Benjamin Grandfond",
             "email":    "benjamin.grandfond@gmail.com",
             "homepage": "http://benjamingrandfond.fr"
+        },
+        {
+            "name":     "Laurent Bachelier",
+            "email":    "laurent@bachelier.name",
+            "homepage": "http://laurent.bachelier.name"
         }
     ],
     "require": {
