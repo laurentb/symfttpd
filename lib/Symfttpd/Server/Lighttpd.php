@@ -100,7 +100,7 @@ class Lighttpd extends BaseServer
     /**
      * Read the server configuration.
      *
-     * @param  string                              $separator
+     * @param string $separator
      *
      * @return string
      * @throws \Symfttpd\Exception\LoaderException
@@ -221,7 +221,7 @@ class Lighttpd extends BaseServer
     /**
      * Return the server command value
      *
-     * @param  null|\Symfony\Component\Process\ExecutableFinder $finder
+     * @param null|\Symfony\Component\Process\ExecutableFinder $finder
      *
      * @return string
      * @throws \Symfttpd\Exception\ExecutableNotFoundException

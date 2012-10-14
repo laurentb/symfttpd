@@ -1,47 +1,6 @@
 {
-    "hash": "f2529ff82f609acec467a4eb07795663",
+    "hash": "0c67a499518bc9aa5f3b622804bbb429",
     "packages": [
-        {
-            "name": "kriswallsmith/spork",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kriswallsmith/spork.git",
-                "reference": "e6a3ec2fc4d74a174148b539ab8c3c7cebefed0e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/kriswallsmith/spork/zipball/e6a3ec2fc4d74a174148b539ab8c3c7cebefed0e",
-                "reference": "e6a3ec2fc4d74a174148b539ab8c3c7cebefed0e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "symfony/event-dispatcher": "*",
-                "ext-pcntl": "*",
-                "ext-posix": "*"
-            },
-            "time": "1339256178",
-            "type": "library",
-            "installation-source": "source",
-            "autoload": {
-                "psr-0": {
-                    "Spork": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kris Wallsmith",
-                    "email": "kris.wallsmith@gmail.com",
-                    "homepage": "http://kriswallsmith.net/"
-                }
-            ],
-            "description": "Asynchronous PHP",
-            "homepage": "https://github.com/kriswallsmith/spork"
-        },
         {
             "name": "symfony/config",
             "version": "dev-master",
@@ -134,60 +93,6 @@
                 }
             ],
             "description": "Symfony Console Component",
-            "homepage": "http://symfony.com"
-        },
-        {
-            "name": "symfony/event-dispatcher",
-            "version": "dev-master",
-            "target-dir": "Symfony/Component/EventDispatcher",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/EventDispatcher",
-                "reference": "24a1039d52b6b9f533cb73dcb96c7748262db686"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/symfony/EventDispatcher/zipball/24a1039d52b6b9f533cb73dcb96c7748262db686",
-                "reference": "24a1039d52b6b9f533cb73dcb96c7748262db686",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "require-dev": {
-                "symfony/dependency-injection": "2.2.*"
-            },
-            "suggest": {
-                "symfony/dependency-injection": "2.2.*",
-                "symfony/http-kernel": "2.2.*"
-            },
-            "time": "1349553479",
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.2-dev"
-                }
-            },
-            "installation-source": "source",
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\EventDispatcher\\": ""
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony EventDispatcher Component",
             "homepage": "http://symfony.com"
         },
         {
@@ -386,7 +291,7 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "kriswallsmith/spork": 20
-    }
+    "stability-flags": [
+
+    ]
 }
