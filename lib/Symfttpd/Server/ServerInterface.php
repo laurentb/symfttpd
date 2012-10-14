@@ -73,22 +73,6 @@ interface ServerInterface
     public function generate();
 
     /**
-     * Generate the rewrite rules.
-     *
-     * @abstract
-     * @return string
-     */
-    public function generateRules();
-
-    /**
-     * Generate the configuration file for the server.
-     *
-     * @abstract
-     * @return string
-     */
-    public function generateConfiguration();
-
-    /**
      * Write the configuration in the directory.
      *
      * @abstract

@@ -58,20 +58,6 @@ class Lighttpd extends BaseServer
     protected $lighttpdConfig;
 
     /**
-     * The file that configures rewriting rules for lighttpd.
-     *
-     * @var string
-     */
-    protected $rulesFilename = 'rules.conf';
-
-    /**
-     * The generated rules.
-     *
-     * @var string
-     */
-    protected $rules;
-
-    /**
      * Constructor class
      *
      * @param \Symfttpd\Project\ProjectInterface $project
@@ -85,7 +71,7 @@ class Lighttpd extends BaseServer
         parent::__construct($project, $twig, $loader, $writer, $config);
 
         // Add the lighttpd templates directory to twig loader.
-        $this->twig->getLoader()->addPath(__DIR__.'/../Resources/templates/lighttpd');
+        $this->twig->getLoader()->addPath(__DIR__ . '/../Resources/templates/lighttpd');
 
         $this->rotate();
     }
@@ -108,55 +94,24 @@ class Lighttpd extends BaseServer
      */
     public function getPidfile()
     {
-        return $this->getCacheDir().'/'.$this->config->get('server_pidfile', '.sf');
+        return $this->getCacheDir() . '/' . $this->config->get('server_pidfile', '.sf');
     }
 
     /**
      * Read the server configuration.
      *
      * @param  string                              $separator
-     * @return string
-     * @throws \Symfttpd\Exception\LoaderException
-     */
-    public function read($separator = PHP_EOL)
-    {
-        return $this->readConfiguration() .
-            $separator .
-            $this->readRules();
-    }
-
-    /**
-     * Return the lighttpd configuration content.
-     * Read the lighttpd.conf in the cache file
-     * if needed.
      *
      * @return string
      * @throws \Symfttpd\Exception\LoaderException
      */
-    public function readConfiguration()
+    public function read()
     {
         if (null == $this->lighttpdConfig) {
             $this->lighttpdConfig = $this->loader->load($this->getConfigFile());
         }
 
         return $this->lighttpdConfig;
-    }
-
-    /**
-     * Return the rules configuration content.
-     * Read the rules.conf in the cache directory
-     * if needed.
-     *
-     * @return string
-     * @throws \Symfttpd\Exception\LoaderException
-     */
-    public function readRules()
-    {
-        if (null == $this->rules) {
-            $this->rules = $this->loader->load($this->getRulesFile());
-        }
-
-        return $this->rules;
     }
 
     /**
@@ -168,7 +123,6 @@ class Lighttpd extends BaseServer
     public function write($force = false)
     {
         $this->writer->write($this->lighttpdConfig, $this->getConfigFile(), $force);
-        $this->writer->write($this->rules, $this->getRulesFile(), $force);
     }
 
     /**
@@ -180,55 +134,27 @@ class Lighttpd extends BaseServer
      */
     public function generate()
     {
-        $this->generateRules();
-        $this->generateConfiguration();
-    }
+        $this->project->scan();
 
-    /**
-     * Generate the lighttpd configuration file.
-     *
-     * @return string
-     */
-    public function generateConfiguration()
-    {
         $this->lighttpdConfig = $this->twig->render(
-            $this->name.'/'.$this->configFilename.'.twig',
+            $this->name . '/' . $this->configFilename . '.twig',
             array(
                 'document_root' => $this->project->getWebDir(),
                 'port'          => $this->config->get('port'),
                 'bind'          => $this->config->get('bind', null),
-                'error_log'     => $this->getLogDir().'/'.$this->config->get('server_error_log', 'error.log'),
-                'access_log'    => $this->getLogDir().'/'.$this->config->get('server_access_log', 'access.log'),
+                'error_log'     => $this->getLogDir() . '/' . $this->config->get('server_error_log', 'error.log'),
+                'access_log'    => $this->getLogDir() . '/' . $this->config->get('server_access_log', 'access.log'),
                 'pidfile'       => $this->getPidfile(),
-                'rules_file'    => null !== $this->rules ? $this->getRulesFile() : null,
                 'php_cgi_cmd'   => $this->config->get('php_cgi_cmd'),
+                'dirs'          => $this->project->readableDirs,
+                'files'         => $this->project->readableFiles,
+                'phps'          => $this->project->readablePhpFiles,
+                'default'       => $this->project->getIndexFile(),
+                'nophp'         => $this->config->get('project_nophp', array('uploads')),
             )
         );
 
         return $this->lighttpdConfig;
-    }
-
-    /**
-     * Generate the lighttpd rewrite rules.
-     *
-     * @return string
-     */
-    public function generateRules()
-    {
-        $this->project->scan();
-
-        $this->rules = $this->twig->render(
-            $this->name.'/'.$this->rulesFilename.'.twig',
-            array(
-                'dirs'    => $this->project->readableDirs,
-                'files'   => $this->project->readableFiles,
-                'phps'    => $this->project->readablePhpFiles,
-                'default' => $this->project->getIndexFile(),
-                'nophp'   => $this->config->get('project_nophp', array('uploads')),
-            )
-        );
-
-        return $this->rules;
     }
 
     /**
@@ -244,7 +170,7 @@ class Lighttpd extends BaseServer
             $this->getLogDir(),
         );
 
-        $filesystem = $filesystem ?: new Filesystem();
+        $filesystem = $filesystem ? : new Filesystem();
 
         if (true === $clear) {
             $filesystem->remove($directories);
@@ -259,17 +185,7 @@ class Lighttpd extends BaseServer
      */
     public function getConfigFile()
     {
-        return $this->getCacheDir().'/'.$this->configFilename;
-    }
-
-    /**
-     * Return the rules config file path.
-     *
-     * @return string
-     */
-    public function getRulesFile()
-    {
-        return $this->getCacheDir().'/'.$this->rulesFilename;
+        return $this->getCacheDir() . '/' . $this->configFilename;
     }
 
     /**
@@ -283,23 +199,13 @@ class Lighttpd extends BaseServer
     }
 
     /**
-     * Return the name of the rules file.
-     *
-     * @return string
-     */
-    public function getRulesFilename()
-    {
-        return $this->rulesFilename;
-    }
-
-    /**
      * Return the lighttpd cache directory.
      *
      * @return string
      */
     public function getCacheDir()
     {
-        return $this->project->getCacheDir().'/'.$this->name;
+        return $this->project->getCacheDir() . '/' . $this->name;
     }
 
     /**
@@ -309,13 +215,14 @@ class Lighttpd extends BaseServer
      */
     public function getLogDir()
     {
-        return $this->project->getLogDir().'/'.$this->name;
+        return $this->project->getLogDir() . '/' . $this->name;
     }
 
     /**
      * Return the server command value
      *
      * @param  null|\Symfony\Component\Process\ExecutableFinder $finder
+     *
      * @return string
      * @throws \Symfttpd\Exception\ExecutableNotFoundException
      */
@@ -365,8 +272,11 @@ class Lighttpd extends BaseServer
 
         $prevGenconf = null;
         while (false !== sleep(1)) {
-            // Generate the configuration file.
-            $genconf = $this->generateRules();
+            /**
+             * Regenerate the configuration file. to check if it defers.
+             * @todo check the web dir informations to detect any changes instead.
+             */
+            $genconf = $this->generate();
 
             if ($prevGenconf !== null && $prevGenconf !== $genconf) {
                 // This sleep() is so that if a HTTP request just created a file in web/,
@@ -410,6 +320,11 @@ class Lighttpd extends BaseServer
         }
     }
 
+    /**
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     * @return mixed|void
+     */
     public function stop(OutputInterface $output)
     {
         // Kill the current server process.

@@ -51,6 +51,4 @@ accesslog.filename    = "{{ access_log }}"
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"
 
-{% if rules_file is not null %}
-include "{{ rules_file }}"
-{% endif %}
+{% include 'rules.conf.twig' %}

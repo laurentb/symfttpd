@@ -55,25 +55,10 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $filesystem->remove($this->tmp);
     }
 
-    public function testGenerateAndReadRule()
-    {
-        $this->server->generateRules();
-        $this->assertEquals($this->getGeneratedRules(), (string) $this->server->readRules());
-    }
-
-    public function testGenerateAndReadConfiguration()
-    {
-        $this->server->generateConfiguration();
-        $this->assertEquals($this->getGeneratedConfiguration(), $this->server->readConfiguration());
-    }
-
     public function testGenerateAndWrite()
     {
         $this->server->generate();
-        $this->assertEquals(
-            $this->getGeneratedConfiguration(true) . PHP_EOL . $this->getGeneratedRules(),
-            $this->server->read()
-        );
+        $this->assertEquals($this->getGeneratedConfiguration(), $this->server->read());
     }
 
     public function testGetCommand()
@@ -110,61 +95,13 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('lighttpd.conf', $this->server->getConfigFilename());
     }
 
-    public function testGetRulesFilename()
-    {
-        $this->assertEquals('rules.conf', $this->server->getRulesFilename());
-    }
-
-    public function testReadRulesFromFile()
-    {
-        $this->server->generateRules($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
-        $this->server->write(true);
-
-        $lighttpd = $this->createLighttpd(false);
-        $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
-    }
-
-    public function testReadConfigFromFile()
-    {
-        $this->server->generateConfiguration();
-        $this->server->write(true);
-
-        $lighttpd = $this->createLighttpd(false);
-        $this->assertEquals($this->getGeneratedConfiguration(), $lighttpd->readConfiguration());
-    }
-
     public function testReadFromFile()
     {
-        $this->server->generate();
-        $this->server->write('all', true);
+        $this->server->generate($this->getMock('\Symfttpd\Configuration\SymfttpdConfiguration'));
+        $this->server->write(true);
 
         $lighttpd = $this->createLighttpd(false);
-        $this->assertEquals($this->getGeneratedConfiguration(true), $lighttpd->readConfiguration());
-        $this->assertEquals($this->getGeneratedRules(), $lighttpd->readRules());
-        $this->assertEquals(
-            $this->getGeneratedConfiguration(true) . PHP_EOL . $this->getGeneratedRules(),
-            $lighttpd->read()
-        );
-    }
-
-    /**
-     * @expectedException \Symfttpd\Exception\LoaderException
-     */
-    public function testReadRulesFromFileException()
-    {
-        $lighttpd = $this->createLighttpd();
-        $lighttpd->rotate(true);
-        $lighttpd->readRules();
-    }
-
-    /**
-     * @expectedException \Symfttpd\Exception\LoaderException
-     */
-    public function testReadConfigFromFileException()
-    {
-        $lighttpd = $this->createLighttpd();
-        $lighttpd->rotate();
-        $lighttpd->readConfiguration();
+        $this->assertEquals($this->getGeneratedConfiguration(), $lighttpd->read());
     }
 
     public function testGetProject()
@@ -292,10 +229,6 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
     public function getGeneratedConfiguration($withRules = false)
     {
         $baseDir = $this->getProject(false)->getRootDir();
-        $rules   = null;
-        if ($withRules) {
-            $rules = $baseDir . '/cache/lighttpd/rules.conf';
-        }
 
         return $this->renderer->render(
             'lighttpd.conf.twig',
@@ -306,22 +239,12 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
                 'error_log'     => $baseDir . '/log/lighttpd/error.log',
                 'access_log'    => $baseDir . '/log/lighttpd/access.log',
                 'pidfile'       => $baseDir . '/cache/lighttpd/.sf',
-                'rules_file'    => $rules,
                 'php_cgi_cmd'   => '/opt/local/bin/php-cgi',
-            )
-        );
-    }
-
-    public function getGeneratedRules()
-    {
-        return $this->renderer->render(
-            'rules.conf.twig',
-            array(
-                'dirs'    => array('css', 'js'),
-                'files'   => array('robots.txt'),
-                'phps'    => array('backend_dev.php', 'frontend_dev.php', 'index.php'),
-                'default' => 'index.php',
-                'nophp'   => array(),
+                'dirs'          => array('css', 'js'),
+                'files'         => array('robots.txt'),
+                'phps'          => array('backend_dev.php', 'frontend_dev.php', 'index.php'),
+                'default'       => 'index.php',
+                'nophp'         => array(),
             )
         );
     }
