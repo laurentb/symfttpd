@@ -12,6 +12,10 @@
 namespace Symfttpd\Server;
 
 use Symfony\Component\Process\ExecutableFinder;
+use Spork\EventDispatcher\EventDispatcher;
+use Spork\ProcessManager;
+use Symfttpd\Tail\TailInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Config;
 use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfttpd\Filesystem\Filesystem;
@@ -405,25 +409,61 @@ class Lighttpd extends BaseServer
     /**
      * Start the server.
      *
-     * @param  null|\Symfony\Component\Process\Process $process
-     * @return null|\Symfony\Component\Process\Process
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
+     *
+     * @return bool
      */
-    public function start(\Symfony\Component\Process\Process $process = null)
+    public function start(OutputInterface $output, TailInterface $tail = null)
     {
-        // Remove an possible existing restart file
-        if (file_exists($this->getRestartFile())) {
-            unlink($this->getRestartFile());
-        }
+        // Run lighttpd
+        $this->doStart($output);
 
-        if (null == $process) {
+        $prevGenconf = null;
+        while (false !== sleep(1)) {
+            // Generate the configuration file.
+            $genconf = $this->generateRules();
+
+            if ($prevGenconf !== null && $prevGenconf !== $genconf) {
+                // This sleep() is so that if a HTTP request just created a file in web/,
+                // the web server isn't restarted right away.
+                sleep(1);
+
+                $this->stop($output);
+
+                $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $this->name));
+
+                $this->doStart($output);
+            }
+            $prevGenconf = $genconf;
+
+            if ($tail instanceof TailInterface) {
+                $tail->consume();
+            }
+        }
+    }
+
+    public function doStart($output)
+    {
+        try {
+            // Regenerate the lighttpd configuration
+            $this->generate();
+            $this->write();
+
             $process = new \Symfony\Component\Process\Process(null);
+            $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($this->getConfigFile()));
+            $process->setWorkingDirectory($this->project->getRootDir());
+            $process->setTimeout(null);
+            $process->run();
+        } catch (\Exception $e) {
+            $output->writeln('<error>The server cannot start</error>');
+            $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
         }
+    }
 
-        $process->setCommandLine($this->getCommand() . ' -D -f ' . escapeshellarg($this->getConfigFile()));
-        $process->setWorkingDirectory($this->project->getRootDir());
-        $process->setTimeout(null);
-        $process->run();
-
-        return $process;
+    public function stop(OutputInterface $output)
+    {
+        // Kill the current server process.
+        \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
     }
 }

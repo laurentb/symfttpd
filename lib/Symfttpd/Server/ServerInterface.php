@@ -11,9 +11,11 @@
 
 namespace Symfttpd\Server;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Config;
 use Symfttpd\Loader;
 use Symfttpd\Project\ProjectInterface;
+use Symfttpd\Tail\TailInterface;
 use Symfttpd\Writer;
 
 /**
@@ -114,17 +116,21 @@ interface ServerInterface
      * Run the server command to start it.
      *
      * @abstract
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
+     *
      * @return mixed
      */
-    public function start();
+    public function start(OutputInterface $output, TailInterface $tail = null);
 
     /**
-     * Return the restart file path.
+     * Stop the server.
      *
-     * @abstract
-     * @return string
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     * @return mixed
      */
-    public function getRestartFile();
+    public function stop(OutputInterface $output);
 
     /**
      * Return the pidfile which contains

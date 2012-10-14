@@ -1,4 +1,6 @@
 <?php
+declare(ticks = 1);
+
 /**
  * This file is part of the Symfttpd Project
  *
@@ -12,6 +14,8 @@
 namespace Symfttpd\Command;
 
 use Symfttpd\Symfttpd;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfttpd\Config;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
 use Symfttpd\Tail\TailInterface;
@@ -48,11 +52,17 @@ class SpawnCommand extends Command
             ->addOption('tail', 't', InputOption::VALUE_NONE, 'Print the log in the console')
             ->addOption('kill', 'K', InputOption::VALUE_NONE, 'Kill existing running symfttpd')
         ;
-
-        if (function_exists('pcntl_fork')) {
-            $this->addOption('single_process', 's', InputOption::VALUE_OPTIONAL, 'Run symfttpd in another process', false);
-        }
     }
+
+    /**
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
+    }
+
 
     /**
      * Run the Symttpd configured server.
@@ -81,9 +91,40 @@ class SpawnCommand extends Command
             }
         }
 
-        // Creates the server configuration.
-        $server->generate();
-        $server->write();
+        // Print the start spawning message.
+        $output->write($this->getMessage($configuration, $server));
+
+        // Flush PHP buffer.
+        flush();
+
+        $multitail = null;
+        if ($input->getOption('tail')) {
+            $tailAccess = new Tail($server->getLogDir() . '/' . $configuration->get('access_log', 'access.log'));
+            $tailError  = new Tail($server->getLogDir() . '/' . $configuration->get('error_log', 'error.log'));
+
+            $multitail = new MultiTail(new OutputFormatter(true));
+            $multitail->add('access', $tailAccess, new OutputFormatterStyle('blue'));
+            $multitail->add('error', $tailError, new OutputFormatterStyle('red', null, array('bold')));
+            // We have to do it before the fork to capture the startup messages
+            $multitail->consume();
+        }
+
+        $this->handleSignals($server, $output);
+
+        return $server->start($output, $multitail) ? 1 : 0;
+    }
+
+    /**
+     * Return the Symfttpd spawning startup message.
+     *
+     * @param \Symfttpd\Config                 $configuration
+     * @param \Symfttpd\Server\ServerInterface $server
+     *
+     * @return string
+     */
+    protected function getMessage(Config $configuration, ServerInterface $server)
+    {
+        $server->getProject()->scan();
 
         if (false == $configuration->get('bind')) {
             $boundAddress = 'all-interfaces';
@@ -102,7 +143,7 @@ class SpawnCommand extends Command
         }
 
         // Pretty information. Nothing interesting code-wise.
-        $text = <<<TEXT
+        $text    = <<<TEXT
 %s started on <info>%s</info>, port <info>%s</info>.
 
 Available applications:
@@ -111,126 +152,23 @@ Available applications:
 <important>Press Ctrl+C to stop serving.</important>
 
 TEXT;
-        $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
-        $output->write(sprintf($text, $server->name, $boundAddress, $configuration->get('port'), implode("\n", $apps)));
-
-        flush();
-
-        if (false == $input->hasOption('single_process') || true == $input->getOption('single_process')) {
-            $output->writeln('<info>Symfttpd will run in a single process mode.</info>');
-            // Run lighttpd
-            $server->start();
-
-            $output->write('Terminated.');
-
-            return 0;
-        }
-
-        $multitail = null;
-        if ($input->getOption('tail')) {
-            $tailAccess = new Tail($server->getLogDir() . '/' . $configuration->get('access_log', 'access.log'));
-            $tailError  = new Tail($server->getLogDir() . '/' . $configuration->get('error_log', 'error.log'));
-
-            $multitail = new MultiTail(new OutputFormatter(true));
-            $multitail->add('access', $tailAccess, new OutputFormatterStyle('blue'));
-            $multitail->add('error', $tailError, new OutputFormatterStyle('red', null, array('bold')));
-            // We have to do it before the fork to capture the startup messages
-            $multitail->consume();
-        }
-
-        $pid = pcntl_fork();
-        $process = null;
-        if ($pid) {
-            $this->watch($server, $output, $multitail);
-            if (pcntl_waitpid($pid, $status, WNOHANG)) {
-                exit(0);
-            }
-        } elseif (0 === $pid) {
-            // Child process
-            $this->spawn($server, $output);
-        } else {
-            $output->writeln('<error>Could not fork</error>');
-
-            exit(1);
-        }
-
-        return 0;
+        return sprintf($text, $server->name, $boundAddress, $configuration->get('port'), implode("\n", $apps));
     }
 
     /**
-     * Launch the server in a fork.
-     * The parent thread check every seconds if the rewrite
-     * rules changed. In this case it will create a file that
-     * will tell to the fork that the server must be restarted.
-     *
-     * @param  \Symfttpd\Server\ServerInterface                  $server
-     * @param  \Symfony\Component\Console\Output\OutputInterface $output
-     * @return bool
-     */
-    protected function spawn(ServerInterface $server, OutputInterface $output)
-    {
-        do {
-            try {
-                // Run lighttpd
-                $server->start();
-            } catch (\Exception $e) {
-                $output->writeln('<error>The server cannot start</error>');
-                $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
-            }
-
-            if (!file_exists($server->getRestartFile())) {
-                $output->writeln('Terminated.');
-
-                return false;
-            } else {
-                $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $server->name));
-
-                // Regenerate the lighttpd configuration
-                $server->generate($this->getSymfttpd()->getConfiguration());
-                $server->write();
-            }
-        } while (file_exists($server->getRestartFile()));
-
-        return false;
-    }
-
-    /**
-     * Watch the document directory.
-     * If the configuration of the server changed (a file has been added in the
-     * web directory for instance), it creates the restart file used in the
-     * spawn to tell it to restart the server.
-     *
      * @param \Symfttpd\Server\ServerInterface                  $server
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param null|\Symfttpd\Tail\TailInterface                 $tail
      */
-    public function watch(ServerInterface $server, OutputInterface $output, TailInterface $tail = null)
+    protected function handleSignals(ServerInterface $server, OutputInterface $output)
     {
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
-        $prevGenconf = null;
-        while (false !== sleep(1)) {
-            // Generate the configuration file.
-            $genconf = $server->generateRules();
+        $handler = function () use ($server, $output) {
+            $server->stop(new NullOutput());
+            $output->writeln(sprintf(PHP_EOL.'<important>Closing %s, bye!</important>', $server->name));
 
-            if ($prevGenconf !== null && $prevGenconf !== $genconf) {
-                // This sleep() is so that if a HTTP request just created a file in web/,
-                // the web server isn't restarted right away.
-                sleep(1);
+            exit(0);
+        };
 
-                // Tell the child process to restart the server
-                $filesystem->touch($server->getRestartFile());
-
-                // Kill the current server process.
-                \Symfttpd\Utils\PosixTools::killPid($server->getPidfile(), $output);
-
-                // Write the new rules.
-                $server->writeRules();
-            }
-            $prevGenconf = $genconf;
-
-            if ($tail instanceof TailInterface) {
-                $tail->consume();
-            }
-        }
+        pcntl_signal(SIGTERM, $handler);
+        pcntl_signal(SIGINT, $handler);
     }
 }
