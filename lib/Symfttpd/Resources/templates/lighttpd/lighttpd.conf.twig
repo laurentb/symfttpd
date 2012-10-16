@@ -30,8 +30,9 @@ fastcgi.server = ( ".php" =>
   )
 )
 
-setenv.add-response-header = ( "X-Symfttpd" => "1",
-    "Expires" => "Sun, 17 Mar 1985 00:42:00 GMT" )
+setenv.add-response-header = (
+  "X-Symfttpd" => "1",
+)
 
 {% include 'mime-types.conf.twig' %}
 
