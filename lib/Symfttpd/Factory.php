@@ -12,6 +12,7 @@
 namespace Symfttpd;
 
 use Symfony\Component\Config\Definition\Processor;
+use Symfttpd\Server\ServerInterface;
 use Symfttpd\Config;
 use Symfttpd\Configuration\Configuration;
 use Symfttpd\Project\ProjectInterface;
@@ -50,13 +51,15 @@ class Factory
         $config = $this->createConfig();
         $config->merge($localConfig);
 
-        $project = $this->createProject($config);
-        $server  = $this->createServer($config, $project);
+        $project   = $this->createProject($config);
+        $server    = $this->createServer($config, $project);
+        $generator = $this->createServerGenerator($config, $server, $project);
 
         $symfttpd = new Symfttpd();
         $symfttpd->setConfig($config);
         $symfttpd->setProject($project);
         $symfttpd->setServer($server);
+        $symfttpd->setServerGenerator($generator);
 
         return $symfttpd;
     }
@@ -120,8 +123,46 @@ class Factory
             throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
         }
 
+        /**
+         * @var \Symfttpd\Server\ServerInterface $server
+         */
+        $server = new $class($project, $config);
+        $server->bind($config->get('server_address', '127.0.0.1'), $config->get('server_port', '4042'));
+
+        // Configure logging directory
+        $logDir = $config->get('server_log_dir', $project->getLogDir() . '/' . $server->getName());
+        $server->setErrorLog($logDir . '/' . $config->get('server_error_log', 'error.log'));
+        $server->setAccessLog($logDir . '/' . $config->get('server_access_log', 'access.log'));
+
+        $server->setPidfile($project->getCacheDir() . '/' . $config->get('server_pidfile', '.sf'));
+
+        // Configure project relative directories and files
+        return $server;
+    }
+
+    /**
+     * @param \Symfttpd\Config                   $config
+     * @param \Symfttpd\Server\ServerInterface   $server
+     * @param \Symfttpd\Project\ProjectInterface $project
+     *
+     * @return \Symfttpd\Server\Generator\GeneratorInterface
+     * @throws \InvalidArgumentException
+     */
+    public function createServerGenerator(Config $config, ServerInterface $server, ProjectInterface $project)
+    {
+        $type = $config->get('server_type', 'lighttpd');
+
+        $class = sprintf('Symfttpd\\Server\\Generator\\%sGenerator', ucfirst($type));
+
+        if (!class_exists($class)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
+        }
+
         // Define configuration template storage paths.
-        $dirs = array_merge(array(__DIR__ . '/Resources/templates'), $config->get('templates_dirs', array()));
+        $dirs = array_merge(
+            array(__DIR__ . '/Resources/templates/' . $server->getName()),
+            $config->get('templates_dirs', array())
+        );
 
         // Configure Twig for the rendering of configuration files.
         $twig = new \Twig_Environment(
@@ -136,7 +177,11 @@ class Factory
 
         $twig->addExtension(new TwigExtension());
 
-        return new $class($project, $twig, new Loader(), new Writer(), $config);
+        $generator = new $class($twig);
+        $generator->setTemplate($server->getName() . '.conf.twig');
+        $generator->setPath($project->getCacheDir() . '/' . $server->getName() . '.conf');
+
+        return $generator;
     }
 
     /**

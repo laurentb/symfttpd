@@ -14,13 +14,9 @@ namespace Symfttpd\Server;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfttpd\Config;
 use Symfttpd\Exception\ExecutableNotFoundException;
-use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\Loader;
-use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\BaseServer;
-use Symfttpd\Writer;
+use Symfttpd\Server\Generator\GeneratorInterface;
 
 /**
  * Lighttpd class
@@ -30,192 +26,12 @@ use Symfttpd\Writer;
 class Lighttpd extends BaseServer
 {
     /**
-     * Server name.
-     *
-     * @var string
+     * Constructor
+     * Set the name of the server.
      */
-    public $name = 'lighttpd';
-
-    /**
-     * The shell command to run lighttpd.
-     *
-     * @var string
-     */
-    protected $command;
-
-    /**
-     * The file that configures the server.
-     *
-     * @var string
-     */
-    protected $configFilename = 'lighttpd.conf';
-
-    /**
-     * The generated configuration used by lighttpd.
-     *
-     * @var string
-     */
-    protected $lighttpdConfig;
-
-    /**
-     * Constructor class
-     *
-     * @param \Symfttpd\Project\ProjectInterface $project
-     * @param \Twig_Environment                  $twig
-     * @param \Symfttpd\Loader                   $loader
-     * @param \Symfttpd\Writer                   $writer
-     * @param \Symfttpd\OptionBag                $config
-     */
-    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, Config $config)
+    public function __construct()
     {
-        parent::__construct($project, $twig, $loader, $writer, $config);
-
-        // Add the lighttpd templates directory to twig loader.
-        $this->twig->getLoader()->addPath(__DIR__ . '/../Resources/templates/lighttpd');
-
-        $this->rotate();
-    }
-
-    /**
-     * Return the project.
-     *
-     * @return \Symfttpd\Project\ProjectInterface
-     */
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    /**
-     * Return the pidfile which contains the pid of the process
-     * of the server.
-     *
-     * @return mixed|null
-     */
-    public function getPidfile()
-    {
-        return $this->getCacheDir() . '/' . $this->config->get('server_pidfile', '.sf');
-    }
-
-    /**
-     * Read the server configuration.
-     *
-     * @param string $separator
-     *
-     * @return string
-     * @throws \Symfttpd\Exception\LoaderException
-     */
-    public function read()
-    {
-        if (null == $this->lighttpdConfig) {
-            $this->lighttpdConfig = $this->loader->load($this->getConfigFile());
-        }
-
-        return $this->lighttpdConfig;
-    }
-
-    /**
-     * Write the configurations files.
-     *
-     * @param string $type
-     * @param bool   $force
-     */
-    public function write($force = false)
-    {
-        $this->writer->write($this->lighttpdConfig, $this->getConfigFile(), $force);
-    }
-
-    /**
-     * Generate the whole configuration :
-     * the server configuration based on the lighttpd.conf.php template
-     * the rules configuration with the rewrite rules based on the rules.conf.php template
-     *
-     * @param SymfttpdConfiguration $configuration
-     */
-    public function generate()
-    {
-        $this->project->scan();
-
-        $this->lighttpdConfig = $this->twig->render(
-            $this->name . '/' . $this->configFilename . '.twig',
-            array(
-                'document_root' => $this->project->getWebDir(),
-                'port'          => $this->config->get('port'),
-                'bind'          => $this->config->get('bind', null),
-                'error_log'     => $this->getLogDir() . '/' . $this->config->get('server_error_log', 'error.log'),
-                'access_log'    => $this->getLogDir() . '/' . $this->config->get('server_access_log', 'access.log'),
-                'pidfile'       => $this->getPidfile(),
-                'php_cgi_cmd'   => $this->config->get('php_cgi_cmd'),
-                'dirs'          => $this->project->readableDirs,
-                'files'         => $this->project->readableFiles,
-                'phps'          => $this->project->readablePhpFiles,
-                'default'       => $this->project->getIndexFile(),
-                'nophp'         => $this->config->get('project_nophp', array('uploads')),
-            )
-        );
-
-        return $this->lighttpdConfig;
-    }
-
-    /**
-     * Remove the log and cache directory of
-     * lighttpd and recreate them.
-     *
-     * @param null|\Symfttpd\Filesystem\Filesystem $filesystem
-     */
-    public function rotate($clear = false, Filesystem $filesystem = null)
-    {
-        $directories = array(
-            $this->getCacheDir(),
-            $this->getLogDir(),
-        );
-
-        $filesystem = $filesystem ? : new Filesystem();
-
-        if (true === $clear) {
-            $filesystem->remove($directories);
-        }
-        $filesystem->mkdir($directories);
-    }
-
-    /**
-     * Return the lighttpd configuration file path.
-     *
-     * @return string
-     */
-    public function getConfigFile()
-    {
-        return $this->getCacheDir() . '/' . $this->configFilename;
-    }
-
-    /**
-     * Return the name of the configuration file.
-     *
-     * @return string
-     */
-    public function getConfigFilename()
-    {
-        return $this->configFilename;
-    }
-
-    /**
-     * Return the lighttpd cache directory.
-     *
-     * @return string
-     */
-    public function getCacheDir()
-    {
-        return $this->project->getCacheDir() . '/' . $this->name;
-    }
-
-    /**
-     * Return the lighttpd log directory.
-     *
-     * @return string
-     */
-    public function getLogDir()
-    {
-        return $this->project->getLogDir() . '/' . $this->name;
+        $this->name = 'lighttpd';
     }
 
     /**
@@ -259,35 +75,44 @@ class Lighttpd extends BaseServer
 
     /**
      * Start the server.
-     *
+     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \Symfttpd\Tail\TailInterface                      $tail
      *
-     * @return bool
+     * @return mixed|void
      */
-    public function start(OutputInterface $output, TailInterface $tail = null)
+    public function start(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null)
     {
         // Run lighttpd
-        $this->doStart($output);
+        try {
+            // Regenerate the lighttpd configuration
+            $generator->dump($this, true);
+
+            $process = new \Symfony\Component\Process\Process(null);
+            $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($generator->getPath()));
+            $process->setTimeout(null);
+            $process->run();
+        } catch (\Exception $e) {
+            $output->writeln('<error>The server cannot start</error>');
+            $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
+        }
 
         $prevGenconf = null;
         while (false !== sleep(1)) {
             /**
              * Regenerate the configuration file. to check if it defers.
-             * @todo check the web dir informations to detect any changes instead.
+             * @todo check the web dir datetime informations to detect any changes instead.
              */
-            $genconf = $this->generate();
+            $genconf = $generator->generate($this);
 
             if ($prevGenconf !== null && $prevGenconf !== $genconf) {
                 // This sleep() is so that if a HTTP request just created a file in web/,
                 // the web server isn't restarted right away.
                 sleep(1);
 
-                $this->stop($output);
-
                 $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $this->name));
 
-                $this->doStart($output);
+                return $this->restart($generator, $output, $tail);
             }
             $prevGenconf = $genconf;
 
@@ -298,26 +123,16 @@ class Lighttpd extends BaseServer
     }
 
     /**
-     * Start the server.
+     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
      *
-     * @param $output
+     * @return mixed|void
      */
-    public function doStart($output)
+    public function restart(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null)
     {
-        try {
-            // Regenerate the lighttpd configuration
-            $this->generate();
-            $this->write(true);
-
-            $process = new \Symfony\Component\Process\Process(null);
-            $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($this->getConfigFile()));
-            $process->setWorkingDirectory($this->project->getRootDir());
-            $process->setTimeout(null);
-            $process->run();
-        } catch (\Exception $e) {
-            $output->writeln('<error>The server cannot start</error>');
-            $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
-        }
+        $this->stop(new NullOutput());
+        $this->start($generator, $output, $tail);
     }
 
     /**

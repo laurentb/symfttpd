@@ -12,11 +12,8 @@
 namespace Symfttpd\Server;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfttpd\Config;
-use Symfttpd\Loader;
-use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Tail\TailInterface;
-use Symfttpd\Writer;
+use Symfttpd\Server\Generator\GeneratorInterface;
 
 /**
  * ServerInterface interface
@@ -27,69 +24,28 @@ use Symfttpd\Writer;
 interface ServerInterface
 {
     /**
-     * Server constructor.
-     *
-     * @param \Symfttpd\Project\ProjectInterface $project
-     * @param \Twig_Environment                  $twig
-     * @param \Symfttpd\Loader                   $loader
-     * @param \Symfttpd\Writer                   $writer
-     * @param \Symfttpd\Config                   $config
-     */
-    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, Config $config);
-
-    /**
-     * Return the project.
-     *
-     * @abstract
-     * @return \Symfttpd\Project\ProjectInterface
-     */
-    public function getProject();
-
-    /**
-     * Return the command that will run the server.
-     * It is lighttpd for the Lighttpd server for example.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function getCommand();
-
-    /**
-     * Set the command that runs the server.
-     *
-     * @abstract
-     * @param $command
-     * @return mixed
-     */
-    public function setCommand($command);
-
-    /**
-     * Generate the configuration file of the server
-     * and the rewrite rules.
-     *
-     * @abstract
-     * @return string
-     */
-    public function generate();
-
-    /**
-     * Write the configuration in the directory.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function write();
-
-    /**
      * Run the server command to start it.
      *
      * @abstract
+     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \Symfttpd\Tail\TailInterface                      $tail
      *
      * @return mixed
      */
-    public function start(OutputInterface $output, TailInterface $tail = null);
+    public function start(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null);
+
+    /**
+     * Restart the server command to start it.
+     *
+     * @abstract
+     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
+     *
+     * @return mixed
+     */
+    public function restart(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null);
 
     /**
      * Stop the server.
@@ -101,19 +57,130 @@ interface ServerInterface
     public function stop(OutputInterface $output);
 
     /**
-     * Return the pidfile which contains
-     * the pid of the process of the server.
+     * @param      $address
+     * @param null $port
      *
-     * @abstract
+     * @return mixed
+     */
+    public function bind($address, $port = null);
+
+    /**
+     * @return string
+     */
+    public function getAddress();
+
+    /**
+     * @return string
+     */
+    public function getPort();
+
+    /**
+     * @param string $command
+     */
+    public function setCommand($command);
+
+    /**
+     * @return string
+     */
+    public function getCommand();
+
+    /**
+     * @param string $pidfile
+     */
+    public function setPidfile($pidfile);
+
+    /**
      * @return string
      */
     public function getPidfile();
 
     /**
-     * Return the log directory of the server.
-     *
-     * @abstract
+     * @param string $accessLog
+     */
+    public function setAccessLog($accessLog);
+
+    /**
      * @return string
      */
-    public function getLogDir();
+    public function getAccessLog();
+
+    /**
+     * @param array $allowedDirs
+     */
+    public function setAllowedDirs(array $allowedDirs);
+
+    /**
+     * @return array
+     */
+    public function getAllowedDirs();
+
+    /**
+     * @param array $allowedFiles
+     */
+    public function setAllowedFiles(array $allowedFiles);
+
+    /**
+     * @return array
+     */
+    public function getAllowedFiles();
+
+    /**
+     * @param array $deniedDirs
+     */
+    public function setDeniedDirs(array $deniedDirs);
+
+    /**
+     * @return array
+     */
+    public function getDeniedDirs();
+
+    /**
+     * @param string $documentRoot
+     */
+    public function setDocumentRoot($documentRoot);
+
+    /**
+     * @return string
+     */
+    public function getDocumentRoot();
+
+    /**
+     * @param string $errorLog
+     */
+    public function setErrorLog($errorLog);
+
+    /**
+     * @return string
+     */
+    public function getErrorLog();
+
+    /**
+     * @param array $executableFiles
+     */
+    public function setExecutableFiles(array $executableFiles);
+
+    /**
+     * @return array
+     */
+    public function getExecutableFiles();
+
+    /**
+     * @param string $fastcgi
+     */
+    public function setFastcgi($fastcgi);
+
+    /**
+     * @return string
+     */
+    public function getFastcgi();
+
+    /**
+     * @param string $indexFile
+     */
+    public function setIndexFile($indexFile);
+
+    /**
+     * @return string
+     */
+    public function getIndexFile();
 }

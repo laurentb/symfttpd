@@ -13,18 +13,16 @@ declare(ticks = 1);
 
 namespace Symfttpd\Command;
 
-use Symfttpd\Symfttpd;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfttpd\Config;
-use Symfttpd\Tail\MultiTail;
-use Symfttpd\Tail\Tail;
-use Symfttpd\Command\Command;
-use Symfttpd\Server\ServerInterface;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfttpd\Command\Command;
+use Symfttpd\Server\ServerInterface;
+use Symfttpd\Tail\MultiTail;
+use Symfttpd\Tail\Tail;
 
 /**
  * SpawnCommand class
@@ -59,6 +57,8 @@ class SpawnCommand extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        parent::initialize($input, $output);
+
         $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
     }
 
@@ -71,34 +71,31 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $configuration = $this->symfttpd->getConfig();
-        $configuration->add(array(
-            // Lighttpd options
-            'port' => $input->getOption('port'),
-            'bind' => true == $input->getOption('all') ? false : $input->getOption('bind')
-        ));
-
         $server = $this->getSymfttpd()->getServer();
+
+        $address = true == $input->getOption('all') ? false : $input->getOption('bind');
+        $port    = $input->getOption('port');
+
+        $server->bind($address, $port);
 
         // Kill other running server in the current project.
         if (true == $input->getOption('kill')) {
-            // Kill existing symfttpd instance if found.
-            if (file_exists($server->getRestartFile())) {
+            // Kill existing server instance if found.
+            if (file_exists($server->getPidfile())) {
                 \Symfttpd\Utils\PosixTools::killPid($server->getPidfile(), $output);
-                unlink($server->getRestartFile());
             }
         }
 
         // Print the start spawning message.
-        $output->write($this->getMessage($configuration, $server));
+        $output->write($this->getMessage($server));
 
         // Flush PHP buffer.
         flush();
 
         $multitail = null;
         if ($input->getOption('tail')) {
-            $tailAccess = new Tail($server->getLogDir() . '/' . $configuration->get('access_log', 'access.log'));
-            $tailError  = new Tail($server->getLogDir() . '/' . $configuration->get('error_log', 'error.log'));
+            $tailAccess = new Tail($server->getAccessLog());
+            $tailError  = new Tail($server->getErrorLog());
 
             $multitail = new MultiTail(new OutputFormatter(true));
             $multitail->add('access', $tailAccess, new OutputFormatterStyle('blue'));
@@ -109,34 +106,30 @@ class SpawnCommand extends Command
 
         $this->handleSignals($server, $output);
 
-        return $server->start($output, $multitail) ? 1 : 0;
+        return $server->start($this->symfttpd->getServerGenerator(), $output, $multitail) ? 1 : 0;
     }
 
     /**
      * Return the Symfttpd spawning startup message.
      *
-     * @param \Symfttpd\Config                 $configuration
      * @param \Symfttpd\Server\ServerInterface $server
      *
      * @return string
      */
-    protected function getMessage(Config $configuration, ServerInterface $server)
+    protected function getMessage(ServerInterface $server)
     {
-        $server->getProject()->scan();
+        $this->symfttpd->getProject()->scan();
 
-        if (false == $configuration->get('bind')) {
-            $boundAddress = 'all-interfaces';
-        } else {
-            $boundAddress = $configuration->get('bind');
+        if (false == $address = $server->getAddress()) {
+            $address = 'all-interfaces';
         }
 
-        $bind = $configuration->get('bind');
-        $host = in_array($bind, array(null, false, '0.0.0.0', '::'), true) ? 'localhost' : $bind;
+        $host = in_array($address, array(null, false, '0.0.0.0', '::'), true) ? 'localhost' : $address;
 
         $apps = array();
-        foreach ($server->getProject()->readablePhpFiles as $file) {
+        foreach ($server->getExecutableFiles() as $file) {
             if (preg_match('/.+\.php$/', $file)) {
-                $apps[$file] = ' http://' . $host . ':' . $configuration->get('port') . '/<info>' . $file . '</info>';
+                $apps[$file] = ' http://' . $host . ':' . $server->getPort() . '/<info>' . $file . '</info>';
             }
         }
 
@@ -151,7 +144,7 @@ Available applications:
 
 TEXT;
 
-        return sprintf($text, $server->name, $boundAddress, $configuration->get('port'), implode("\n", $apps));
+        return sprintf($text, $server->getName(), $address, $server->getPort(), implode("\n", $apps));
     }
 
     /**
@@ -162,7 +155,7 @@ TEXT;
     {
         $handler = function () use ($server, $output) {
             $server->stop(new NullOutput());
-            $output->writeln(sprintf(PHP_EOL.'<important>Closing %s, bye!</important>', $server->name));
+            $output->writeln(PHP_EOL.'<important>Stop serving, bye!</important>');
 
             exit(0);
         };
