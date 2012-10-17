@@ -12,6 +12,7 @@
 namespace Symfttpd\Server\Generator;
 
 use Symfttpd\Server\ServerInterface;
+use Symfttpd\Filesystem\Filesystem;
 
 /**
  * GeneratorInterface
@@ -21,9 +22,10 @@ use Symfttpd\Server\ServerInterface;
 interface GeneratorInterface
 {
     /**
-     * @param \Twig_Environment $twig
+     * @param \Twig_Environment               $twig
+     * @param \Symfttpd\Filesystem\Filesystem $filesystem
      */
-    public function __construct(\Twig_Environment $twig);
+    public function __construct(\Twig_Environment $twig, Filesystem $filesystem);
 
     /**
      * @param \Symfttpd\Server\ServerInterface $server

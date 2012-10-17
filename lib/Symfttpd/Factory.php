@@ -12,10 +12,11 @@
 namespace Symfttpd;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfttpd\Server\ServerInterface;
 use Symfttpd\Config;
 use Symfttpd\Configuration\Configuration;
+use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Project\ProjectInterface;
+use Symfttpd\Server\ServerInterface;
 
 /**
  * Factory description
@@ -177,9 +178,13 @@ class Factory
 
         $twig->addExtension(new TwigExtension());
 
-        $generator = new $class($twig);
-        $generator->setTemplate($server->getName() . '.conf.twig');
-        $generator->setPath($project->getCacheDir() . '/' . $server->getName() . '.conf');
+        $filesystem = new Filesystem();
+
+        $generator = new $class($twig, $filesystem);
+        $generator->setTemplate($config->get('server_template', $server->getName() . '.conf.twig'));
+
+        $defaultPath = $project->getCacheDir() . '/' . $server->getName(). '/' . $server->getName() . '.conf';
+        $generator->setPath($config->get('server_config_path', $defaultPath));
 
         return $generator;
     }

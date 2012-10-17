@@ -11,6 +11,7 @@
 
 namespace Symfttpd\Server\Generator;
 
+use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Server\Generator\GeneratorInterface;
 use Symfttpd\Server\ServerInterface;
 
@@ -27,6 +28,11 @@ class LighttpdGenerator implements GeneratorInterface
     protected $twig;
 
     /**
+     * @var \Symfttpd\Filesystem\Filesystem
+     */
+    protected $filesystem;
+
+    /**
      * @var string
      */
     protected $template;
@@ -37,11 +43,13 @@ class LighttpdGenerator implements GeneratorInterface
     protected $path;
 
     /**
-     * @param \Twig_Environment $twig
+     * @param \Twig_Environment               $twig
+     * @param \Symfttpd\Filesystem\Filesystem $filesystem
      */
-    public function __construct(\Twig_Environment $twig)
+    public function __construct(\Twig_Environment $twig, Filesystem $filesystem)
     {
         $this->twig = $twig;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -85,6 +93,12 @@ class LighttpdGenerator implements GeneratorInterface
         }
 
         $configuration = $this->generate($server);
+
+        $directory = dirname($this->getPath());
+
+        if (!$this->filesystem->exists($directory)) {
+            $this->filesystem->mkdir($directory);
+        }
 
         if (false === file_put_contents($this->getPath(), $configuration)) {
             throw new \RuntimeException(sprintf('Cannot generate the file "%s".', $this->getPath()));
