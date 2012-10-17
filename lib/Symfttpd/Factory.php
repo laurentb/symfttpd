@@ -170,7 +170,7 @@ class Factory
         // Define configuration template storage paths.
         $dirs = array_merge(
             array(__DIR__ . '/Resources/templates/' . $server->getName()),
-            $config->get('templates_dirs', array())
+            $config->get('server_templates_dirs', array())
         );
 
         // Configure Twig for the rendering of configuration files.
