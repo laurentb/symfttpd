@@ -72,7 +72,7 @@ class LighttpdGenerator implements GeneratorInterface
                 'dirs'          => $server->getAllowedDirs(),
                 'files'         => $server->getAllowedFiles(),
                 'phps'          => $server->getExecutableFiles(),
-                'nophp'         => $server->getDeniedDirs(),
+                'nophp'         => $server->getUnexecutableDirs(),
                 'default'       => $server->getIndexFile(),
             )
         );

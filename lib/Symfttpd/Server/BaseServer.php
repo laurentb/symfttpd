@@ -92,7 +92,7 @@ abstract class BaseServer implements ServerInterface
     /**
      * @var array
      */
-    protected $deniedDirs = array();
+    protected $unexecutableDirs = array();
 
     /**
      * @var string
@@ -222,19 +222,19 @@ abstract class BaseServer implements ServerInterface
     }
 
     /**
-     * @param array $deniedDirs
+     * @param array $unexecutableDirs
      */
-    public function setDeniedDirs(array $deniedDirs)
+    public function setUnexecutableDirs(array $unexecutableDirs)
     {
-        $this->deniedDirs = $deniedDirs;
+        $this->unexecutableDirs = $unexecutableDirs;
     }
 
     /**
      * @return array
      */
-    public function getDeniedDirs()
+    public function getUnexecutableDirs()
     {
-        return $this->deniedDirs;
+        return $this->unexecutableDirs;
     }
 
     /**

@@ -127,7 +127,7 @@ class Factory
         /**
          * @var \Symfttpd\Server\ServerInterface $server
          */
-        $server = new $class($project, $config);
+        $server = new $class();
         $server->bind($config->get('server_address', '127.0.0.1'), $config->get('server_port', '4042'));
 
         // Configure logging directory
@@ -135,9 +135,17 @@ class Factory
         $server->setErrorLog($logDir . '/' . $config->get('server_error_log', 'error.log'));
         $server->setAccessLog($logDir . '/' . $config->get('server_access_log', 'access.log'));
 
+        $server->setFastcgi($config->get('php_cgi_cmd'));
         $server->setPidfile($project->getCacheDir() . '/' . $config->get('server_pidfile', '.sf'));
 
         // Configure project relative directories and files
+        $server->setDocumentRoot($project->getWebDir());
+        $server->setIndexFile($project->getIndexFile());
+        $server->setAllowedDirs($config->get('project_readable_dirs', array()));
+        $server->setAllowedFiles($config->get('project_readable_files', array()));
+        $server->setExecutableFiles($config->get('project_readable_phpfiles', array()));
+        $server->setUnexecutableDirs($config->get('project_nophp', array()));
+
         return $server;
     }
 

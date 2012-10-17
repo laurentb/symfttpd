@@ -65,6 +65,16 @@ interface ServerInterface
     public function bind($address, $port = null);
 
     /**
+     * @param string $name
+     */
+    public function setName($name);
+
+    /**
+     * @return string
+     */
+    public function getName();
+
+    /**
      * @return string
      */
     public function getAddress();
@@ -125,14 +135,14 @@ interface ServerInterface
     public function getAllowedFiles();
 
     /**
-     * @param array $deniedDirs
+     * @param array $unexecutableDirs
      */
-    public function setDeniedDirs(array $deniedDirs);
+    public function setUnexecutableDirs(array $unexecutableDirs);
 
     /**
      * @return array
      */
-    public function getDeniedDirs();
+    public function getUnexecutableDirs();
 
     /**
      * @param string $documentRoot
