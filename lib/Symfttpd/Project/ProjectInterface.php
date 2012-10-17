@@ -25,12 +25,6 @@ interface ProjectInterface
     public function __construct(\Symfttpd\Config $options, $path = null);
 
     /**
-     * @abstract
-     * @return mixed
-     */
-    public function scan();
-
-    /**
      * Return the project name.
      *
      * @abstract

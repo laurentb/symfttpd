@@ -74,43 +74,6 @@ abstract class BaseProject implements ProjectInterface
     }
 
     /**
-     * Scan readable files, dirs and php executable files
-     * as index.php.
-     *
-     * @todo: move this in a dedicated class.
-     */
-    public function scan()
-    {
-        // Reset the default values.
-        $this->readableDirs     = $this->config->get('project_readable_dirs', array());
-        $this->readableFiles    = $this->config->get('project_readable_files', array());
-        $this->readablePhpFiles = $this->config->get('project_readable_phpfiles', array('index.php'));
-
-        $iterator = new \DirectoryIterator($this->getWebDir());
-
-        foreach ($iterator as $file) {
-            $name = $file->getFilename();
-            if ($name[0] != '.') {
-                if ($file->isDir() && false == in_array($name, $this->readableDirs)) {
-                    $this->readableDirs[] = $name;
-                } elseif (!preg_match('/\.php$/', $name) && false == in_array($name, $this->readableFiles)) {
-                    $this->readableFiles[] = $name;
-                } else {
-                    if (false === $this->config->has('project_readable_restrict')
-                        && false == in_array($name, $this->readablePhpFiles)
-                    ) {
-                        $this->readablePhpFiles[] = $name;
-                    }
-                }
-            }
-        }
-
-        sort($this->readableDirs);
-        sort($this->readableFiles);
-        sort($this->readablePhpFiles);
-    }
-
-    /**
      * Return the directory where lives the project.
      *
      * @return mixed

@@ -118,8 +118,6 @@ class SpawnCommand extends Command
      */
     protected function getMessage(ServerInterface $server)
     {
-        $this->symfttpd->getProject()->scan();
-
         if (false == $address = $server->getAddress()) {
             $address = 'all-interfaces';
         }
