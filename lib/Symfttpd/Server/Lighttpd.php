@@ -83,18 +83,20 @@ class Lighttpd extends BaseServer
      */
     public function start(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null)
     {
-        // Run lighttpd
-        try {
-            // Regenerate the lighttpd configuration
-            $generator->dump($this, true);
+        // Regenerate the lighttpd configuration
+        $generator->dump($this, true);
 
-            $process = new \Symfony\Component\Process\Process(null);
-            $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($generator->getPath()));
-            $process->setTimeout(null);
-            $process->run();
-        } catch (\Exception $e) {
-            $output->writeln('<error>The server cannot start</error>');
-            $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
+        $process = new \Symfony\Component\Process\Process(null);
+        $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($generator->getPath()));
+        $process->setTimeout(null);
+
+        // Run lighttpd
+        $process->run();
+
+        $stderr = $process->getErrorOutput();
+
+        if (!empty($stderr)) {
+            throw new \RuntimeException($stderr);
         }
 
         $prevGenconf = null;

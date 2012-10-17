@@ -106,7 +106,14 @@ class SpawnCommand extends Command
 
         $this->handleSignals($server, $output);
 
-        return $server->start($this->symfttpd->getServerGenerator(), $output, $multitail) ? 1 : 0;
+        try {
+            return $server->start($this->symfttpd->getServerGenerator(), $output, $multitail) ? 1 : 0;
+        } catch (\Exception $e) {
+            $output->writeln('<error>The server cannot start</error>');
+            $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
+
+            exit(0);
+        }
     }
 
     /**
