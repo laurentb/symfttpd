@@ -1,0 +1,27 @@
+{
+    "alias": "symfttpd.phar",
+    "blacklist": ["Compiler.php"],
+    "directories": ["lib"],
+    "finder": [
+        {
+            "name": ["*.php", "*.twig"],
+            "in": ["lib"],
+            "exclude": ["Tests"]
+        },
+        {
+            "name": ["*.php"],
+            "in": ["vendor"],
+            "exclude": [
+                "vendor/twig/doc",
+                "vendor/twig/test",
+                "vendor/bin",
+                "vendor/phpmd",
+                "vendor/pdepend"
+            ]
+        }
+    ],
+    "git-version": "package_version",
+    "main": "bin/symfttpd",
+    "output": "symfttpd.phar",
+    "stub": true
+}
