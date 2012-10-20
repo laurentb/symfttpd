@@ -29,21 +29,6 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getConfig
-     * @param $config
-     * @param $values
-     */
-    public function testScan($config, $values)
-    {
-        $this->project->config->clear();
-        $this->project->config->add($config);
-        $this->project->scan();
-        $this->assertEquals($values['dirs'], $this->project->readableDirs);
-        $this->assertEquals($values['files'], $this->project->readableFiles);
-        $this->assertEquals($values['php'], $this->project->readablePhpFiles);
-    }
-
-    /**
      * @expectedException \InvalidArgumentException
      */
     public function testSetPathException()

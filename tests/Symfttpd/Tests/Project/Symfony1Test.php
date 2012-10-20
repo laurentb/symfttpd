@@ -68,50 +68,6 @@ class Symfony1Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals(realpath(sys_get_temp_dir()), $this->project->getRootDir());
     }
 
-    public function testScan()
-    {
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
-
-        $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
-
-        $projectTree = array(
-            $baseDir.'/apps',
-            $baseDir.'/cache',
-            $baseDir.'/config',
-            $baseDir.'/lib',
-            $baseDir.'/log',
-            $baseDir.'/web',
-            $baseDir.'/web/css',
-            $baseDir.'/web/js',
-        );
-
-        $files = array(
-            $baseDir.'/web/index.php',
-            $baseDir.'/web/frontend_dev.php',
-            $baseDir.'/web/backend_dev.php',
-            $baseDir.'/web/robots.txt',
-            $baseDir.'/log/frontend.log',
-        );
-
-        $filesystem->remove($projectTree);
-        $filesystem->mkdir($projectTree);
-        $filesystem->touch($files);
-
-        $this->project->setRootDir($baseDir);
-        $this->project->scan();
-
-        $this->assertContains('index.php', $this->project->readablePhpFiles);
-        $this->assertContains('frontend_dev.php', $this->project->readablePhpFiles);
-        $this->assertContains('backend_dev.php', $this->project->readablePhpFiles);
-
-        $this->assertContains('css', $this->project->readableDirs);
-        $this->assertContains('js', $this->project->readableDirs);
-
-        $this->assertContains('robots.txt', $this->project->readableFiles);
-
-        $filesystem->remove($projectTree);
-    }
-
     public function testGetName()
     {
         $this->assertEquals('symfony', $this->project->getName());

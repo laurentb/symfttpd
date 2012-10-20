@@ -112,7 +112,7 @@ class SpawnCommand extends Command
             $output->writeln('<error>The server cannot start</error>');
             $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
 
-            exit(0);
+            return 0;
         }
     }
 
