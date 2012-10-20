@@ -37,12 +37,6 @@ class Compiler
             unlink($pharFile);
         }
 
-        $process = new Process('git log --pretty="%h" -n1 HEAD', __DIR__);
-        if ($process->run() != 0) {
-            throw new \RuntimeException('Can\'t run git log. You must ensure to run compile from composer git repository clone and that git binary is available.');
-        }
-        $this->version = trim($process->getOutput());
-
         $process = new Process('git describe --tags HEAD');
         if ($process->run() == 0) {
             $this->version = trim($process->getOutput());
@@ -73,10 +67,9 @@ class Compiler
             ->name('*.php')
             ->in(__DIR__.'/../../vendor/symfony')
             ->in(__DIR__.'/../../vendor/twig')
-            ->in(__DIR__.'/../../vendor/pimple')
             ->exclude(__DIR__.'/../../vendor/twig/doc')
             ->exclude(__DIR__.'/../../vendor/twig/test')
-            ->exclude(__DIR__.'/../../vendor/pimple/test');
+        ;
 
         foreach ($finder as $file) {
             $this->addFile($phar, $file);
@@ -86,6 +79,8 @@ class Compiler
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/autoload.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_namespaces.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_classmap.php'));
+        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/include_paths.php'));
+        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_real.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/ClassLoader.php'));
         $this->addSymfttpdBin($phar);
 
