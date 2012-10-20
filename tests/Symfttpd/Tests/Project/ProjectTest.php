@@ -20,7 +20,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\OptionBag());
+        $this->project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\Config());
 
     }
     public function tearDown()
@@ -29,37 +29,22 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getOptions
-     * @param $options
-     * @param $values
-     */
-    public function testScan($options, $values)
-    {
-        $this->project->options->clear();
-        $this->project->options->add($options);
-        $this->project->scan();
-        $this->assertEquals($values['dirs'], $this->project->readableDirs);
-        $this->assertEquals($values['files'], $this->project->readableFiles);
-        $this->assertEquals($values['php'], $this->project->readablePhpFiles);
-    }
-
-    /**
      * @expectedException \InvalidArgumentException
      */
     public function testSetPathException()
     {
-        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\OptionBag()));
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Config()));
         $project->setRootDir(__DIR__.'/foo/bar');
     }
 
     public function testGetRootDir()
     {
-        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\OptionBag()));
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Config()));
         $project->setRootDir(sys_get_temp_dir());
         $this->assertEquals(realpath(sys_get_temp_dir()), $project->getRootDir());
     }
 
-    public function getOptions()
+    public function getConfig()
     {
         return array(
             array(
@@ -108,7 +93,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetName()
     {
-        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\OptionBag()));
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Config()));
         $project->getName();
     }
 
@@ -118,8 +103,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetVersion()
     {
-        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\OptionBag()));
+        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Config()));
         $project->getVersion();
     }
 }
-

@@ -28,7 +28,7 @@ class Compiler
     /**
      * Compile symfttpd.
      *
-     * @param string $pharFile
+     * @param  string            $pharFile
      * @throws \RuntimeException
      */
     public function compile($pharFile = 'symfttpd.phar')
@@ -36,12 +36,6 @@ class Compiler
         if (file_exists($pharFile)) {
             unlink($pharFile);
         }
-
-        $process = new Process('git log --pretty="%h" -n1 HEAD', __DIR__);
-        if ($process->run() != 0) {
-            throw new \RuntimeException('Can\'t run git log. You must ensure to run compile from composer git repository clone and that git binary is available.');
-        }
-        $this->version = trim($process->getOutput());
 
         $process = new Process('git describe --tags HEAD');
         if ($process->run() == 0) {
@@ -73,10 +67,9 @@ class Compiler
             ->name('*.php')
             ->in(__DIR__.'/../../vendor/symfony')
             ->in(__DIR__.'/../../vendor/twig')
-            ->in(__DIR__.'/../../vendor/pimple')
             ->exclude(__DIR__.'/../../vendor/twig/doc')
             ->exclude(__DIR__.'/../../vendor/twig/test')
-            ->exclude(__DIR__.'/../../vendor/pimple/test');
+        ;
 
         foreach ($finder as $file) {
             $this->addFile($phar, $file);
@@ -86,6 +79,8 @@ class Compiler
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/autoload.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_namespaces.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_classmap.php'));
+        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/include_paths.php'));
+        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/autoload_real.php'));
         $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../vendor/composer/ClassLoader.php'));
         $this->addSymfttpdBin($phar);
 
@@ -116,11 +111,10 @@ class Compiler
         $phar->addFromString('bin/symfttpd', $content);
     }
 
-
     /**
      * Removes whitespace from a PHP source string while preserving line numbers.
      *
-     * @param string $source A PHP string
+     * @param  string $source A PHP string
      * @return string The PHP string with the whitespace removed
      */
     private function stripWhitespace($source)

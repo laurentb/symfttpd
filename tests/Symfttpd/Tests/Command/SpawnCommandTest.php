@@ -11,10 +11,8 @@
 
 namespace Symfttpd\Tests\Command;
 
-use Symfttpd\Command\SpawnCommand;
-use Symfttpd\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfttpd\Command\SpawnCommand;
 
 /**
  * SpawnCommand test class.
@@ -24,141 +22,67 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 class SpawnCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Symfttpd\Filesystem\Filesystem $filesystem
-     */
-    protected $filesystem;
-
-    /**
      * @var Symfony\Component\Console\Tester\CommandTester $command
      */
     protected $command;
 
-    /**
-     * Path to the fixtures.
-     *
-     * @var string
-     */
-    protected $fixtures;
-
     public function setUp()
     {
-        $this->fixtures = sys_get_temp_dir().'/symfttpd-test';
-
-        $this->filesystem = new Filesystem();
-        $this->filesystem->mkdir(array(
-            $this->fixtures.'/cache/lighttpd/',
-            $this->fixtures.'/log/lighttpd/',
-            $this->fixtures.'/web',
-        ));
-
         $this->command = new SpawnCommand();
+        $this->command->setSymfttpd($this->getSymfttpd());
     }
 
-    public function tearDown()
-    {
-        $this->filesystem->remove($this->fixtures);
-    }
-
+    /**
+     * @covers \Symfttpd\Command\SpawnCommand::execute
+     * @covers \Symfttpd\Command\SpawnCommand::getMessage
+     */
     public function testExecute()
     {
-        $this->markTestSkipped('Spawn and watch methods make it untestable... yet.');
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(array(), array('port' => 4043));
 
-        $symfttpd = new \Symfttpd\Symfttpd($this->getConfiguration());
+        $this->assertRegExp('/symfttpd started on 127.0.0.1, port 4043./', $commandTester->getDisplay());
+        $this->assertRegExp('#http://127\.0\.0\.1:4043/index.php#', $commandTester->getDisplay());
+    }
 
-        $symfttpd['server'] = $this->getServer();
+    public function getSymfttpd()
+    {
+        $symfttpd = $this->getMock('\\Symfttpd\\Symfttpd');
+        $symfttpd->expects($this->any())
+            ->method('getServer')
+            ->will($this->returnValue($this->getServer()));
 
-        $application = new \Symfttpd\Console\Application();
-        $application->setAutoExit(false);
-        $application->setSymfttpd($symfttpd);
-        $application->add($this->command);
+        $symfttpd->expects($this->once())
+            ->method('getServerGenerator')
+            ->will($this->returnValue($this->getMock('\\Symfttpd\\Server\\Generator\\GeneratorInterface')));
 
-        $process = $this->getProcess();
-
-        $symfttpd['server']->expects($this->once())
-            ->method('start')
-            ->will($this->returnValue($process));
-
-        $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'spawn'), array('interactive' => false));
-
-        $this->assertTrue($process->isRunning());
+        return $symfttpd;
     }
 
     public function getServer()
     {
-        $twig_loader = $this->getMock('\\Twig_Loader_Filesystem', array('addPath'), array(''));
-        $twig_loader->expects($this->once())
-            ->method('addPath');
+        $server = $this->getMock('\\Symfttpd\\Server\\ServerInterface');
 
-        $twig = $this->getMock('\\Twig_Environment', array('getLoader', 'render'), array($twig_loader));
-        $twig->expects($this->once())
-            ->method('getLoader')
-            ->will($this->returnValue($twig_loader));
+        $server->expects($this->any())
+            ->method('getAddress')
+            ->will($this->returnValue('127.0.0.1'));
 
-        $twig->expects($this->atLeastOnce())
-            ->method('render')
-            ->will($this->returnValue(''));
+        $server->expects($this->any())
+            ->method('getPort')
+            ->will($this->returnValue('4043'));
 
-        $project = $this->getProject();
+        $server->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('symfttpd'));
 
-        $loader = $this->getMock('\\Symfttpd\\Loader');
-        $writer = $this->getMock('\\Symfttpd\\Writer');
+        $server->expects($this->any())
+            ->method('getExecutableFiles')
+            ->will($this->returnValue(array('index.php')));
 
-        $server = $this->getMockBuilder('\\Symfttpd\\Server\\Lighttpd')
-            ->setMethods(array('write', 'getProject', 'getConfigFilename', 'getRulesFilename', 'getCacheDir', 'start'))
-            ->setConstructorArgs(array(
-                $project,
-                $twig,
-                $loader,
-                $writer,
-                new \Symfttpd\OptionBag())
-            )
-            ->getMock();
-
-        $server->expects($this->once())
-            ->method('getProject')
-            ->will($this->returnValue($project));
-
-        $server->expects($this->once())
-            ->method('getConfigFilename')
-            ->will($this->returnValue('lighttpd.conf'));
-
-        $server->expects($this->once())
-            ->method('getRulesFilename')
-            ->will($this->returnValue('rules.conf'));
-
-        $server->expects($this->atLeastOnce())
-            ->method('getCacheDir');
+        $server->expects($this->any())
+            ->method('start')
+            ->will($this->returnValue(1));
 
         return $server;
-    }
-
-    public function getProject()
-    {
-        $project = $this->getMockBuilder('\\Symfttpd\\Project\\Php')
-            ->setMethods(array())
-            ->setConstructorArgs(array(new \Symfttpd\OptionBag(), $this->fixtures))
-            ->getMockForAbstractClass();
-
-        return $project;
-    }
-
-    public function getConfiguration()
-    {
-        return $this->getMock('\\Symfttpd\\Configuration\\SymfttpdConfiguration');
-    }
-
-    public function getProcess()
-    {
-        $process = $this->getMockBuilder('\\Symfony\\Component\\Console\\Process')
-            ->disableOriginalConstructor()
-            ->setMethods(array('run'))
-            ->getMock();
-
-        $process->expects($this->once())
-            ->method('run')
-            ->will($this->returnValue(0));
-
-        return $process;
     }
 }

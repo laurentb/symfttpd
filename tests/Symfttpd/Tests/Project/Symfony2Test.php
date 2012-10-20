@@ -24,7 +24,7 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->project = new Symfony2(new \Symfttpd\OptionBag());
+        $this->project = new Symfony2(new \Symfttpd\Config());
     }
 
     /**
@@ -59,46 +59,13 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
 
     public function testGetIndexFile()
     {
-        $this->assertEquals('index.php', $this->project->getIndexFile());
+        $this->assertEquals('app.php', $this->project->getIndexFile());
     }
 
     public function testGetRootDir()
     {
         $this->project->setRootDir(sys_get_temp_dir());
         $this->assertEquals(realpath(sys_get_temp_dir()), $this->project->getRootDir());
-    }
-
-    public function testScan()
-    {
-        $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
-
-        $projectTree = array(
-            $baseDir,
-            $baseDir.'/app',
-            $baseDir.'/app/cache',
-            $baseDir.'/app/config',
-            $baseDir.'/src',
-            $baseDir.'/app/logs',
-            $baseDir.'/web',
-            $baseDir.'/web/bundles',
-        );
-
-        $files = array(
-            $baseDir.'/web/index.php',
-            $baseDir.'/web/robots.txt',
-        );
-
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
-        $filesystem->remove($projectTree);
-        $filesystem->mkdir($projectTree);
-        $filesystem->touch($files);
-
-        $this->project->setRootDir($baseDir);
-        $this->project->scan();
-
-        $this->assertContains('index.php', $this->project->readablePhpFiles);
-        $this->assertContains('bundles', $this->project->readableDirs);
-        $this->assertContains('robots.txt', $this->project->readableFiles);
     }
 
     public function testGetName()
@@ -111,4 +78,3 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2', $this->project->getVersion());
     }
 }
-

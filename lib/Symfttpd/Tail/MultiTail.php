@@ -75,8 +75,8 @@ class MultiTail implements TailInterface
 
     /**
      * Display a line from a Tail, if it is valid.
-     * @param Tail   $tail
-     * @param string $name Unique name of the Tail
+     * @param  Tail    $tail
+     * @param  string  $name Unique name of the Tail
      * @return boolean Line validity
      *
      * @author Laurent Bachelier <laurent@bachelier.name>
@@ -99,4 +99,3 @@ class MultiTail implements TailInterface
         return false;
     }
 }
-

@@ -23,118 +23,142 @@
  * Path to symfttpd files
  * Useful for creating the link to genconf.
  * Do not change/copy it unless you know what you are doing.
+ *
  * @var string symfttpd path
  */
-$options['path'] = dirname(__FILE__);
-
-/**
- * Create the symlink to genconf
- * @var string|boolean false or path relative to the project root
- */
-$options['genconf'] = 'config/lighttpd.php';
-
-/**
- * Create the symlink to the symfony data directory
- * (not recommended unless using symfony 1.0)
- * @var string|boolean false or path relative to the project root
- */
-$options['data_symlink'] = false;
-
-/**
- * Create the symlink to the symfony lib directory
- * (lib/vendor/symfony is the recommended path for 1.1+)
- * @var string|boolean false or path relative to the project root
- */
-$options['lib_symlink']  = 'lib/vendor/symfony';
-
-/**
- * Create the symlink to the symfony directory
- * (not recommended)
- * @var string|boolean false or path relative to the project root
- */
-$options['symfony_symlink'] = false;
-
-/**
- * Create the symlink for "/sf"
- * (recommended)
- * @var string|boolean false or "web/sf"
- */
-$options['web_symlink'] = 'web/sf';
-
-/**
- * Try to run symfony:publish-assets
- * @var boolean
- */
-$options['do_plugins'] = true;
-
-/**
- * Create relative symlinks
- * (recommended)
- * @var boolean
- */
-$options['relative'] = true;
-
-/**
- * Wanted symfony version
- * You should override this in the project-level config
- * @var string
- */
-$options['want'] = '1.4';
-
-
-/**
- * symfony paths
- * You should override this in the user-level config
- * @var array version=>path
- */
-$options['sf_path'] = array(
-    '1.0'=>getenv('HOME').'/Dev/symfony/1.0',
-    '1.1'=>getenv('HOME').'/Dev/symfony/1.1',
-    '1.2'=>getenv('HOME').'/Dev/symfony/1.2',
-    '1.3'=>getenv('HOME').'/Dev/symfony/1.3',
-    '1.4'=>getenv('HOME').'/Dev/symfony/1.4',
-);
-
-// }}}
-
-// {{{ spawn configuration
-
-/**
- * symfttpd will try to find the executables by using the PATH environment
- * variable, then by using this variable.
- * @var array List of directories
- */
-$options['custom_path'] = array('/usr/sbin');
-
-/**
- * Absolute path to the lighttpd server executable
- * @var string|null to autodetect (try to find "lighttpd" in the path)
- */
-$options['lighttpd_cmd'] = null;
-
-/**
- * Absolute path to the CLI PHP executable
- * @var string|boolean false to autodetect (try to find "php" in the path)
- */
-$options['php_cmd'] = realpath(PHP_BINDIR.'/php');
-
-/**
- * Absolute path to the CGI PHP executable
- * @var string|boolean false to autodetect (try to find "php-cgi" in the path)
- * @deprecated
- */
+//$options['path'] = dirname(__FILE__);
+//
+///**
+// * Create the symlink to genconf
+// * @var string|boolean false or path relative to the project root
+// */
+//$options['genconf'] = 'config/lighttpd.php';
+//
+///**
+// * Create the symlink to the symfony data directory
+// * (not recommended unless using symfony 1.0)
+// * @var string|boolean false or path relative to the project root
+// */
+//$options['data_symlink'] = false;
+//
+///**
+// * Create the symlink to the symfony lib directory
+// * (lib/vendor/symfony is the recommended path for 1.1+)
+// * @var string|boolean false or path relative to the project root
+// */
+//$options['lib_symlink']  = 'lib/vendor/symfony';
+//
+///**
+// * Create the symlink to the symfony directory
+// * (not recommended)
+// * @var string|boolean false or path relative to the project root
+// */
+//$options['symfony_symlink'] = false;
+//
+///**
+// * Create the symlink for "/sf"
+// * (recommended)
+// * @var string|boolean false or "web/sf"
+// */
+//$options['web_symlink'] = 'web/sf';
+//
+///**
+// * Try to run symfony:publish-assets
+// * @var boolean
+// */
+//$options['do_plugins'] = true;
+//
+///**
+// * Create relative symlinks
+// * (recommended)
+// * @var boolean
+// */
+//$options['relative'] = true;
+//
+///**
+// * Wanted symfony version
+// * You should override this in the project-level config
+// * @var string
+// */
+//$options['want'] = null;
+//
+//
+///**
+// * symfony paths
+// * You should override this in the user-level config
+// * @var array version=>path
+// */
+//$options['sf_path'] = array(
+//    '1.0'=>getenv('HOME').'/Dev/symfony/1.0',
+//    '1.1'=>getenv('HOME').'/Dev/symfony/1.1',
+//    '1.2'=>getenv('HOME').'/Dev/symfony/1.2',
+//    '1.3'=>getenv('HOME').'/Dev/symfony/1.3',
+//    '1.4'=>getenv('HOME').'/Dev/symfony/1.4',
+//);
+//
+//// }}}
+//
+//// {{{ spawn configuration
+//
+///**
+// * symfttpd will try to find the executables by using the PATH environment
+// * variable, then by using this variable.
+// * @var array List of directories
+// */
+//$options['custom_path'] = array('/usr/sbin');
+//
+///**
+// * Absolute path to the lighttpd server executable
+// * @var string|null to autodetect (try to find "lighttpd" in the path)
+// */
+//$options['lighttpd_cmd'] = null;
+//
+///**
+// * Absolute path to the CLI PHP executable
+// * @var string|boolean false to autodetect (try to find "php" in the path)
+// */
+//$options['php_cmd'] = realpath(PHP_BINDIR.'/php');
+//
+///**
+// * Absolute path to the CGI PHP executable
+// * @var string|boolean false to autodetect (try to find "php-cgi" in the path)
+// * @deprecated
+// */
 $options['php_cgi_cmd'] = realpath(PHP_BINDIR.'/php-cgi');
-
-/**
- * Command to generate the docroot and rewriting config.
- * @var string|null to use included genconf tool with default parametrs
- */
-$options['genconf_cmd'] = null;
-
-/**
- * Default server template path
- * @var string|null null to autodetect (try to find "php-cgi" in the path)
- */
-$options['config_template'] = dirname(__FILE__).'/data/lighttpd.conf.php';
+//
+///**
+// * Command to generate the docroot and rewriting config.
+// * @var string|null to use included genconf tool with default parametrs
+// */
+//$options['genconf_cmd'] = null;
+//
+///**
+// * Default server template path
+// * @var string|null null to autodetect (try to find "php-cgi" in the path)
+// */
+//$options['config_template'] = dirname(__FILE__).'/data/lighttpd.conf.php';
 
 // }}}
+
+// Required options
+$options['project_type']    = 'php'; // Can be php or symfony
+$options['project_version'] = null; // null only if type is php
+
+// Not required options
+$options['project_readable_dirs']     = array('uploads'); // readable directories by the server in the web dir.
+$options['project_readable_files']    = array('authors.txt', 'robots.txt'); // readable files by the server in the web dir (robots.txt).
+$options['project_readable_phpfiles'] = array('index.php'); // executable php files in the web directory
+$options['project_readable_restrict'] = true; // if true the server will restrict access to other files than readable php files.
+$options['project_nophp']             = array('uploads'); // deny PHP execution in the specified directories.
+$options['project_log_dir']           = 'log';
+$options['project_cache_dir']         = 'cache';
+$options['project_web_dir']           = 'web';
+
+// Required options
+$options['server_type'] = 'lighttpd';
+
+// Not required options
+$options['server_pidfile']     = 'server_pidfile'; // The pidfile stores the PID of the server process.
+$options['server_restartfile'] = 'server_restartfile'; // The file that tells the spawn command to restart the server.
+$options['server_access_log']  = 'access.log'; // The server access log file of the server.
+$options['server_error_log']   = 'error.log'; // The server error log file of the server.

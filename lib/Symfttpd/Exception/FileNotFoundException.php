@@ -12,11 +12,11 @@
 namespace Symfttpd\Exception;
 
 /**
- * WriterException class.
+ * FileNotFoundException class.
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class WriterException extends \Exception
+class FileNotFoundException extends \Exception
 {
 
 }

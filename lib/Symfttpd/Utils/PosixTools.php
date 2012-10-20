@@ -20,12 +20,12 @@ class PosixTools
 {
     /**
      * Get a process ID from a file, and kill it, and remove the file either way.
-     * @param string $pidfile Path to PID file
+     * @param  string  $pidfile Path to PID file
      * @return boolean Success
      *
      * @author Laurent Bachelier <laurent@bachelier.name>
      */
-    static public function killPid($pidfile, \Symfony\Component\Console\Output\OutputInterface $output)
+    public static function killPid($pidfile, \Symfony\Component\Console\Output\OutputInterface $output)
     {
         if (file_exists($pidfile)) {
             $pid = intval(trim(file_get_contents($pidfile)));
@@ -43,4 +43,3 @@ class PosixTools
         return false;
     }
 }
-

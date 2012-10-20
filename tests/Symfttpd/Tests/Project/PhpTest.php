@@ -24,7 +24,7 @@ class PhpTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->project = new Php(new \Symfttpd\OptionBag());
+        $this->project = new Php(new \Symfttpd\Config());
     }
 
     /**
@@ -54,35 +54,6 @@ class PhpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('index.php', $this->project->getIndexFile());
     }
 
-    public function testScan()
-    {
-        $filesystem = new \Symfttpd\Filesystem\Filesystem();
-
-        $baseDir = sys_get_temp_dir().'/symfttpd-project-test';
-
-        $filesystem->remove($baseDir);
-        $filesystem->mkdir($baseDir);
-
-        $this->project->setRootDir($baseDir);
-
-        $baseDir = $this->project->getRootDir();
-
-        $files = array(
-            $baseDir.DIRECTORY_SEPARATOR.'index.php',
-            $baseDir.DIRECTORY_SEPARATOR.'robots.txt',
-        );
-
-        $filesystem->touch($files);
-
-        $this->project->scan();
-
-        $this->assertContains('index.php', $this->project->readablePhpFiles);
-        $this->assertEmpty($this->project->readableDirs);
-        $this->assertContains('robots.txt', $this->project->readableFiles);
-
-        $filesystem->remove($baseDir);
-    }
-
     public function testGetName()
     {
         $this->assertEquals('php', $this->project->getName());
@@ -93,4 +64,3 @@ class PhpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('', $this->project->getVersion());
     }
 }
-

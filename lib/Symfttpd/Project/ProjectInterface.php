@@ -19,10 +19,10 @@ namespace Symfttpd\Project;
 interface ProjectInterface
 {
     /**
-     * @abstract
-     * @return mixed
+     * @param \Symfttpd\Config $options
+     * @param null             $path
      */
-    public function scan();
+    public function __construct(\Symfttpd\Config $options, $path = null);
 
     /**
      * Return the project name.

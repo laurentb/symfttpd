@@ -12,10 +12,6 @@
 namespace Symfttpd\Server;
 
 use Symfttpd\Server\ServerInterface;
-use Symfttpd\Project\ProjectInterface;
-use Symfttpd\OptionBag;
-use Symfttpd\Loader;
-use Symfttpd\Writer;
 
 /**
  * BaseServer class.
@@ -25,57 +21,299 @@ use Symfttpd\Writer;
 abstract class BaseServer implements ServerInterface
 {
     /**
-     * @var ProjectInterface
+     * @var string
      */
-    protected $project;
+    protected $name;
 
     /**
-     * @var \Twig_Environment
-     */
-    protected $twig;
-
-    /**
-     * @var \Symfttpd\Loader
-     */
-    protected $loader;
-
-    /**
-     * @var \Symfttpd\Writer
-     */
-    protected $writer;
-
-    /**
-     * The server options
+     * Server address
      *
-     * @var OptionBag
+     * @var string
      */
-    public $options;
+    protected $address;
 
     /**
-     * Return the keys for the server configuration.
+     * Server port
      *
+     * @var string
+     */
+    protected $port;
+
+    /**
+     * The shell command to run lighttpd.
+     *
+     * @var string
+     */
+    protected $command;
+
+    /**
+     * Return the pidfile of the server.
+     * Used to kill the process.
+     *
+     * @var string
+     */
+    protected $pidfile;
+
+    /**
+     * @var string
+     */
+    protected $errorLog;
+
+    /**
+     * @var string
+     */
+    protected $accessLog;
+
+    /**
+     * @var string
+     */
+    protected $documentRoot;
+
+    /**
+     * @var string
+     */
+    protected $fastcgi;
+
+    /**
      * @var array
      */
-    static public $configurationKeys = array(
-        'server_pidfile',     // The pidfile stores the PID of the server process.
-        'server_restartfile', // The file that tells the spawn command to restart the server.
-        'server_access_log',  // The server access log file of the server.
-        'server_error_log',   // The server error log file of the server.
-    );
+    protected $allowedDirs = array();
 
     /**
-     * @param \Symfttpd\Project\ProjectInterface $project
-     * @param \Twig_Environment                  $twig
-     * @param \Symfttpd\Loader                   $loader
-     * @param \Symfttpd\Writer                   $writer
-     * @param \Symfttpd\OptionBag                $options
+     * @var array
      */
-    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options)
+    protected $allowedFiles = array();
+
+    /**
+     * @var array
+     */
+    protected $executableFiles = array();
+
+    /**
+     * @var array
+     */
+    protected $unexecutableDirs = array();
+
+    /**
+     * @var string
+     */
+    protected $indexFile;
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
     {
-        $this->project  = $project;
-        $this->twig     = $twig;
-        $this->options  = $options;
-        $this->loader   = $loader;
-        $this->writer   = $writer;
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param      $address
+     * @param null $port
+     */
+    public function bind($address, $port = null)
+    {
+        $this->address = $address;
+        $this->port = $port;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    /**
+     * @param string $command
+     */
+    public function setCommand($command)
+    {
+        $this->command = $command;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommand()
+    {
+        return $this->command;
+    }
+
+    /**
+     * @param string $pidfile
+     */
+    public function setPidfile($pidfile)
+    {
+        $this->pidfile = $pidfile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPidfile()
+    {
+        return $this->pidfile;
+    }
+
+    /**
+     * @param string $accessLog
+     */
+    public function setAccessLog($accessLog)
+    {
+        $this->accessLog = $accessLog;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccessLog()
+    {
+        return $this->accessLog;
+    }
+
+    /**
+     * @param array $allowedDirs
+     */
+    public function setAllowedDirs(array $allowedDirs)
+    {
+        $this->allowedDirs = $allowedDirs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedDirs()
+    {
+        return $this->allowedDirs;
+    }
+
+    /**
+     * @param array $allowedFiles
+     */
+    public function setAllowedFiles(array $allowedFiles)
+    {
+        $this->allowedFiles = $allowedFiles;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedFiles()
+    {
+        return $this->allowedFiles;
+    }
+
+    /**
+     * @param array $unexecutableDirs
+     */
+    public function setUnexecutableDirs(array $unexecutableDirs)
+    {
+        $this->unexecutableDirs = $unexecutableDirs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUnexecutableDirs()
+    {
+        return $this->unexecutableDirs;
+    }
+
+    /**
+     * @param string $documentRoot
+     */
+    public function setDocumentRoot($documentRoot)
+    {
+        $this->documentRoot = $documentRoot;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocumentRoot()
+    {
+        return $this->documentRoot;
+    }
+
+    /**
+     * @param string $errorLog
+     */
+    public function setErrorLog($errorLog)
+    {
+        $this->errorLog = $errorLog;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrorLog()
+    {
+        return $this->errorLog;
+    }
+
+    /**
+     * @param array $executableFiles
+     */
+    public function setExecutableFiles(array $executableFiles)
+    {
+        $this->executableFiles = $executableFiles;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExecutableFiles()
+    {
+        return $this->executableFiles;
+    }
+
+    /**
+     * @param string $fastcgi
+     */
+    public function setFastcgi($fastcgi)
+    {
+        $this->fastcgi = $fastcgi;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFastcgi()
+    {
+        return $this->fastcgi;
+    }
+
+    /**
+     * @param string $indexFile
+     */
+    public function setIndexFile($indexFile)
+    {
+        $this->indexFile = $indexFile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndexFile()
+    {
+        return $this->indexFile;
     }
 }

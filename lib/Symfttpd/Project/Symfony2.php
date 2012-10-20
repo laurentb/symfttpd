@@ -69,6 +69,6 @@ class Symfony2 extends BaseProject
      */
     public function getIndexFile()
     {
-        return 'index.php';
+        return 'app.php';
     }
 }

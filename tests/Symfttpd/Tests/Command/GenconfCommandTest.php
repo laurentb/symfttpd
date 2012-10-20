@@ -35,14 +35,16 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->fixtures = sys_get_temp_dir().'/symfttpd-test';
+        $this->fixtures = sys_get_temp_dir() . '/symfttpd-test';
 
         $this->filesystem = new Filesystem();
-        $this->filesystem->mkdir(array(
-            $this->fixtures.'/cache/lighttpd/',
-            $this->fixtures.'/log/lighttpd/',
-            $this->fixtures.'/web',
-        ));
+        $this->filesystem->mkdir(
+            array(
+                $this->fixtures . '/cache/lighttpd/',
+                $this->fixtures . '/log/lighttpd/',
+                $this->fixtures . '/web',
+            )
+        );
 
         $this->markTestSkipped();
 
@@ -66,6 +68,7 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getExecutionType
+     *
      * @param $type
      */
     public function testExecuteWrite($type, $generateMethod, $output)
@@ -73,14 +76,18 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
         $symfttpd = $this->getSymfttpd();
 
         $server = $this->getMockBuilder('\\Symfttpd\\Server\\Lighttpd')
-            ->setMethods(array($generateMethod, 'write', 'getProject', 'getConfigFilename', 'getRulesFilename', 'getCacheDir'))
-            ->setConstructorArgs(array(
+            ->setMethods(
+            array($generateMethod, 'write', 'getProject', 'getConfigFilename', 'getRulesFilename', 'getCacheDir')
+        )
+            ->setConstructorArgs(
+            array(
                 $symfttpd['project'],
                 $symfttpd['twig'],
                 $symfttpd['loader'],
                 $symfttpd['writer'],
-                new \Symfttpd\OptionBag())
+                new \Symfttpd\Config()
             )
+        )
             ->getMock();
 
         if ($type !== 'rules') {
@@ -109,7 +116,7 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
             ->method('write')
             ->with($this->equalTo($type));
 
-        $symfttpd['server']  = $server;
+        $symfttpd['server'] = $server;
 
         $application = new \Symfttpd\Console\Application();
         $application->setAutoExit(false);
@@ -117,7 +124,10 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
         $application->add($this->command);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'genconf', 'type' => $type, '--path' => $this->fixtures.'/web'), array('interactive' => false));
+        $tester->run(
+            array('command' => 'genconf', 'type' => $type, '--path' => $this->fixtures . '/web'),
+            array('interactive' => false)
+        );
 
         $this->assertContains($output, $tester->getDisplay());
         $this->assertContains('The configuration file has been well generated.', $tester->getDisplay());
@@ -134,6 +144,7 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getExecutionReadType
+     *
      * @param $type
      */
     public function testExecuteRead($type, $generateMethod, $readMethod)
@@ -141,14 +152,18 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
         $symfttpd = $this->getSymfttpd();
 
         $server = $this->getMockBuilder('\\Symfttpd\\Server\\Lighttpd')
-            ->setMethods(array($generateMethod, $readMethod, 'getProject', 'getConfigFilename', 'getRulesFilename', 'getCacheDir'))
-            ->setConstructorArgs(array(
+            ->setMethods(
+            array($generateMethod, $readMethod, 'getProject', 'getConfigFilename', 'getRulesFilename', 'getCacheDir')
+        )
+            ->setConstructorArgs(
+            array(
                 $symfttpd['project'],
                 $symfttpd['twig'],
                 $symfttpd['loader'],
                 $symfttpd['writer'],
-                new \Symfttpd\OptionBag())
+                new \Symfttpd\Config()
             )
+        )
             ->getMock();
 
         if ($type !== 'rules') {
@@ -176,7 +191,7 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
         $server->expects($this->once())
             ->method($readMethod);
 
-        $symfttpd['server']  = $server;
+        $symfttpd['server'] = $server;
 
         $application = new \Symfttpd\Console\Application();
         $application->setAutoExit(false);
@@ -184,7 +199,10 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
         $application->add($this->command);
 
         $tester = new ApplicationTester($application);
-        $tester->run(array('command' => 'genconf', 'type' => $type, '--path' => $this->fixtures.'/web', '--output' => true), array('interactive' => false));
+        $tester->run(
+            array('command' => 'genconf', 'type' => $type, '--path' => $this->fixtures . '/web', '--output' => true),
+            array('interactive' => false)
+        );
 
         $this->assertEmpty($tester->getDisplay());
     }
@@ -200,7 +218,7 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 
     public function getSymfttpd()
     {
-        $config = $this->getMock('\\Symfttpd\\Configuration\\SymfttpdConfiguration');
+        $config   = $this->getMock('\\Symfttpd\\Configuration\\SymfttpdConfiguration');
         $symfttpd = new \Symfttpd\Symfttpd($config);
 
         $twig_loader = $this->getMock('\\Twig_Loader_Filesystem', array('addPath'), array(''));
@@ -212,12 +230,17 @@ class GenconfCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getLoader')
             ->will($this->returnValue($twig_loader));
 
-        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array('getProjectType', 'getProjectVersion'), '', false);
-        $loader = $this->getMock('\\Symfttpd\\Loader');
-        $writer = $this->getMock('\\Symfttpd\\Writer');
+        $project = $this->getMockForAbstractClass(
+            '\\Symfttpd\\Project\\BaseProject',
+            array('getProjectType', 'getProjectVersion'),
+            '',
+            false
+        );
+        $loader  = $this->getMock('\\Symfttpd\\Loader');
+        $writer  = $this->getMock('\\Symfttpd\\Writer');
 
-        $symfttpd['twig']  = $twig;
-        $symfttpd['project']  = $project;
+        $symfttpd['twig']    = $twig;
+        $symfttpd['project'] = $project;
         $symfttpd['loader']  = $loader;
         $symfttpd['writer']  = $writer;
 

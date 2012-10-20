@@ -12,10 +12,7 @@
 namespace Symfttpd\Tests\Command;
 
 use Symfttpd\Command\Command;
-use Symfttpd\Console\Application;
-use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * CommandTest class
@@ -39,18 +36,18 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('#Symfttpd - version#', $tester->getDisplay());
     }
 
-    public function testGetSymfttpdFromApplication()
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The command does not know Symfttpd.
+     */
+    public function testGetSymfttpdException()
     {
-        $application = new Application();
-        $application->add($this->command);
+        try {
+            $this->command->getSymfttpd();
+        } catch (\RuntimeException $e) {
+            throw $e;
+        }
 
-        $tester = new ApplicationTester($application);
-
-        $this->assertInstanceof('Symfttpd\\Symfttpd', $this->command->getSymfttpd());
-    }
-
-    public function testGetSymfttpdFromFactory()
-    {
-        $this->assertInstanceof('Symfttpd\\Symfttpd', $this->command->getSymfttpd());
+        $this->fail('No exception thrown');
     }
 }

@@ -1,19 +1,19 @@
 {
-    "name": "laurentb/symfttpd",
+    "name": "benjam1/symfttpd",
     "description": "PHP webserver",
-    "keywords": ["symfony", "server", "webserver"],
+    "keywords": ["symfony", "server", "webserver", "lighttpd"],
     "type": "library",
     "licence": "MIT",
     "authors": [
         {
-            "name":     "Laurent Bachelier",
-            "email":    "laurent@bachelier.name",
-            "homepage": "http://laurent.bachelier.name"
-        },
-        {
             "name":     "Benjamin Grandfond",
             "email":    "benjamin.grandfond@gmail.com",
             "homepage": "http://benjamingrandfond.fr"
+        },
+        {
+            "name":     "Laurent Bachelier",
+            "email":    "laurent@bachelier.name",
+            "homepage": "http://laurent.bachelier.name"
         }
     ],
     "require": {
@@ -22,8 +22,8 @@
         "symfony/process":    "2.2.*",
         "symfony/finder":     "2.2.*",
         "symfony/filesystem": "2.2.*",
-        "twig/twig":          ">=1.10,<2.0-dev",
-        "pimple/pimple":      "1.0.0"
+        "symfony/config":     "2.2.*",
+        "twig/twig":          ">=1.10,<2.0-dev"
     },
     "autoload": {
         "psr-0": {

@@ -1,34 +1,35 @@
 {
-    "hash": "48bead3a7f8d207e1830aca78ee40a5d",
+    "hash": "0c67a499518bc9aa5f3b622804bbb429",
     "packages": [
         {
-            "name": "pimple/pimple",
-            "version": "1.0.0",
+            "name": "symfony/config",
+            "version": "dev-master",
+            "target-dir": "Symfony/Component/Config",
             "source": {
                 "type": "git",
-                "url": "git://github.com/fabpot/Pimple.git",
-                "reference": "v1.0.0"
+                "url": "https://github.com/symfony/Config",
+                "reference": "dbfadc6995574df68ad9b6c7e56a68b4bd9d0fa3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Pimple/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://github.com/symfony/Config/zipball/dbfadc6995574df68ad9b6c7e56a68b4bd9d0fa3",
+                "reference": "dbfadc6995574df68ad9b6c7e56a68b4bd9d0fa3",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.3.3"
             },
-            "time": "2012-05-08 13:57:24",
+            "time": "1349553479",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "2.2-dev"
                 }
             },
-            "installation-source": "dist",
+            "installation-source": "source",
             "autoload": {
                 "psr-0": {
-                    "Pimple": "lib/"
+                    "Symfony\\Component\\Config\\": ""
                 }
             },
             "license": [
@@ -38,14 +39,14 @@
                 {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
                 }
             ],
-            "description": "Pimple is a simple Dependency Injection Container for PHP 5.3",
-            "homepage": "http://pimple.sensiolabs.org",
-            "keywords": [
-                "dependency injection",
-                "container"
-            ]
+            "description": "Symfony Config Component",
+            "homepage": "http://symfony.com"
         },
         {
             "name": "symfony/console",
@@ -54,18 +55,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "c4ed7ef2c51e1a44dc138e16054396860f512e99"
+                "reference": "d214b141627b947ba16c7c8f8599e6823902d124"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/zipball/c4ed7ef2c51e1a44dc138e16054396860f512e99",
-                "reference": "c4ed7ef2c51e1a44dc138e16054396860f512e99",
+                "url": "https://github.com/symfony/Console/zipball/d214b141627b947ba16c7c8f8599e6823902d124",
+                "reference": "d214b141627b947ba16c7c8f8599e6823902d124",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1349015269",
+            "time": "1350379165",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -101,18 +102,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Filesystem",
-                "reference": "1721034eb288f6d3a5a9967c90f778c40232e6ab"
+                "reference": "5272b50e20a737fd8e9eeb0310d1ce3230b0308c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Filesystem/zipball/1721034eb288f6d3a5a9967c90f778c40232e6ab",
-                "reference": "1721034eb288f6d3a5a9967c90f778c40232e6ab",
+                "url": "https://github.com/symfony/Filesystem/zipball/5272b50e20a737fd8e9eeb0310d1ce3230b0308c",
+                "reference": "5272b50e20a737fd8e9eeb0310d1ce3230b0308c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1348854729",
+            "time": "1349553479",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -148,18 +149,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder",
-                "reference": "86f7d6765dbb2fe59c10ab4960728e9494d80b36"
+                "reference": "be47860ddba8647f966c4e5eed06024f31785d43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Finder/zipball/86f7d6765dbb2fe59c10ab4960728e9494d80b36",
-                "reference": "86f7d6765dbb2fe59c10ab4960728e9494d80b36",
+                "url": "https://github.com/symfony/Finder/zipball/be47860ddba8647f966c4e5eed06024f31785d43",
+                "reference": "be47860ddba8647f966c4e5eed06024f31785d43",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1348817656",
+            "time": "1350156028",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -195,18 +196,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Process",
-                "reference": "c305a523248add6fc917d258d531ce82669405c3"
+                "reference": "f029d06585ad7646cc2e9ee9daf1f395014e1c7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Process/zipball/c305a523248add6fc917d258d531ce82669405c3",
-                "reference": "c305a523248add6fc917d258d531ce82669405c3",
+                "url": "https://github.com/symfony/Process/zipball/f029d06585ad7646cc2e9ee9daf1f395014e1c7f",
+                "reference": "f029d06585ad7646cc2e9ee9daf1f395014e1c7f",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1348854729",
+            "time": "1349553479",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -241,22 +242,22 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Twig.git",
-                "reference": "120cde3fa54c31047edf1cd003752ca119dec9a8"
+                "reference": "61393dc9fb8982110048624aa573aec4aee0b465"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/zipball/120cde3fa54c31047edf1cd003752ca119dec9a8",
-                "reference": "120cde3fa54c31047edf1cd003752ca119dec9a8",
+                "url": "https://github.com/fabpot/Twig/zipball/61393dc9fb8982110048624aa573aec4aee0b465",
+                "reference": "61393dc9fb8982110048624aa573aec4aee0b465",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "1348936415",
+            "time": "1350737598",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.10-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "installation-source": "source",

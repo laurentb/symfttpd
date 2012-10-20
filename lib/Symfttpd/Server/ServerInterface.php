@@ -11,11 +11,9 @@
 
 namespace Symfttpd\Server;
 
-use Symfttpd\Project\ProjectInterface;
-use Symfttpd\Loader;
-use Symfttpd\Writer;
-use Symfttpd\OptionBag;
-use Symfttpd\Configuration\SymfttpdConfiguration;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfttpd\Tail\TailInterface;
+use Symfttpd\Server\Generator\GeneratorInterface;
 
 /**
  * ServerInterface interface
@@ -26,123 +24,173 @@ use Symfttpd\Configuration\SymfttpdConfiguration;
 interface ServerInterface
 {
     /**
-     * Server constructor.
-     *
-     * @param \Symfttpd\Project\ProjectInterface $project
-     * @param \Twig_Environment                  $twig
-     * @param \Symfttpd\Loader                   $loader
-     * @param \Symfttpd\Writer                   $writer
-     * @param \Symfttpd\OptionBag                $options
-     */
-    public function __construct(ProjectInterface $project, \Twig_Environment $twig, Loader $loader, Writer $writer, OptionBag $options);
-
-    /**
-     * Return the project.
+     * Run the server command to start it.
      *
      * @abstract
-     * @return \Symfttpd\Project\ProjectInterface
-     */
-    public function getProject();
-
-    /**
-     * Return the command that will run the server.
-     * It is lighttpd for the Lighttpd server for example.
+     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
      *
-     * @abstract
      * @return mixed
      */
-    public function getCommand();
+    public function start(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null);
 
     /**
-     * Set the command that runs the server.
+     * Restart the server command to start it.
      *
      * @abstract
-     * @param $command
+     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
+     *
      * @return mixed
+     */
+    public function restart(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null);
+
+    /**
+     * Stop the server.
+     *
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     * @return mixed
+     */
+    public function stop(OutputInterface $output);
+
+    /**
+     * @param      $address
+     * @param null $port
+     *
+     * @return mixed
+     */
+    public function bind($address, $port = null);
+
+    /**
+     * @param string $name
+     */
+    public function setName($name);
+
+    /**
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * @return string
+     */
+    public function getAddress();
+
+    /**
+     * @return string
+     */
+    public function getPort();
+
+    /**
+     * @param string $command
      */
     public function setCommand($command);
 
     /**
-     * Generate the configuration file of the server
-     * and the rewrite rules.
-     *
-     * @abstract
-     * @param SymfttpdConfiguration $configuration
      * @return string
      */
-    public function generate(SymfttpdConfiguration $configuration);
+    public function getCommand();
 
     /**
-     * Generate the rewrite rules.
-     *
-     * @abstract
-     * @return string
+     * @param string $pidfile
      */
-    public function generateRules();
+    public function setPidfile($pidfile);
 
     /**
-     * Generate the configuration file for the server.
-     *
-     * @abstract
-     * @param \Symfttpd\Configuration\SymfttpdConfiguration $configuration
-     * @return string
-     */
-    public function generateConfiguration(SymfttpdConfiguration $configuration);
-
-    /**
-     * Write the configuration in the directory.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function write();
-
-    /**
-     * Write the rewrite rules.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function writeRules();
-
-    /**
-     * Write the configuration file.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function writeConfiguration();
-
-    /**
-     * Run the server command to start it.
-     *
-     * @abstract
-     * @return mixed
-     */
-    public function start();
-
-    /**
-     * Return the restart file path.
-     *
-     * @abstract
-     * @return string
-     */
-    public function getRestartFile();
-
-    /**
-     * Return the pidfile which contains
-     * the pid of the process of the server.
-     *
-     * @abstract
      * @return string
      */
     public function getPidfile();
 
     /**
-     * Return the log directory of the server.
-     *
-     * @abstract
+     * @param string $accessLog
+     */
+    public function setAccessLog($accessLog);
+
+    /**
      * @return string
      */
-    public function getLogDir();
+    public function getAccessLog();
+
+    /**
+     * @param array $allowedDirs
+     */
+    public function setAllowedDirs(array $allowedDirs);
+
+    /**
+     * @return array
+     */
+    public function getAllowedDirs();
+
+    /**
+     * @param array $allowedFiles
+     */
+    public function setAllowedFiles(array $allowedFiles);
+
+    /**
+     * @return array
+     */
+    public function getAllowedFiles();
+
+    /**
+     * @param array $unexecutableDirs
+     */
+    public function setUnexecutableDirs(array $unexecutableDirs);
+
+    /**
+     * @return array
+     */
+    public function getUnexecutableDirs();
+
+    /**
+     * @param string $documentRoot
+     */
+    public function setDocumentRoot($documentRoot);
+
+    /**
+     * @return string
+     */
+    public function getDocumentRoot();
+
+    /**
+     * @param string $errorLog
+     */
+    public function setErrorLog($errorLog);
+
+    /**
+     * @return string
+     */
+    public function getErrorLog();
+
+    /**
+     * @param array $executableFiles
+     */
+    public function setExecutableFiles(array $executableFiles);
+
+    /**
+     * @return array
+     */
+    public function getExecutableFiles();
+
+    /**
+     * @param string $fastcgi
+     */
+    public function setFastcgi($fastcgi);
+
+    /**
+     * @return string
+     */
+    public function getFastcgi();
+
+    /**
+     * @param string $indexFile
+     */
+    public function setIndexFile($indexFile);
+
+    /**
+     * @return string
+     */
+    public function getIndexFile();
 }

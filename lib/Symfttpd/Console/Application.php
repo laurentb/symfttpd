@@ -12,8 +12,11 @@
 namespace Symfttpd\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Command\Command;
+use Symfttpd\Command\GenconfCommand;
+use Symfttpd\Command\SpawnCommand;
+use Symfttpd\Factory;
 use Symfttpd\Symfttpd;
-use Symfttpd\Configuration\SymfttpdConfiguration;
 
 /**
  * Application class
@@ -29,7 +32,6 @@ class Application extends BaseApplication
 
     /**
      * Constructor
-     * Initialize a Symfttpd object.
      */
     public function __construct()
     {
@@ -43,8 +45,8 @@ class Application extends BaseApplication
      */
     public function getSymfttpd()
     {
-        if (null == $this->symfttpd) {
-            $this->symfttpd = new Symfttpd(new SymfttpdConfiguration());
+        if ($this->symfttpd === null) {
+            $this->symfttpd = Factory::create();
         }
 
         return $this->symfttpd;
@@ -56,5 +58,31 @@ class Application extends BaseApplication
     public function setSymfttpd(Symfttpd $symfttpd)
     {
         $this->symfttpd = $symfttpd;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function add(Command $command)
+    {
+        if ($command instanceof \Symfttpd\Command\Command) {
+            $command->setSymfttpd($this->getSymfttpd());
+        }
+
+        return parent::add($command);
+    }
+
+    /**
+     * Initializes Symfttpd commands.
+     *
+     * @return array
+     */
+    public function getDefaultCommands()
+    {
+        $commands = parent::getDefaultCommands();
+        $commands[] = new GenconfCommand();
+        $commands[] = new SpawnCommand();
+
+        return $commands;
     }
 }

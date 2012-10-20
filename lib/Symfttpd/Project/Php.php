@@ -28,8 +28,8 @@ class Php extends BaseProject
      */
     public function getCacheDir()
     {
-        if ($this->options->has('project_cache_dir')) {
-            return $this->rootDir.'/'.$this->options->get('project_cache_dir');
+        if ($this->config->has('project_cache_dir')) {
+            return $this->rootDir.'/'.$this->config->get('project_cache_dir');
         }
 
         return $this->rootDir;
@@ -42,8 +42,8 @@ class Php extends BaseProject
      */
     public function getLogDir()
     {
-        if ($this->options->has('project_log_dir')) {
-            return $this->rootDir.'/'.$this->options->get('project_log_dir');
+        if ($this->config->has('project_log_dir')) {
+            return $this->rootDir.'/'.$this->config->get('project_log_dir');
         }
 
         return $this->rootDir;
@@ -56,8 +56,8 @@ class Php extends BaseProject
      */
     public function getWebDir()
     {
-        if ($this->options->has('project_web_dir')) {
-            return $this->rootDir.'/'.$this->options->get('project_web_dir');
+        if ($this->config->has('project_web_dir')) {
+            return $this->rootDir.'/'.$this->config->get('project_web_dir');
         }
 
         return $this->rootDir;
@@ -80,6 +80,6 @@ class Php extends BaseProject
      */
     public function getVersion()
     {
-        return null;
+        return $this->version;
     }
 }

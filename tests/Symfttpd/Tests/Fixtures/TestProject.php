@@ -11,20 +11,22 @@
 
 namespace Symfttpd\Tests\Fixtures;
 
+use Symfttpd\Config;
+use Symfttpd\Project\BaseProject;
 /**
  * TestProject class
  * This class allow us to test the abstract BaseProject class.
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class TestProject extends \Symfttpd\Project\BaseProject
+class TestProject extends BaseProject
 {
     protected $name = 'test',
               $version = "1.0";
 
     protected $filesystem;
 
-    public function __construct(\Symfttpd\OptionBag $options, $path = null)
+    public function __construct(Config $options, $path = null)
     {
         if (null == $path) {
             $path = sys_get_temp_dir().'/symfttpd-project-test';
@@ -36,7 +38,6 @@ class TestProject extends \Symfttpd\Project\BaseProject
 
         $this->buildProject();
     }
-
 
     /**
      * Return the cache directory of the project.
