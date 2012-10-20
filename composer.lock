@@ -55,18 +55,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "4a74ab0170585fd25d925ff94582f68b0037f016"
+                "reference": "d214b141627b947ba16c7c8f8599e6823902d124"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/zipball/4a74ab0170585fd25d925ff94582f68b0037f016",
-                "reference": "4a74ab0170585fd25d925ff94582f68b0037f016",
+                "url": "https://github.com/symfony/Console/zipball/d214b141627b947ba16c7c8f8599e6823902d124",
+                "reference": "d214b141627b947ba16c7c8f8599e6823902d124",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1350206314",
+            "time": "1350379165",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -242,22 +242,22 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Twig.git",
-                "reference": "82334f876f06b76b28d60ef547ff0ccee8bc1de8"
+                "reference": "61393dc9fb8982110048624aa573aec4aee0b465"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/zipball/82334f876f06b76b28d60ef547ff0ccee8bc1de8",
-                "reference": "82334f876f06b76b28d60ef547ff0ccee8bc1de8",
+                "url": "https://github.com/fabpot/Twig/zipball/61393dc9fb8982110048624aa573aec4aee0b465",
+                "reference": "61393dc9fb8982110048624aa573aec4aee0b465",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "1350154884",
+            "time": "1350737598",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.10-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "installation-source": "source",
