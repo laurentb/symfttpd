@@ -11,6 +11,8 @@
 
 namespace Symfttpd\Project;
 
+use Symfttpd\Project\BaseProject;
+
 /**
  * Symfony2 class
  *

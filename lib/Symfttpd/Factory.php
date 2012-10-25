@@ -143,7 +143,7 @@ class Factory
         $server->setIndexFile($project->getIndexFile());
         $server->setAllowedDirs($config->get('project_readable_dirs', array()));
         $server->setAllowedFiles($config->get('project_readable_files', array()));
-        $server->setExecutableFiles($config->get('project_readable_phpfiles', array()));
+        $server->setExecutableFiles($config->get('project_readable_phpfiles', array($project->getIndexFile())));
         $server->setUnexecutableDirs($config->get('project_nophp', array()));
 
         return $server;
