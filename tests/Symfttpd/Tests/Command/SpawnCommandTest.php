@@ -29,7 +29,6 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->command = new SpawnCommand();
-        $this->command->setSymfttpd($this->getSymfttpd());
     }
 
     /**
@@ -38,6 +37,8 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute()
     {
+        $this->command->setSymfttpd($this->getSymfttpd());
+
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(array(), array('port' => 4043));
 
@@ -84,5 +85,27 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(1));
 
         return $server;
+    }
+
+    public function testGetMessage()
+    {
+        $server = $this->getMock('\\Symfttpd\\Server\\ServerInterface');
+
+        $server->expects($this->exactly(3))
+            ->method('getAddress')
+            ->will($this->returnValue('localhost'));
+
+        $server->expects($this->exactly(3))
+            ->method('getPort')
+            ->will($this->returnValue('4042'));
+
+        $server->expects($this->once())
+            ->method('getExecutableFiles')
+            ->will($this->returnValue(array('app.php', 'app_dev.php')));
+
+        $command = new SpawnCommand();
+        $message = $command->getMessage($server);
+
+        $this->assertRegExp('~localhost:4042~', $message);
     }
 }

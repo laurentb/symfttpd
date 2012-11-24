@@ -73,7 +73,7 @@ class SpawnCommand extends Command
     {
         $server = $this->getSymfttpd()->getServer();
 
-        $address = true == $input->getOption('all') ? false : $input->getOption('bind');
+        $address = true == $input->getOption('all') ? 'localhost' : $input->getOption('bind');
         $port    = $input->getOption('port');
 
         $server->bind($address, $port);
@@ -123,23 +123,17 @@ class SpawnCommand extends Command
      *
      * @return string
      */
-    protected function getMessage(ServerInterface $server)
+    public function getMessage(ServerInterface $server)
     {
-        if (false == $address = $server->getAddress()) {
-            $address = 'all-interfaces';
-        }
-
-        $host = in_array($address, array(null, false, '0.0.0.0', '::'), true) ? 'localhost' : $address;
-
         $apps = array();
         foreach ($server->getExecutableFiles() as $file) {
             if (preg_match('/.+\.php$/', $file)) {
-                $apps[$file] = ' http://' . $host . ':' . $server->getPort() . '/<info>' . $file . '</info>';
+                $apps[$file] = ' http://' . $server->getAddress() . ':' . $server->getPort() . '/<info>' . $file . '</info>';
             }
         }
 
         // Pretty information. Nothing interesting code-wise.
-        $text    = <<<TEXT
+        $text = <<<TEXT
 %s started on <info>%s</info>, port <info>%s</info>.
 
 Available applications:
@@ -149,7 +143,7 @@ Available applications:
 
 TEXT;
 
-        return sprintf($text, $server->getName(), $address, $server->getPort(), implode("\n", $apps));
+        return sprintf($text, $server->getName(), $server->getAddress(), $server->getPort(), implode("\n", $apps));
     }
 
     /**
