@@ -11,10 +11,8 @@
 
 namespace Symfttpd\Server;
 
-use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfttpd\Server\BaseServer;
 use Symfttpd\Server\Generator\GeneratorInterface;
 
@@ -37,29 +35,10 @@ class Lighttpd extends BaseServer
     /**
      * Return the server command value
      *
-     * @param null|\Symfony\Component\Process\ExecutableFinder $finder
-     *
      * @return string
-     * @throws \Symfttpd\Exception\ExecutableNotFoundException
      */
-    public function getCommand(ExecutableFinder $finder = null)
+    public function getCommand()
     {
-        if (null == $this->command) {
-
-            if (null == $finder) {
-                $finder = new ExecutableFinder();
-            }
-
-            $finder->addSuffix('');
-            $cmd = $finder->find('lighttpd');
-
-            if (null == $cmd) {
-                throw new ExecutableNotFoundException('lighttpd executable not found.');
-            }
-
-            $this->command = $cmd;
-        }
-
         return $this->command;
     }
 

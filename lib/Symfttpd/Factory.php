@@ -12,8 +12,10 @@
 namespace Symfttpd;
 
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Config;
 use Symfttpd\Configuration\Configuration;
+use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
@@ -25,6 +27,19 @@ use Symfttpd\Server\ServerInterface;
  */
 class Factory
 {
+    /**
+     * @var \Symfony\Component\Process\ExecutableFinder
+     */
+    public $execFinder;
+
+    /**
+     * @param \Symfony\Component\Process\ExecutableFinder $execFinder
+     */
+    public function __construct(ExecutableFinder $execFinder)
+    {
+        $this->execFinder = $execFinder;
+    }
+
     /**
      * @return Config
      */
@@ -130,6 +145,24 @@ class Factory
         $server = new $class();
         $server->bind($config->get('server_address', '127.0.0.1'), $config->get('server_port', '4042'));
 
+        // BC
+        if ('lighttpd' == $type && $config->has('lighttpd_cmd')) {
+            $server->setCommand($config->get('lighttpd_cmd'));
+        } else {
+            if ($config->has('server_cmd')) {
+                $server->setCommand($config->get('server_cmd'));
+            } else {
+                $this->execFinder->addSuffix('');
+
+                // Try to guess the executable command of the server.
+                if (null == $cmd = $this->execFinder->find($type)) {
+                    throw new ExecutableNotFoundException($type.' executable not found.');
+                }
+
+                $server->setCommand($cmd);
+            }
+        }
+
         // Configure logging directory
         $logDir = $config->get('server_log_dir', $project->getLogDir() . '/' . $server->getName());
         $server->setErrorLog($logDir . '/' . $config->get('server_error_log', 'error.log'));
@@ -204,11 +237,9 @@ class Factory
      *
      * @return Symfttpd
      */
-    public static function create(array $config = array())
+    public function create(array $config = array())
     {
-        $factory = new static();
-
-        $symfttpd = $factory->createSymfttpd($config);
+        $symfttpd = $this->createSymfttpd($config);
 
         return $symfttpd;
     }

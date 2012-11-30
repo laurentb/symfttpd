@@ -32,30 +32,7 @@ class LighttpdTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCommand()
     {
-        $finder = $this->getMock('\\Symfony\\Component\\Process\\ExecutableFinder');
-        $finder->expects($this->once())
-            ->method('find')
-            ->with('lighttpd')
-            ->will($this->returnValue('/usr/sbin/lighttpd'));
-
-        $this->assertEquals('/usr/sbin/lighttpd', $this->server->getCommand($finder));
-
         $this->server->setCommand('/opt/local/sbin/lighttpd');
         $this->assertEquals('/opt/local/sbin/lighttpd', $this->server->getCommand());
-    }
-
-    /**
-     * @expectedException \Symfttpd\Exception\ExecutableNotFoundException
-     * @expectedExceptionMessage lighttpd executable not found.
-     */
-    public function testGetCommandException()
-    {
-        $finder = $this->getMock('\\Symfony\\Component\\Process\\ExecutableFinder');
-        $finder->expects($this->once())
-            ->method('find')
-            ->with('lighttpd')
-            ->will($this->returnValue(null));
-
-        $this->server->getCommand($finder);
     }
 }

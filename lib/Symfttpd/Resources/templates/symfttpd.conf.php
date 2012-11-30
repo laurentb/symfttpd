@@ -106,11 +106,11 @@
 // * @var array List of directories
 // */
 //$options['custom_path'] = array('/usr/sbin');
-//
-///**
-// * Absolute path to the lighttpd server executable
-// * @var string|null to autodetect (try to find "lighttpd" in the path)
-// */
+
+/**
+ * Absolute path to the lighttpd server executable
+ * @var string|null to autodetect (try to find "lighttpd" in the path)
+ */
 //$options['lighttpd_cmd'] = null;
 //
 ///**
@@ -158,6 +158,7 @@ $options['project_web_dir']           = 'web';
 $options['server_type'] = 'lighttpd';
 
 // Not required options
+$options['server_cmd']         = null; // The server error log file of the server.
 $options['server_pidfile']     = 'server_pidfile'; // The pidfile stores the PID of the server process.
 $options['server_restartfile'] = 'server_restartfile'; // The file that tells the spawn command to restart the server.
 $options['server_access_log']  = 'access.log'; // The server access log file of the server.

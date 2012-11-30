@@ -26,7 +26,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->factory = new Factory();
+        $execFinder = $this->getMock('Symfony\Component\Process\ExecutableFinder');
+
+        $execFinder->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue('/foo/lighttpd'));
+
+        $this->factory = new Factory($execFinder);
     }
 
     /**
@@ -116,6 +122,51 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             $config,
             $this->getMock('\\Symfttpd\\Server\\ServerInterface'),
             $this->getMock('\\Symfttpd\\Project\\ProjectInterface')
+        );
+    }
+
+    /**
+     * @dataProvider getServerConfig
+     * @testdox Should create a server instance
+     * @param $config
+     */
+    public function testCreateServer($config, $expected)
+    {
+        $config = new Config($config);
+
+        $project = $this->getMock('\\Symfttpd\\Project\\ProjectInterface');
+        $project->expects($this->once())
+            ->method('getLogDir')
+            ->will($this->returnValue('/tmp'));
+
+        $project->expects($this->once())
+            ->method('getCacheDir')
+            ->will($this->returnValue('/tmp'));
+
+        $project->expects($this->once())
+            ->method('getWebDir')
+            ->will($this->returnValue('/web'));
+
+        $project->expects($this->exactly(2))
+            ->method('getIndexFile')
+            ->will($this->returnValue('index.php'));
+
+        $server = $this->factory->createServer($config, $project);
+
+        $this->assertEquals($expected, $server->getCommand());
+    }
+
+    public function getServerConfig()
+    {
+        return array(
+            array(
+                'config' => array('lighttpd_cmd' => '/usr/bin/lighttpd'),
+                'expected' => '/usr/bin/lighttpd'
+            ),
+            array(
+                'config' => array('server_cmd' => '/usr/foo/lighttpd'),
+                'expected' => '/usr/foo/lighttpd'
+            ),
         );
     }
 }

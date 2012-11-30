@@ -34,7 +34,7 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
 
     public function testGetProject()
     {
-        $factory = new Factory();
+        $factory = new Factory($this->getMock('Symfony\Component\Process\ExecutableFinder'));
 
         $this->symfttpd = new Symfttpd();
         $this->symfttpd->setConfig(new Config(array(
@@ -50,14 +50,15 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
 
     public function testGetServer()
     {
-        $factory = new Factory();
+        $factory = new Factory($this->getMock('Symfony\Component\Process\ExecutableFinder'));
 
         $this->symfttpd = new Symfttpd();
 
         $this->symfttpd->setConfig(new Config(array(
             'project_type' => 'symfony',
             'project_version' => '1',
-            'server_type' => 'lighttpd'
+            'server_type' => 'lighttpd',
+            'server_cmd'  => '/foo/lightt',
         )));
 
         $project = $this->getMock('\\Symfttpd\\Project\\Symfony1', array(), array(new Config()));

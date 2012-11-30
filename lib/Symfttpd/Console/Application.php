@@ -13,6 +13,7 @@ namespace Symfttpd\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Command\GenconfCommand;
 use Symfttpd\Command\SpawnCommand;
 use Symfttpd\Factory;
@@ -46,7 +47,8 @@ class Application extends BaseApplication
     public function getSymfttpd()
     {
         if ($this->symfttpd === null) {
-            $this->symfttpd = Factory::create();
+            $factory = new Factory(new ExecutableFinder());
+            $this->symfttpd = $factory->create();
         }
 
         return $this->symfttpd;
