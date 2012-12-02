@@ -111,8 +111,16 @@ class SpawnCommand extends Command
         try {
             $configuration = $this->symfttpd->getServerConfiguration();
 
+            $paths = array_map(function ($path) {
+                $info = pathinfo($path);
+
+                return $info['dirname'];
+            }, array($configuration->getPath(), $server->getAccessLog(), $server->getErrorLog()));
+
+            array_unique($paths);
+
             $filesystem = new Filesystem();
-            $filesystem->touch(array($configuration->getPath(), $server->getAccessLog(), $server->getErrorLog()));
+            $filesystem->mkdir($paths);
 
             return $server->start($configuration, $output, $multitail) ? 1 : 0;
         } catch (\Exception $e) {
