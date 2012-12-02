@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Command\Command;
+use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Server\ServerInterface;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
@@ -107,7 +108,12 @@ class SpawnCommand extends Command
         $this->handleSignals($server, $output);
 
         try {
-            return $server->start($this->symfttpd->getServerConfiguration(), $output, $multitail) ? 1 : 0;
+            $configuration = $this->symfttpd->getServerConfiguration();
+
+            $filesystem = new Filesystem();
+            $filesystem->touch(array($configuration->getPath(), $server->getAccessLog(), $server->getErrorLog()));
+
+            return $server->start($configuration, $output, $multitail) ? 1 : 0;
         } catch (\Exception $e) {
             $output->writeln('<error>The server cannot start</error>');
             $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
