@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Command\GenconfCommand;
+use Symfttpd\Command\SelfupdateCommand;
 use Symfttpd\Command\SpawnCommand;
 use Symfttpd\Factory;
 use Symfttpd\Symfttpd;
@@ -91,6 +92,7 @@ class Application extends BaseApplication
         $commands = parent::getDefaultCommands();
         $commands[] = new GenconfCommand();
         $commands[] = new SpawnCommand();
+        $commands[] = new SelfupdateCommand();
 
         return $commands;
     }
