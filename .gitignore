@@ -13,3 +13,6 @@ cache
 
 # Build
 /build
+
+# Symfttpd generated phar
+symfttpd*.phar
