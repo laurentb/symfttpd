@@ -27,16 +27,24 @@ use Symfttpd\Symfttpd;
 class Application extends BaseApplication
 {
     /**
-     * @var Symfttpd\Symfttpd
+     * @var \Symfttpd\Symfttpd
      */
     protected $symfttpd;
+
+    /**
+     * @var \Symfttpd\Factory
+     */
+    protected $factory;
 
     /**
      * Constructor
      */
     public function __construct()
     {
+        $this->factory = new Factory(new ExecutableFinder());
+
         parent::__construct('Symfttpd', Symfttpd::VERSION);
+
     }
 
     /**
@@ -47,8 +55,7 @@ class Application extends BaseApplication
     public function getSymfttpd()
     {
         if ($this->symfttpd === null) {
-            $factory = new Factory(new ExecutableFinder());
-            $this->symfttpd = $factory->create();
+            $this->symfttpd = $this->factory->create();
         }
 
         return $this->symfttpd;
