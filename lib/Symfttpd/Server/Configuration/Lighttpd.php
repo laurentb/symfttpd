@@ -9,18 +9,18 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Server\Generator;
+namespace Symfttpd\Server\Configuration;
 
 use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\Server\Generator\GeneratorInterface;
+use Symfttpd\Server\Configuration\ConfigurationInterface;
 use Symfttpd\Server\ServerInterface;
 
 /**
- * LighttpdConfiguration description
+ * Lighttpd description
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class LighttpdGenerator implements GeneratorInterface
+class Lighttpd implements ConfigurationInterface
 {
     /**
      * @var \Twig_Environment

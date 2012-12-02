@@ -69,13 +69,13 @@ class Factory
 
         $project   = $this->createProject($config);
         $server    = $this->createServer($config, $project);
-        $generator = $this->createServerGenerator($config, $server, $project);
+        $generator = $this->createServerConfiguration($config, $server, $project);
 
         $symfttpd = new Symfttpd();
         $symfttpd->setConfig($config);
         $symfttpd->setProject($project);
         $symfttpd->setServer($server);
-        $symfttpd->setServerGenerator($generator);
+        $symfttpd->setServerConfiguration($generator);
 
         return $symfttpd;
     }
@@ -187,14 +187,14 @@ class Factory
      * @param \Symfttpd\Server\ServerInterface   $server
      * @param \Symfttpd\Project\ProjectInterface $project
      *
-     * @return \Symfttpd\Server\Generator\GeneratorInterface
+     * @return \Symfttpd\Server\Configuration\ConfigurationInterface
      * @throws \InvalidArgumentException
      */
-    public function createServerGenerator(Config $config, ServerInterface $server, ProjectInterface $project)
+    public function createServerConfiguration(Config $config, ServerInterface $server, ProjectInterface $project)
     {
         $type = $config->get('server_type', 'lighttpd');
 
-        $class = sprintf('Symfttpd\\Server\\Generator\\%sGenerator', ucfirst($type));
+        $class = sprintf('Symfttpd\\Server\\Configuration\\%s', ucfirst($type));
 
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
@@ -221,13 +221,13 @@ class Factory
 
         $filesystem = new Filesystem();
 
-        $generator = new $class($twig, $filesystem);
-        $generator->setTemplate($config->get('server_template', $server->getName() . '.conf.twig'));
+        $configuration = new $class($twig, $filesystem);
+        $configuration->setTemplate($config->get('server_template', $server->getName() . '.conf.twig'));
 
         $defaultPath = $project->getCacheDir() . '/' . $server->getName(). '/' . $server->getName() . '.conf';
-        $generator->setPath($config->get('server_config_path', $defaultPath));
+        $configuration->setPath($config->get('server_config_path', $defaultPath));
 
-        return $generator;
+        return $configuration;
     }
 
     /**

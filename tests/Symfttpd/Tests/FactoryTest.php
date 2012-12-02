@@ -40,9 +40,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      * @covers \Symfttpd\Factory::createSymfttpd
      * @covers \Symfttpd\Factory::createConfig
      * @covers \Symfttpd\Factory::createProject
-     * @covers \Symfttpd\Factory::createServerGenerator
-     * @covers \Symfttpd\Symfttpd::setServerGenerator
-     * @covers \Symfttpd\Symfttpd::getServerGenerator
+     * @covers \Symfttpd\Factory::createServerConfiguration
+     * @covers \Symfttpd\Symfttpd::setServerConfiguration
+     * @covers \Symfttpd\Symfttpd::getServerConfiguration
      */
     public function testCreate()
     {
@@ -50,13 +50,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $config   = $symfttpd->getConfig();
         $project  = $symfttpd->getProject();
         $server   = $symfttpd->getServer();
-        $generator = $symfttpd->getServerGenerator();
+        $generator = $symfttpd->getServerConfiguration();
 
         $this->assertInstanceOf('\\Symfttpd\\Symfttpd', $symfttpd);
         $this->assertInstanceOf('\\Symfttpd\\Config', $config);
         $this->assertInstanceOf('\\Symfttpd\\Project\\ProjectInterface', $project);
         $this->assertInstanceOf('\\Symfttpd\\Server\\ServerInterface', $server);
-        $this->assertInstanceOf('\\Symfttpd\\Server\\Generator\\GeneratorInterface', $generator);
+        $this->assertInstanceOf('\\Symfttpd\\Server\\Configuration\\ConfigurationInterface', $generator);
     }
 
     public function testCreateProject()
@@ -114,11 +114,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "foo" is not supported
      */
-    public function testCreateServerGeneratorException()
+    public function testCreateServerConfigurationException()
     {
         $config = new Config(array('server_type' => 'foo'));
 
-        $this->factory->createServerGenerator(
+        $this->factory->createServerConfiguration(
             $config,
             $this->getMock('\\Symfttpd\\Server\\ServerInterface'),
             $this->getMock('\\Symfttpd\\Project\\ProjectInterface')

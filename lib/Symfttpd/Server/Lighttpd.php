@@ -14,7 +14,7 @@ namespace Symfttpd\Server;
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Server\BaseServer;
-use Symfttpd\Server\Generator\GeneratorInterface;
+use Symfttpd\Server\Configuration\ConfigurationInterface;
 
 /**
  * Lighttpd class
@@ -54,19 +54,19 @@ class Lighttpd extends BaseServer
 
     /**
      * Start the server.
-     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\TailInterface                      $tail
+     * @param \Symfttpd\Server\Configuration\ConfigurationInterface $configuration
+     * @param \Symfony\Component\Console\Output\OutputInterface     $output
+     * @param \Symfttpd\Tail\TailInterface                          $tail
      *
      * @return mixed|void
      */
-    public function start(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null)
+    public function start(ConfigurationInterface $configuration, OutputInterface $output, TailInterface $tail = null)
     {
         // Regenerate the lighttpd configuration
-        $generator->dump($this, true);
+        $configuration->dump($this, true);
 
         $process = new \Symfony\Component\Process\Process(null);
-        $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($generator->getPath()));
+        $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($configuration->getPath()));
         $process->setTimeout(null);
 
         // Run lighttpd
@@ -84,7 +84,7 @@ class Lighttpd extends BaseServer
              * Regenerate the configuration file. to check if it defers.
              * @todo check the web dir datetime informations to detect any changes instead.
              */
-            $genconf = $generator->generate($this);
+            $genconf = $configuration->generate($this);
 
             if ($prevGenconf !== null && $prevGenconf !== $genconf) {
                 // This sleep() is so that if a HTTP request just created a file in web/,
@@ -93,7 +93,7 @@ class Lighttpd extends BaseServer
 
                 $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $this->name));
 
-                return $this->restart($generator, $output, $tail);
+                return $this->restart($configuration, $output, $tail);
             }
             $prevGenconf = $genconf;
 
@@ -104,16 +104,16 @@ class Lighttpd extends BaseServer
     }
 
     /**
-     * @param \Symfttpd\Server\Generator\GeneratorInterface     $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\TailInterface                      $tail
+     * @param \Symfttpd\Server\Configuration\ConfigurationInterface $configuration
+     * @param \Symfony\Component\Console\Output\OutputInterface     $output
+     * @param \Symfttpd\Tail\TailInterface                          $tail
      *
      * @return mixed|void
      */
-    public function restart(GeneratorInterface $generator, OutputInterface $output, TailInterface $tail = null)
+    public function restart(ConfigurationInterface $configuration, OutputInterface $output, TailInterface $tail = null)
     {
         $this->stop(new NullOutput());
-        $this->start($generator, $output, $tail);
+        $this->start($configuration, $output, $tail);
     }
 
     /**

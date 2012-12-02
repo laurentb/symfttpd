@@ -16,7 +16,7 @@ use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Config;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
-use Symfttpd\Server\Generator\GeneratorInterface;
+use Symfttpd\Server\Configuration\ConfigurationInterface;
 
 /**
  * Symfttpd class
@@ -43,9 +43,9 @@ class Symfttpd
     protected $server;
 
     /**
-     * @var \Symfttpd\Server\Generator\GeneratorInterface
+     * @var \Symfttpd\Server\Configuration\ConfigurationInterface
      */
-    protected $serverGenerator;
+    protected $serverConfiguration;
 
     /**
      * @param \Symfttpd\Config $config
@@ -96,19 +96,19 @@ class Symfttpd
     }
 
     /**
-     * @param \Symfttpd\Server\Generator\GeneratorInterface $serverGenerator
+     * @param \Symfttpd\Server\Configuration\ConfigurationInterface $serverGenerator
      */
-    public function setServerGenerator(GeneratorInterface $serverGenerator)
+    public function setServerConfiguration(ConfigurationInterface $serverGenerator)
     {
-        $this->serverGenerator = $serverGenerator;
+        $this->serverConfiguration = $serverGenerator;
     }
 
     /**
-     * @return \Symfttpd\Server\Generator\GeneratorInterface
+     * @return \Symfttpd\Server\Configuration\ConfigurationInterface
      */
-    public function getServerGenerator()
+    public function getServerConfiguration()
     {
-        return $this->serverGenerator;
+        return $this->serverConfiguration;
     }
 
     /**
