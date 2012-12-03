@@ -97,11 +97,12 @@ class Symfony2 extends BaseProject
      * * css
      * * js
      * * bundles
+     * * images
      *
      * @return array
      */
     public function getDefaultReadableDirs()
     {
-        return array('css', 'js', 'bundles');
+        return array('css', 'js', 'bundles', 'images');
     }
 }
