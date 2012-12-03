@@ -70,6 +70,10 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
             ->method('getCacheDir')
             ->will($this->returnValue(sys_get_temp_dir()));
 
+        $project->expects($this->once())
+            ->method('getDefaultExecutableFiles')
+            ->will($this->returnValue(array('index.php')));
+
         $this->symfttpd->setProject($project);
         $this->symfttpd->setServer($factory->createServer($this->symfttpd->getConfig(), $project));
 

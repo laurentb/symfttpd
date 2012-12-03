@@ -130,4 +130,12 @@ abstract class BaseProject implements ProjectInterface
 
         return $this->version;
     }
+
+    /**
+     * @return array
+     */
+    public function getDefaultExecutableFiles()
+    {
+        return array($this->getIndexFile());
+    }
 }

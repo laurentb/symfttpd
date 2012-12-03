@@ -12,6 +12,7 @@
 namespace Symfttpd\Tests\Project;
 
 use Symfttpd\Project\Symfony2;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Symfony2Test class
@@ -76,5 +77,25 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
     public function testGetVersion()
     {
         $this->assertEquals('2', $this->project->getVersion());
+    }
+
+    public function testGetDefaultExecutableFiles()
+    {
+        $filesystem = new Filesystem();
+
+        $this->project->setRootDir(sys_get_temp_dir());
+
+        $filesystem->mkdir($this->project->getWebDir());
+
+        $filesystem->touch(array(
+            $this->project->getWebDir().'/app.php',
+            $this->project->getWebDir().'/app_dev.php',
+        ));
+
+        $this->assertInternalType('array', $this->project->getDefaultExecutableFiles());
+        $this->assertContains('app.php', $this->project->getDefaultExecutableFiles());
+        $this->assertContains('app_dev.php', $this->project->getDefaultExecutableFiles());
+
+        $filesystem->remove(array($this->project->getWebDir()));
     }
 }

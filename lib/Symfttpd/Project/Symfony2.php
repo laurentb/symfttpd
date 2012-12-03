@@ -73,4 +73,22 @@ class Symfony2 extends BaseProject
     {
         return 'app.php';
     }
+
+    /**
+     * Return default executables files of a Symfony project.
+     *
+     * @return array
+     */
+    public function getDefaultExecutableFiles()
+    {
+        $files = array();
+
+        foreach (array('app_dev.php', $this->getIndexFile()) as $file) {
+            if (file_exists($this->getWebDir().DIRECTORY_SEPARATOR.$file)) {
+                $files[] = $file;
+            }
+        }
+
+        return $files ;
+    }
 }

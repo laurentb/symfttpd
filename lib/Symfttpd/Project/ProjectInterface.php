@@ -88,4 +88,11 @@ interface ProjectInterface
      * @return mixed
      */
     public function setRootDir($rootDir);
+
+    /**
+     * Return default executable files.
+     *
+     * @return array
+     */
+    public function getDefaultExecutableFiles();
 }

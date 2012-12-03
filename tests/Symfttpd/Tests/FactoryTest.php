@@ -147,9 +147,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getWebDir')
             ->will($this->returnValue('/web'));
 
-        $project->expects($this->exactly(2))
+        $project->expects($this->once())
             ->method('getIndexFile')
             ->will($this->returnValue('index.php'));
+
+        $project->expects($this->once())
+            ->method('getDefaultExecutableFiles')
+            ->will($this->returnValue(array('index.php')));
 
         $server = $this->factory->createServer($config, $project);
 
