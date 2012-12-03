@@ -98,4 +98,12 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
 
         $filesystem->remove(array($this->project->getWebDir()));
     }
+
+    public function testGetDefaultReadableDirs()
+    {
+        $this->assertInternalType('array', $this->project->getDefaultReadableDirs());
+        $this->assertContains('css', $this->project->getDefaultReadableDirs());
+        $this->assertContains('js', $this->project->getDefaultReadableDirs());
+        $this->assertContains('bundles', $this->project->getDefaultReadableDirs());
+    }
 }

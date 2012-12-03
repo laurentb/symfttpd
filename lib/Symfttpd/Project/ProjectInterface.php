@@ -95,4 +95,11 @@ interface ProjectInterface
      * @return array
      */
     public function getDefaultExecutableFiles();
+
+    /**
+     * Return default readable files.
+     *
+     * @return mixed
+     */
+    public function getDefaultReadableDirs();
 }

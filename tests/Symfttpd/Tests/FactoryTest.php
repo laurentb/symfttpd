@@ -155,6 +155,10 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getDefaultExecutableFiles')
             ->will($this->returnValue(array('index.php')));
 
+        $project->expects($this->once())
+            ->method('getDefaultReadableDirs')
+            ->will($this->returnValue(array()));
+
         $server = $this->factory->createServer($config, $project);
 
         $this->assertEquals($expected, $server->getCommand());

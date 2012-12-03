@@ -138,4 +138,12 @@ abstract class BaseProject implements ProjectInterface
     {
         return array($this->getIndexFile());
     }
+
+    /**
+     * @return array
+     */
+    public function getDefaultReadableDirs()
+    {
+        return array();
+    }
 }

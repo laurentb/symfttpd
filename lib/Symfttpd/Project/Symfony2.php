@@ -91,4 +91,17 @@ class Symfony2 extends BaseProject
 
         return $files ;
     }
+
+    /**
+     * Return default readable dirs of a Symfony 2 project:
+     * * css
+     * * js
+     * * bundles
+     *
+     * @return array
+     */
+    public function getDefaultReadableDirs()
+    {
+        return array('css', 'js', 'bundles');
+    }
 }
