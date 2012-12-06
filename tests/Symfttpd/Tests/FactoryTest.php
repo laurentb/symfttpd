@@ -159,6 +159,10 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getDefaultReadableDirs')
             ->will($this->returnValue(array()));
 
+        $project->expects($this->once())
+            ->method('getDefaultReadableFiles')
+            ->will($this->returnValue(array()));
+
         $server = $this->factory->createServer($config, $project);
 
         $this->assertEquals($expected, $server->getCommand());

@@ -78,6 +78,10 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
             ->method('getDefaultReadableDirs')
             ->will($this->returnValue(array()));
 
+        $project->expects($this->once())
+            ->method('getDefaultReadableFiles')
+            ->will($this->returnValue(array()));
+
         $this->symfttpd->setProject($project);
         $this->symfttpd->setServer($factory->createServer($this->symfttpd->getConfig(), $project));
 

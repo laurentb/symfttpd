@@ -106,4 +106,12 @@ class Symfony2Test extends \PHPUnit_Framework_TestCase
         $this->assertContains('js', $this->project->getDefaultReadableDirs());
         $this->assertContains('bundles', $this->project->getDefaultReadableDirs());
     }
+
+    public function testGetDefaultReadableFiles()
+    {
+        $this->assertInternalType('array', $this->project->getDefaultReadableFiles());
+        $this->assertContains('favicon.ico', $this->project->getDefaultReadableFiles());
+        $this->assertContains('apple-touch-icon.png', $this->project->getDefaultReadableFiles());
+        $this->assertContains('robots.txt', $this->project->getDefaultReadableFiles());
+    }
 }

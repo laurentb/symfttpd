@@ -175,7 +175,7 @@ class Factory
         $server->setDocumentRoot($project->getWebDir());
         $server->setIndexFile($project->getIndexFile());
         $server->setAllowedDirs($config->get('project_readable_dirs', $project->getDefaultReadableDirs()));
-        $server->setAllowedFiles($config->get('project_readable_files', array()));
+        $server->setAllowedFiles($config->get('project_readable_files', $project->getDefaultReadableFiles()));
         $server->setExecutableFiles($config->get('project_readable_phpfiles', $project->getDefaultExecutableFiles()));
         $server->setUnexecutableDirs($config->get('project_nophp', array()));
 

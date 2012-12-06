@@ -146,4 +146,12 @@ abstract class BaseProject implements ProjectInterface
     {
         return array();
     }
+
+    /**
+     * @return array
+     */
+    public function getDefaultReadableFiles()
+    {
+        return array();
+    }
 }

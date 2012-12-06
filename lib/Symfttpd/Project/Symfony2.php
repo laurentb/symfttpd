@@ -105,4 +105,14 @@ class Symfony2 extends BaseProject
     {
         return array('css', 'js', 'bundles', 'images');
     }
+
+    /**
+     * Return default readable files of a Symfony 2 project.
+     *
+     * @return array
+     */
+    public function getDefaultReadableFiles()
+    {
+        return array('favicon.ico', 'apple-touch-icon.png', 'robots.txt');
+    }
 }
