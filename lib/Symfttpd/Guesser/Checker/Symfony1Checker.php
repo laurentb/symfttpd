@@ -6,17 +6,12 @@ use Symfony\Component\Finder\Finder;
 use Symfttpd\Guesser\Checker\CheckerInterface;
 
 /**
- * Symfony2Checker description
+ * Symfony1Checker description
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class Symfony2Checker implements CheckerInterface
+class Symfony1Checker implements CheckerInterface
 {
-    /**
-     * @var string
-     */
-    protected $directory;
-
     /**
      * @var string
      */
@@ -25,7 +20,12 @@ class Symfony2Checker implements CheckerInterface
     /**
      * @var string
      */
-    protected $version = '2';
+    protected $version = '1';
+
+    /**
+     * @var string
+     */
+    protected $directory;
 
     public function __construct($basedir = null)
     {
@@ -61,12 +61,15 @@ class Symfony2Checker implements CheckerInterface
         $dirsFinder = Finder::create();
         $dirsFinder->directories()
             ->in($this->directory)
-            ->name('app')
-            ->name('src')
-            ->name('vendor')
+            ->name('apps')
+            ->name('config')
+            ->name('data')
+            ->name('lib')
+            ->name('plugin')
+            ->name('web')
         ;
 
-        return $dirsFinder->count() == 3;
+        return $dirsFinder->count() == 6;
     }
 
     /**
@@ -79,11 +82,10 @@ class Symfony2Checker implements CheckerInterface
     {
         $filesFinder = Finder::create();
         $filesFinder->files()
-            ->in($this->directory.'/app')
-            ->name('console')
-            ->name('AppKernel.php')
+            ->in($this->directory)
+            ->name('symfony')
         ;
 
-        return $filesFinder->count() == 2;
+        return $filesFinder->count() == 1;
     }
 }
