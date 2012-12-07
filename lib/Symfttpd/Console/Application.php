@@ -18,6 +18,9 @@ use Symfttpd\Command\GenconfCommand;
 use Symfttpd\Command\SelfupdateCommand;
 use Symfttpd\Command\SpawnCommand;
 use Symfttpd\Factory;
+use Symfttpd\Guesser\Checker\Symfony2Checker;
+use Symfttpd\Guesser\Checker\Symfony1Checker;
+use Symfttpd\Guesser\ProjectGuesser;
 use Symfttpd\Symfttpd;
 
 /**
@@ -42,7 +45,11 @@ class Application extends BaseApplication
      */
     public function __construct()
     {
-        $this->factory = new Factory(new ExecutableFinder());
+        $guesser = new ProjectGuesser();
+        $guesser->registerChecker(new Symfony2Checker());
+        $guesser->registerChecker(new Symfony1Checker());
+
+        $this->factory = new Factory(new ExecutableFinder(), $guesser);
 
         parent::__construct('Symfttpd', Symfttpd::VERSION);
 

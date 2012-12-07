@@ -12,6 +12,8 @@
 namespace Symfttpd;
 
 use Symfony\Component\Config\Definition\Processor;
+use Symfttpd\Guesser\Exception\UnguessableException;
+use Symfttpd\Guesser\ProjectGuesser;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Config;
 use Symfttpd\Configuration\Configuration;
@@ -33,15 +35,24 @@ class Factory
     public $execFinder;
 
     /**
-     * @param \Symfony\Component\Process\ExecutableFinder $execFinder
+     * @var \Symfttpd\Guesser\ProjectGuesser
      */
-    public function __construct(ExecutableFinder $execFinder)
+    public $projectGuesser;
+
+    /**
+     * Constructor
+     *
+     * @param \Symfony\Component\Process\ExecutableFinder $execFinder
+     * @param \Symfttpd\Guesser\ProjectGuesser            $projectGuesser
+     */
+    public function __construct(ExecutableFinder $execFinder, ProjectGuesser $projectGuesser)
     {
         $this->execFinder = $execFinder;
+        $this->projectGuesser = $projectGuesser;
     }
 
     /**
-     * @return Config
+     * @return \Symfttpd\Config
      */
     public function createConfig()
     {
@@ -60,7 +71,7 @@ class Factory
      *
      * @param array $localConfig
      *
-     * @return Symfttpd
+     * @return \Symfttpd\Symfttpd
      */
     public function createSymfttpd(array $localConfig = array())
     {
@@ -94,19 +105,19 @@ class Factory
     {
         // Find the type of framework if any.
         if ($config->has('want')) {
-            $type = "symfony";
-        } else {
-            $type = $config->get('project_type', 'php');
+            $config->set('project_type', 'symfony');
+            $config->set('project_version', substr($config->get('want'), 0, 1));
         }
 
-        // Find the version of the framework if any.
-        if ($type !== 'php' && !$config->has('project_version')) {
-            if ($config->has('want')) {
-                $version = substr($config->get('want'), 0, 1);
-            } else {
-                throw new \RuntimeException('A project version must be set in the symfttpd.conf.php file.');
+        if (!$config->has('project_type')) {
+            try {
+                list($type, $version) = $this->projectGuesser->guess();
+            } catch(UnguessableException $e) {
+                $type = 'php';
+                $version = null;
             }
         } else {
+            $type = $config->get('project_type');
             $version = $config->get('project_version');
         }
 
