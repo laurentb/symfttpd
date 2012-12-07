@@ -112,7 +112,7 @@ class Factory
         if (!$config->has('project_type')) {
             try {
                 list($type, $version) = $this->projectGuesser->guess();
-            } catch(UnguessableException $e) {
+            } catch (UnguessableException $e) {
                 $type = 'php';
                 $version = null;
             }
@@ -124,7 +124,13 @@ class Factory
         $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type) . str_replace(array('.', '-', 'O'), '', $version));
 
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('"%s" in version "%s" is not supported.', $type, $version));
+            if (!$version) {
+                $message = sprintf('"%s"', $type);
+            } else {
+                $message = sprintf('"%s" (with version "%s")', $type, $version);
+            }
+
+            throw new \InvalidArgumentException(sprintf('%s is not supported.', $message));
         }
 
         return new $class($config, getcwd());

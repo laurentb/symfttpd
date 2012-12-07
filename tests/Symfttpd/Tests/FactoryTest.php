@@ -26,13 +26,15 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $execFinder = $this->getMock('Symfony\Component\Process\ExecutableFinder');
+        $execFinder = $this->getMock('\Symfony\Component\Process\ExecutableFinder');
 
         $execFinder->expects($this->any())
             ->method('find')
             ->will($this->returnValue('/foo/lighttpd'));
 
-        $this->factory = new Factory($execFinder);
+        $guesser = $this->getMock('\Symfttpd\Guesser\ProjectGuesser');
+
+        $this->factory = new Factory($execFinder, $guesser);
     }
 
     /**
@@ -85,13 +87,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 'config' => new Config(array('project_type' => 'foo')),
-                'exception' => '\\RuntimeException',
-                'exceptionMessage' => 'A project version must be set in the symfttpd.conf.php file.'
+                'exception' => '\\InvalidArgumentException',
+                'exceptionMessage' => '"foo" is not supported.'
             ),
             array(
                 'config' => new Config(array('project_type' => 'foo', 'project_version' => 3)),
                 'exception' => '\\InvalidArgumentException',
-                'exceptionMessage' => '"foo" in version "3" is not supported.'
+                'exceptionMessage' => '"foo" (with version "3") is not supported.'
             )
         );
     }

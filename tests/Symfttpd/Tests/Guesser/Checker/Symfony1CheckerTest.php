@@ -2,7 +2,6 @@
 
 namespace Symfttpd\Tests\Guesser\Checker;
 
-use Symfony\Component\Finder\Finder;
 use Symfttpd\Guesser\Checker\Symfony1Checker;
 
 /**
@@ -30,7 +29,6 @@ class Symfony1CheckerTest extends \PHPUnit_Framework_TestCase
         $filesystem->touch(array(
             $basedir.'/symfony',
         ));
-
 
         $checker = new Symfony1Checker($basedir);
 

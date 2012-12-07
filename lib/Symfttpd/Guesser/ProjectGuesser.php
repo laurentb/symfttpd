@@ -2,7 +2,6 @@
 
 namespace Symfttpd\Guesser;
 
-use Symfony\Component\Finder\Finder;
 use Symfttpd\Guesser\Checker\CheckerInterface;
 use Symfttpd\Guesser\Exception\UnguessableException;
 

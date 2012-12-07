@@ -2,7 +2,6 @@
 
 namespace Symfttpd\Tests\Guesser;
 
-use Symfony\Component\Finder\Finder;
 use Symfttpd\Guesser\ProjectGuesser;
 
 /**

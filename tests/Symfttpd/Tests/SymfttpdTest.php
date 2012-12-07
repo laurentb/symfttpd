@@ -34,7 +34,10 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
 
     public function testGetProject()
     {
-        $factory = new Factory($this->getMock('Symfony\Component\Process\ExecutableFinder'));
+        $factory = new Factory(
+            $this->getMock('\Symfony\Component\Process\ExecutableFinder'),
+            $this->getMock('\Symfttpd\Guesser\ProjectGuesser')
+        );
 
         $this->symfttpd = new Symfttpd();
         $this->symfttpd->setConfig(new Config(array(
@@ -50,7 +53,10 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
 
     public function testGetServer()
     {
-        $factory = new Factory($this->getMock('Symfony\Component\Process\ExecutableFinder'));
+        $factory = new Factory(
+            $this->getMock('\Symfony\Component\Process\ExecutableFinder'),
+            $this->getMock('\Symfttpd\Guesser\ProjectGuesser')
+        );
 
         $this->symfttpd = new Symfttpd();
 
