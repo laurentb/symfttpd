@@ -169,7 +169,7 @@ class Factory
         $server->setAccessLog($logDir . '/' . $config->get('server_access_log', 'access.log'));
 
         $server->setFastcgi($config->get('php_cgi_cmd'));
-        $server->setPidfile($project->getCacheDir() . '/' . $config->get('server_pidfile', '.sf'));
+        $server->setPidfile($project->getCacheDir() . '/' . $server->getName(). '/' . $config->get('server_pidfile', '.sf'));
 
         // Configure project relative directories and files
         $server->setDocumentRoot($project->getWebDir());
