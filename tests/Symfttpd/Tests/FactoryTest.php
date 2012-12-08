@@ -63,7 +63,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateProject()
     {
-        $config = new Config(array('want' => '1.4'));
+        $config = new Config(array('project_type' => 'symfony', 'project_version' => '1.4'));
 
         $project = $this->factory->createProject($config);
 
@@ -174,7 +174,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                'config' => array('lighttpd_cmd' => '/usr/bin/lighttpd'),
+                'config' => array('server_cmd' => '/usr/bin/lighttpd'),
                 'expected' => '/usr/bin/lighttpd'
             ),
             array(

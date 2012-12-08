@@ -113,33 +113,10 @@ class Symfttpd
 
     /**
      * Find executables.
-     *
-     * @throws \Symfttpd\Exception\ExecutableNotFoundException
      */
     public function findExecutables()
     {
-        $this->findPhpCmd();
         $this->findPhpCgiCmd();
-    }
-
-    /**
-     * Set the php command value in the Symfttpd option
-     * if it is not already set.
-     *
-     * @throws \Symfttpd\Exception\ExecutableNotFoundException
-     */
-    protected function findPhpCmd()
-    {
-        if (false === $this->getConfig()->has('php_cmd')) {
-            $phpFinder = new PhpExecutableFinder();
-            $cmd = $phpFinder->find();
-
-            if (false == (boolean) $cmd) {
-                throw new \Symfttpd\Exception\ExecutableNotFoundException('php executable not found');
-            }
-
-            $this->getConfig()->set('php_cmd', $cmd);
-        }
     }
 
     /**

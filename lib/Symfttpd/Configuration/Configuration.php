@@ -35,7 +35,7 @@ class Configuration implements ConfigurationInterface
         $this->addServerConfiguration($root);
         $this->addProjectConfiguration($root);
 
-        $this->AddGlobalValidate($root);
+        $this->addGlobalValidate($root);
 
         return $builder;
     }
@@ -150,7 +150,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param \Symfony\Component\Config\Definition\Builder\NodeDefinition $node
      */
-    public function AddGlobalValidate(NodeDefinition $node)
+    public function addGlobalValidate(NodeDefinition $node)
     {
         $node
             ->validate()

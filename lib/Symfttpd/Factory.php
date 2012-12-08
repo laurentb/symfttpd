@@ -103,12 +103,6 @@ class Factory
      */
     public function createProject(Config $config)
     {
-        // Find the type of framework if any.
-        if ($config->has('want')) {
-            $config->set('project_type', 'symfony');
-            $config->set('project_version', substr($config->get('want'), 0, 1));
-        }
-
         if (!$config->has('project_type')) {
             try {
                 list($type, $version) = $this->projectGuesser->guess();
@@ -118,7 +112,7 @@ class Factory
             }
         } else {
             $type = $config->get('project_type');
-            $version = $config->get('project_version');
+            $version = substr($config->get('project_version'), 0, 1);
         }
 
         $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type) . str_replace(array('.', '-', 'O'), '', $version));
@@ -162,22 +156,17 @@ class Factory
         $server = new $class();
         $server->bind($config->get('server_address', '127.0.0.1'), $config->get('server_port', '4042'));
 
-        // BC
-        if ('lighttpd' == $type && $config->has('lighttpd_cmd')) {
-            $server->setCommand($config->get('lighttpd_cmd'));
+        if ($config->has('server_cmd')) {
+            $server->setCommand($config->get('server_cmd'));
         } else {
-            if ($config->has('server_cmd')) {
-                $server->setCommand($config->get('server_cmd'));
-            } else {
-                $this->execFinder->addSuffix('');
+            $this->execFinder->addSuffix('');
 
-                // Try to guess the executable command of the server.
-                if (null == $cmd = $this->execFinder->find($type)) {
-                    throw new ExecutableNotFoundException($type.' executable not found.');
-                }
-
-                $server->setCommand($cmd);
+            // Try to guess the executable command of the server.
+            if (null == $cmd = $this->execFinder->find($type)) {
+                throw new ExecutableNotFoundException($type.' executable not found.');
             }
+
+            $server->setCommand($cmd);
         }
 
         // Configure logging directory
