@@ -1,3 +1,4 @@
+{% block modules %}
 server.modules = (
     "mod_rewrite",
     "mod_access",
@@ -5,14 +6,32 @@ server.modules = (
     "mod_setenv",
     "mod_fastcgi",
 )
+{% endblock modules %}
 
+{% block server %}
 server.document-root  = "{{ document_root }}"
+server.indexfiles     = ("index.php", "index.html", "index.htm", "default.htm")
 server.port           = {{ port }}
-
-{% if bind is not null %}
+{%- if bind is not null -%}
 server.bind           = "{{ bind }}"
-{% endif %}
+{%- endif -%}
+server.follow-symlink = "enable"
+static-file.exclude-extensions = (".php")
 
+# http://redmine.lighttpd.net/issues/406
+server.force-lowercase-filenames = "disable"
+
+server.pid-file       = "{{ pidfile }}"
+
+server.errorlog       = "{{ error_log }}"
+accesslog.filename    = "{{ access_log }}"
+
+debug.log-file-not-found = "enable"
+debug.log-request-header-on-error = "enable"
+setenv.add-response-header = ( "X-Symfttpd" => "1")
+{% endblock server %}
+
+{% block fastcgi %}
 fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
@@ -29,25 +48,7 @@ fastcgi.server = ( ".php" =>
     )
   )
 )
-
-setenv.add-response-header = ( "X-Symfttpd" => "1")
+{% endblock fastcgi %}
 
 {% include 'mime-types.conf.twig' %}
-
-server.indexfiles     = ("index.php", "index.html",
-                        "index.htm", "default.htm")
-server.follow-symlink = "enable"
-static-file.exclude-extensions = (".php")
-
-# http://redmine.lighttpd.net/issues/406
-server.force-lowercase-filenames = "disable"
-
-server.pid-file       = "{{ pidfile }}"
-
-server.errorlog       = "{{ error_log }}"
-accesslog.filename    = "{{ access_log }}"
-
-debug.log-file-not-found = "enable"
-debug.log-request-header-on-error = "enable"
-
 {% include 'rules.conf.twig' %}

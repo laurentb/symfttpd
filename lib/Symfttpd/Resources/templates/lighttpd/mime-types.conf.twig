@@ -1,3 +1,4 @@
+{% block mimetypes %}
 ###############################################################################
 # Default mime-types.conf for Gentoo.
 # include'd from lighttpd.conf.
@@ -73,3 +74,4 @@ mimetype.assign             = (
   ".tbz"          =>      "application/x-bzip-compressed-tar",
   ".tar.bz2"      =>      "application/x-bzip-compressed-tar"
  )
+{% endblock mimetypes %}
