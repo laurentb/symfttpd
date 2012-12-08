@@ -23,9 +23,16 @@ to create all the symlinks.
 
 ## Installation
 
-### Easiest way
+### Locally
 
 [Download](https://github.com/downloads/benja-M-1/symfttpd/symfttpd.phar) the `.phar` file.
+
+### Globally
+
+You can run these commands to install symfttpd globally:
+
+    $ sudo wget https://github.com/downloads/benja-M-1/symfttpd/symfttpd.phar -O /usr/local/bin/symfttpd
+    $ sudo chmod +x /usr/local/bin/symfttpd
 
 ### Source
 
