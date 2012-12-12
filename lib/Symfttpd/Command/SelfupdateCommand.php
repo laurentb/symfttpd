@@ -47,7 +47,7 @@ class SelfupdateCommand extends BaseCommand
     {
         $output->writeln('<info>Downloading the latest version.</info>');
 
-        $remoteFilename = "https://github.com/downloads/benja-M-1/symfttpd/symfttpd.phar";
+        $remoteFilename = "http://benja-m-1.github.com/symfttpd/downloads/symfttpd.phar";
         $localFilename  = $_SERVER['argv'][0];
         $tempFilename   = basename($localFilename, '.phar').'-temp.phar';
 
