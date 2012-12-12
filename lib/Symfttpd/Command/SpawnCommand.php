@@ -75,7 +75,7 @@ class SpawnCommand extends Command
     {
         $server = $this->getSymfttpd()->getServer();
 
-        $address = true == $input->getOption('all') ? 'localhost' : $input->getOption('bind');
+        $address = true == $input->getOption('all') ? null : $input->getOption('bind');
         $port    = $input->getOption('port');
 
         $server->bind($address, $port);
@@ -140,10 +140,14 @@ class SpawnCommand extends Command
      */
     public function getMessage(ServerInterface $server)
     {
+        if (null == ($address = $server->getAddress())) {
+            $address = 'localhost';
+        }
+
         $apps = array();
         foreach ($server->getExecutableFiles() as $file) {
             if (preg_match('/.+\.php$/', $file)) {
-                $apps[$file] = ' http://' . $server->getAddress() . ':' . $server->getPort() . '/<info>' . $file . '</info>';
+                $apps[$file] = ' http://' . $address . ':' . $server->getPort() . '/<info>' . $file . '</info>';
             }
         }
 
@@ -158,7 +162,13 @@ Available applications:
 
 TEXT;
 
-        return sprintf($text, $server->getName(), $server->getAddress(), $server->getPort(), implode("\n", $apps));
+        return sprintf(
+            $text,
+            $server->getName(),
+            null === $server->getAddress() ? 'all interfaces' : $server->getAddress(),
+            $server->getPort(),
+            implode("\n", $apps)
+        );
     }
 
     /**

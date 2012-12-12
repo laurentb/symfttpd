@@ -12,6 +12,7 @@
 namespace Symfttpd\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfttpd\Server\MockServer;
 use Symfttpd\Command\SpawnCommand;
 
 /**
@@ -37,22 +38,46 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute()
     {
-        $this->command->setSymfttpd($this->getSymfttpd());
+        $symfttpd = $this->getSymfttpd();
+        $symfttpd->expects($this->any())
+            ->method('getServer')
+            ->will($this->returnValue($this->getServer()));
+
+        $this->command->setSymfttpd($symfttpd);
 
         $commandTester = new CommandTester($this->command);
-        $commandTester->execute(array(), array('port' => 4043));
+        $commandTester->execute(array('-p' => 4043));
 
         $this->assertRegExp('/symfttpd started on 127.0.0.1, port 4043./', $commandTester->getDisplay());
         $this->assertRegExp('#http://127\.0\.0\.1:4043/index.php#', $commandTester->getDisplay());
     }
 
+    /**
+     * @covers \Symfttpd\Command\SpawnCommand::execute
+     * @covers \Symfttpd\Command\SpawnCommand::getMessage
+     */
+    public function testExecuteOnAllInterfaces()
+    {
+        $server = new MockServer();
+        $server->setExecutableFiles(array('index.php'));
+
+        $symfttpd = $this->getSymfttpd();
+        $symfttpd->expects($this->any())
+            ->method('getServer')
+            ->will($this->returnValue($server));
+
+        $this->command->setSymfttpd($symfttpd);
+
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(array('-p' => 4043, '--all' => true));
+
+        $this->assertRegExp('/started on all interfaces, port 4043./', $commandTester->getDisplay());
+        $this->assertRegExp('#http://localhost:4043/index.php#', $commandTester->getDisplay());
+    }
+
     public function getSymfttpd()
     {
         $symfttpd = $this->getMock('\\Symfttpd\\Symfttpd');
-        $symfttpd->expects($this->any())
-            ->method('getServer')
-            ->will($this->returnValue($this->getServer()));
-
         $symfttpd->expects($this->once())
             ->method('getServerConfiguration')
             ->will($this->returnValue($this->getMock('\\Symfttpd\\Server\\Configuration\\ConfigurationInterface')));
