@@ -79,8 +79,8 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
     {
         $symfttpd = $this->getMock('\\Symfttpd\\Symfttpd');
         $symfttpd->expects($this->once())
-            ->method('getServerConfiguration')
-            ->will($this->returnValue($this->getMock('\\Symfttpd\\Server\\Configuration\\ConfigurationInterface')));
+            ->method('getServerConfigurationFile')
+            ->will($this->returnValue($this->getMock('\\Symfttpd\\ConfigurationFile\\ConfigurationFileInterface')));
 
         return $symfttpd;
     }

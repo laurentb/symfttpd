@@ -13,7 +13,7 @@ namespace Symfttpd\Server;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Tail\TailInterface;
-use Symfttpd\Server\Configuration\ConfigurationInterface;
+use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
 
 /**
  * ServerInterface interface
@@ -27,25 +27,25 @@ interface ServerInterface
      * Run the server command to start it.
      *
      * @abstract
-     * @param \Symfttpd\Server\Configuration\ConfigurationInterface $generator
+     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $generator
      * @param \Symfony\Component\Console\Output\OutputInterface     $output
      * @param \Symfttpd\Tail\TailInterface                          $tail
      *
      * @return mixed
      */
-    public function start(ConfigurationInterface $generator, OutputInterface $output, TailInterface $tail = null);
+    public function start(ConfigurationFileInterface $generator, OutputInterface $output, TailInterface $tail = null);
 
     /**
      * Restart the server command to start it.
      *
      * @abstract
-     * @param \Symfttpd\Server\Configuration\ConfigurationInterface $generator
+     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $generator
      * @param \Symfony\Component\Console\Output\OutputInterface     $output
      * @param \Symfttpd\Tail\TailInterface                          $tail
      *
      * @return mixed
      */
-    public function restart(ConfigurationInterface $generator, OutputInterface $output, TailInterface $tail = null);
+    public function restart(ConfigurationFileInterface $generator, OutputInterface $output, TailInterface $tail = null);
 
     /**
      * Stop the server.

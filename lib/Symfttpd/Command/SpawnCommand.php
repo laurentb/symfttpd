@@ -109,20 +109,20 @@ class SpawnCommand extends Command
         $this->handleSignals($server, $output);
 
         try {
-            $configuration = $this->symfttpd->getServerConfiguration();
+            $configurationFile = $this->symfttpd->getServerConfigurationFile();
 
             $paths = array_map(function ($path) {
                 $info = pathinfo($path);
 
                 return $info['dirname'];
-            }, array($configuration->getPath(), $server->getAccessLog(), $server->getErrorLog()));
+            }, array($configurationFile->getPath(), $server->getAccessLog(), $server->getErrorLog()));
 
             array_unique($paths);
 
             $filesystem = new Filesystem();
             $filesystem->mkdir($paths);
 
-            return $server->start($configuration, $output, $multitail) ? 1 : 0;
+            return $server->start($configurationFile, $output, $multitail) ? 1 : 0;
         } catch (\Exception $e) {
             $output->writeln('<error>The server cannot start</error>');
             $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));

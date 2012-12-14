@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Tests\Configuration;
+namespace Symfttpd\Tests;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfttpd\Configuration\Configuration;
+use Symfttpd\Configuration;
 
 /**
  * ConfigurationTest description

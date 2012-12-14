@@ -14,7 +14,7 @@ namespace Symfttpd\Server;
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Server\BaseServer;
-use Symfttpd\Server\Configuration\ConfigurationInterface;
+use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
 
 /**
  * MockServer class
@@ -55,25 +55,25 @@ class MockServer extends BaseServer
     /**
      * Start the server.
      *
-     * @param \Symfttpd\Server\Configuration\ConfigurationInterface $configuration
+     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configuration
      * @param \Symfony\Component\Console\Output\OutputInterface     $output
      * @param \Symfttpd\Tail\TailInterface                          $tail
      *
      * @return mixed|void
      */
-    public function start(ConfigurationInterface $configuration, OutputInterface $output, TailInterface $tail = null)
+    public function start(ConfigurationFileInterface $configuration, OutputInterface $output, TailInterface $tail = null)
     {
 
     }
 
     /**
-     * @param \Symfttpd\Server\Configuration\ConfigurationInterface $configuration
+     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configuration
      * @param \Symfony\Component\Console\Output\OutputInterface     $output
      * @param \Symfttpd\Tail\TailInterface                          $tail
      *
      * @return mixed|void
      */
-    public function restart(ConfigurationInterface $configuration, OutputInterface $output, TailInterface $tail = null)
+    public function restart(ConfigurationFileInterface $configuration, OutputInterface $output, TailInterface $tail = null)
     {
 
     }

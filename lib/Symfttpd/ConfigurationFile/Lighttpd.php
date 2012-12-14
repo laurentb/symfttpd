@@ -9,10 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Server\Configuration;
+namespace Symfttpd\ConfigurationFile;
 
 use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\Server\Configuration\ConfigurationInterface;
+use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
 use Symfttpd\Server\ServerInterface;
 
 /**
@@ -20,7 +20,7 @@ use Symfttpd\Server\ServerInterface;
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class Lighttpd implements ConfigurationInterface
+class Lighttpd implements ConfigurationFileInterface
 {
     /**
      * @var \Twig_Environment

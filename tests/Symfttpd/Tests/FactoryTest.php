@@ -13,7 +13,6 @@ namespace Symfttpd\Tests;
 
 use Symfttpd\Config;
 use Symfttpd\Factory;
-use Symfttpd\Symfttpd;
 
 /**
  * FactoryTest description
@@ -52,13 +51,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $config   = $symfttpd->getConfig();
         $project  = $symfttpd->getProject();
         $server   = $symfttpd->getServer();
-        $generator = $symfttpd->getServerConfiguration();
+        $generator = $symfttpd->getServerConfigurationFile();
 
         $this->assertInstanceOf('\\Symfttpd\\Symfttpd', $symfttpd);
         $this->assertInstanceOf('\\Symfttpd\\Config', $config);
         $this->assertInstanceOf('\\Symfttpd\\Project\\ProjectInterface', $project);
         $this->assertInstanceOf('\\Symfttpd\\Server\\ServerInterface', $server);
-        $this->assertInstanceOf('\\Symfttpd\\Server\\Configuration\\ConfigurationInterface', $generator);
+        $this->assertInstanceOf('\\Symfttpd\\ConfigurationFile\\ConfigurationFileInterface', $generator);
     }
 
     public function testCreateProject()
@@ -116,11 +115,11 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "foo" is not supported
      */
-    public function testCreateServerConfigurationException()
+    public function testCreateServerConfigurationFileException()
     {
         $config = new Config(array('server_type' => 'foo'));
 
-        $this->factory->createServerConfiguration(
+        $this->factory->createServerConfigurationFile(
             $config,
             $this->getMock('\\Symfttpd\\Server\\ServerInterface'),
             $this->getMock('\\Symfttpd\\Project\\ProjectInterface')
@@ -129,41 +128,22 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getServerConfig
-     * @testdox Should create a server instance
+     *
      * @param $config
+     * @param $expected
      */
     public function testCreateServer($config, $expected)
     {
         $config = new Config($config);
 
         $project = $this->getMock('\\Symfttpd\\Project\\ProjectInterface');
-        $project->expects($this->once())
-            ->method('getLogDir')
-            ->will($this->returnValue('/tmp'));
-
-        $project->expects($this->once())
-            ->method('getCacheDir')
-            ->will($this->returnValue('/tmp'));
-
-        $project->expects($this->once())
-            ->method('getWebDir')
-            ->will($this->returnValue('/web'));
-
-        $project->expects($this->once())
-            ->method('getIndexFile')
-            ->will($this->returnValue('index.php'));
-
-        $project->expects($this->once())
-            ->method('getDefaultExecutableFiles')
-            ->will($this->returnValue(array('index.php')));
-
-        $project->expects($this->once())
-            ->method('getDefaultReadableDirs')
-            ->will($this->returnValue(array()));
-
-        $project->expects($this->once())
-            ->method('getDefaultReadableFiles')
-            ->will($this->returnValue(array()));
+        $project->expects($this->once())->method('getLogDir')->will($this->returnValue('/tmp'));
+        $project->expects($this->once())->method('getCacheDir')->will($this->returnValue('/tmp'));
+        $project->expects($this->once())->method('getWebDir')->will($this->returnValue('/web'));
+        $project->expects($this->once())->method('getIndexFile')->will($this->returnValue('index.php'));
+        $project->expects($this->once())->method('getDefaultExecutableFiles')->will($this->returnValue(array('index.php')));
+        $project->expects($this->once())->method('getDefaultReadableDirs')->will($this->returnValue(array()));
+        $project->expects($this->once())->method('getDefaultReadableFiles')->will($this->returnValue(array()));
 
         $server = $this->factory->createServer($config, $project);
 
@@ -173,10 +153,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     public function getServerConfig()
     {
         return array(
-            array(
-                'config' => array('server_cmd' => '/usr/bin/lighttpd'),
-                'expected' => '/usr/bin/lighttpd'
-            ),
             array(
                 'config' => array('server_cmd' => '/usr/foo/lighttpd'),
                 'expected' => '/usr/foo/lighttpd'

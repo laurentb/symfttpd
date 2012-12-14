@@ -16,7 +16,7 @@ use Symfttpd\Guesser\Exception\UnguessableException;
 use Symfttpd\Guesser\ProjectGuesser;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Config;
-use Symfttpd\Configuration\Configuration;
+use Symfttpd\Configuration;
 use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\Project\ProjectInterface;
@@ -80,13 +80,13 @@ class Factory
 
         $project   = $this->createProject($config);
         $server    = $this->createServer($config, $project);
-        $generator = $this->createServerConfiguration($config, $server, $project);
+        $generator = $this->createServerConfigurationFile($config, $server, $project);
 
         $symfttpd = new Symfttpd();
         $symfttpd->setConfig($config);
         $symfttpd->setProject($project);
         $symfttpd->setServer($server);
-        $symfttpd->setServerConfiguration($generator);
+        $symfttpd->setServerConfigurationFile($generator);
 
         return $symfttpd;
     }
@@ -139,6 +139,7 @@ class Factory
      * @return \Symfttpd\Server\ServerInterface
      *
      * @throws \InvalidArgumentException
+     * @throws Exception\ExecutableNotFoundException
      */
     public function createServer(Config $config, ProjectInterface $project)
     {
@@ -150,9 +151,7 @@ class Factory
             throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
         }
 
-        /**
-         * @var \Symfttpd\Server\ServerInterface $server
-         */
+        /** @var \Symfttpd\Server\ServerInterface $server */
         $server = new $class();
         $server->bind($config->get('server_address', '127.0.0.1'), $config->get('server_port', '4042'));
 
@@ -193,14 +192,14 @@ class Factory
      * @param \Symfttpd\Server\ServerInterface   $server
      * @param \Symfttpd\Project\ProjectInterface $project
      *
-     * @return \Symfttpd\Server\Configuration\ConfigurationInterface
+     * @return \Symfttpd\ConfigurationFile\ConfigurationFileInterface
      * @throws \InvalidArgumentException
      */
-    public function createServerConfiguration(Config $config, ServerInterface $server, ProjectInterface $project)
+    public function createServerConfigurationFile(Config $config, ServerInterface $server, ProjectInterface $project)
     {
         $type = $config->get('server_type', 'lighttpd');
 
-        $class = sprintf('Symfttpd\\Server\\Configuration\\%s', ucfirst($type));
+        $class = sprintf('Symfttpd\\ConfigurationFile\\%s', ucfirst($type));
 
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));

@@ -9,17 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Server\Configuration;
+namespace Symfttpd\ConfigurationFile;
 
 use Symfttpd\Server\ServerInterface;
 use Symfttpd\Filesystem\Filesystem;
 
 /**
- * ConfigurationInterface
+ * ConfigurationFileInterface
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-interface ConfigurationInterface
+interface ConfigurationFileInterface
 {
     /**
      * @param \Twig_Environment               $twig
