@@ -175,14 +175,14 @@ interface ServerInterface
     public function getExecutableFiles();
 
     /**
-     * @param string $fastcgi
+     * @param string $gateway
      */
-    public function setFastcgi($fastcgi);
+    public function setGateway($gateway);
 
     /**
      * @return string
      */
-    public function getFastcgi();
+    public function getGateway();
 
     /**
      * @param string $indexFile

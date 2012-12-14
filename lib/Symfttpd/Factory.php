@@ -173,7 +173,7 @@ class Factory
         $server->setErrorLog($logDir . '/' . $config->get('server_error_log', 'error.log'));
         $server->setAccessLog($logDir . '/' . $config->get('server_access_log', 'access.log'));
 
-        $server->setFastcgi($config->get('php_cgi_cmd'));
+        $server->setGateway($config->get('php_cgi_cmd'));
         $server->setPidfile($project->getCacheDir() . '/' . $server->getName(). '/' . $config->get('server_pidfile', '.sf'));
 
         // Configure project relative directories and files

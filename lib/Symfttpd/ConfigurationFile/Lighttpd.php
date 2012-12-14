@@ -68,7 +68,7 @@ class Lighttpd implements ConfigurationFileInterface
                 'error_log'     => $server->getErrorLog(),
                 'access_log'    => $server->getAccessLog(),
                 'pidfile'       => $server->getPidfile(),
-                'php_cgi_cmd'   => $server->getFastcgi(),
+                'php_cgi_cmd'   => $server->getGateway(),
                 'dirs'          => $server->getAllowedDirs(),
                 'files'         => $server->getAllowedFiles(),
                 'phps'          => $server->getExecutableFiles(),

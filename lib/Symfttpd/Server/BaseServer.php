@@ -288,7 +288,7 @@ abstract class BaseServer implements ServerInterface
     /**
      * @param string $fastcgi
      */
-    public function setFastcgi($fastcgi)
+    public function setGateway($fastcgi)
     {
         $this->fastcgi = $fastcgi;
     }
@@ -296,7 +296,7 @@ abstract class BaseServer implements ServerInterface
     /**
      * @return string
      */
-    public function getFastcgi()
+    public function getGateway()
     {
         return $this->fastcgi;
     }
