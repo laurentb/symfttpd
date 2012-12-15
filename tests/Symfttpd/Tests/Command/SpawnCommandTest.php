@@ -77,17 +77,17 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
 
     public function getSymfttpd()
     {
-        $symfttpd = $this->getMock('\\Symfttpd\\Symfttpd');
+        $symfttpd = $this->getMock('\Symfttpd\Symfttpd');
         $symfttpd->expects($this->once())
-            ->method('getConfigurationFile')
-            ->will($this->returnValue($this->getMock('\\Symfttpd\\ConfigurationFile\\ConfigurationFileInterface')));
+            ->method('getGenerator')
+            ->will($this->returnValue($this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false)));
 
         return $symfttpd;
     }
 
     public function getServer()
     {
-        $server = $this->getMock('\\Symfttpd\\Server\\ServerInterface');
+        $server = $this->getMock('\Symfttpd\Server\ServerInterface');
 
         $server->expects($this->any())
             ->method('getAddress')
@@ -114,7 +114,7 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMessage()
     {
-        $server = $this->getMock('\\Symfttpd\\Server\\ServerInterface');
+        $server = $this->getMock('\Symfttpd\Server\ServerInterface');
 
         $server->expects($this->exactly(3))
             ->method('getAddress')

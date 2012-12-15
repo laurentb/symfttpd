@@ -9,18 +9,17 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\ConfigurationFile;
+namespace Symfttpd;
 
 use Symfttpd\Filesystem\Filesystem;
-use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
-use Symfttpd\ConfigurationFile\ConfigurableInterface;
 
 /**
- * ConfigurationFile description
+ * ConfigurationGenerator generates and dumps the configuration
+ * generated with twig.
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class ConfigurationFile implements ConfigurationFileInterface
+class ConfigurationGenerator
 {
     /**
      * @var \Twig_Environment
@@ -85,20 +84,20 @@ class ConfigurationFile implements ConfigurationFileInterface
     }
 
     /**
-     * @param ConfigurableInterface $configurable
+     * @param \Symfttpd\Server\ServerInterface|\Symfttpd\Gateway\GatewayInterface $subject
      * @param bool                  $force
      *
      * @return string
      * @throws \RuntimeException
      */
-    public function dump(ConfigurableInterface $configurable, $force = false)
+    public function dump($subject, $force = false)
     {
         // Don't rewrite existing configuration if not forced to.
         if (false === $force && file_exists($this->getPath())) {
             return;
         }
 
-        $configuration = $this->generate($configurable);
+        $configuration = $this->generate($subject);
 
         $directory = dirname($this->getPath());
 
@@ -114,12 +113,12 @@ class ConfigurationFile implements ConfigurationFileInterface
     }
 
     /**
-     * @param ConfigurableInterface $configurable
+     * @param \Symfttpd\Server\ServerInterface|\Symfttpd\Gateway\GatewayInterface $subject
      *
      * @return string
      */
-    public function generate(ConfigurableInterface $configurable)
+    public function generate($subject)
     {
-        return $this->twig->render($this->getTemplate(), array('configurable' => $configurable));
+        return $this->twig->render($this->getTemplate(), array('subject' => $subject));
     }
 }

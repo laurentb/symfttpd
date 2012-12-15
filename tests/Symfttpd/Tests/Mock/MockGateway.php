@@ -12,14 +12,13 @@
 namespace Symfttpd\Tests\Mock;
 
 use Symfttpd\Gateway\BaseGateway;
-use Symfttpd\ConfigurationFile\ConfigurableInterface;
 
 /**
  * MockGateway description
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class MockGateway extends BaseGateway implements ConfigurableInterface
+class MockGateway extends BaseGateway
 {
     public function getName()
     {

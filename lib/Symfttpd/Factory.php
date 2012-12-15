@@ -79,13 +79,13 @@ class Factory
 
         $project   = $this->createProject($config);
         $server    = $this->createServer($config, $project);
-        $generator = $this->createConfigurationFile($config, $server, $project);
+        $generator = $this->createGenerator($config, $server, $project);
 
         $symfttpd = new Symfttpd();
         $symfttpd->setConfig($config);
         $symfttpd->setProject($project);
         $symfttpd->setServer($server);
-        $symfttpd->setConfigurationFile($generator);
+        $symfttpd->setGenerator($generator);
 
         return $symfttpd;
     }
@@ -207,10 +207,10 @@ class Factory
      * @param \Symfttpd\Server\ServerInterface   $server
      * @param \Symfttpd\Project\ProjectInterface $project
      *
-     * @return \Symfttpd\ConfigurationFile\ConfigurationFileInterface
+     * @return \Symfttpd\ConfigurationGenerator
      * @throws \InvalidArgumentException
      */
-    public function createConfigurationFile(Config $config, ServerInterface $server, ProjectInterface $project)
+    public function createGenerator(Config $config, ServerInterface $server, ProjectInterface $project)
     {
         // Define configuration template storage paths.
         $dirs = array_merge(
@@ -233,7 +233,7 @@ class Factory
 
         $filesystem = new Filesystem();
 
-        $configuration = new \Symfttpd\ConfigurationFile\ConfigurationFile($twig, $filesystem);
+        $configuration = new \Symfttpd\ConfigurationGenerator($twig, $filesystem);
         $configuration->setTemplate($config->get('server_template', $server->getName() . '.conf.twig'));
 
         $defaultPath = $project->getCacheDir() . '/' . $server->getName(). '/' . $server->getName() . '.conf';

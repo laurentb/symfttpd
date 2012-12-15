@@ -9,16 +9,16 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttp\Tests\ConfigurationFile\Gateway;
+namespace Symfttp\Tests\ConfigurationGenerator\Gateway;
 
-use Symfttpd\ConfigurationFile\ConfigurationFile;
+use Symfttpd\ConfigurationGenerator;
 
 /**
  * PhpFpmFileTest description
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class ConfigurationFileTest extends \PHPUnit_Framework_TestCase
+class ConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     public $path;
 
@@ -35,7 +35,7 @@ class ConfigurationFileTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->twig = $this->getMock('\Twig_Environment');
-        $this->file = new ConfigurationFile($this->twig, $this->getMock('\Symfttpd\Filesystem\Filesystem'));
+        $this->file = new ConfigurationGenerator($this->twig, $this->getMock('\Symfttpd\Filesystem\Filesystem'));
     }
 
     public function tearDown()

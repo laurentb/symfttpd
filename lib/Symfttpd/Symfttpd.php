@@ -16,7 +16,6 @@ use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Config;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
-use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
 
 /**
  * Symfttpd class
@@ -43,9 +42,9 @@ class Symfttpd
     protected $server;
 
     /**
-     * @var \Symfttpd\ConfigurationFile\ConfigurationFileInterface
+     * @var \Symfttpd\ConfigurationGenerator
      */
-    protected $configurationFile;
+    protected $generator;
 
     /**
      * @param \Symfttpd\Config $config
@@ -96,19 +95,19 @@ class Symfttpd
     }
 
     /**
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configurationFile
+     * @param \Symfttpd\ConfigurationGenerator
      */
-    public function setConfigurationFile(ConfigurationFileInterface $configurationFile)
+    public function setGenerator(ConfigurationGenerator $configurationFile)
     {
-        $this->configurationFile = $configurationFile;
+        $this->generator = $configurationFile;
     }
 
     /**
-     * @return \Symfttpd\ConfigurationFile\ConfigurationFileInterface
+     * @return \Symfttpd\ConfigurationGenerator
      */
-    public function getConfigurationFile()
+    public function getGenerator()
     {
-        return $this->configurationFile;
+        return $this->generator;
     }
 
     /**

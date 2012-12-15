@@ -41,9 +41,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      * @covers \Symfttpd\Factory::createSymfttpd
      * @covers \Symfttpd\Factory::createConfig
      * @covers \Symfttpd\Factory::createProject
-     * @covers \Symfttpd\Factory::createConfigurationFile
-     * @covers \Symfttpd\Symfttpd::setConfigurationFile
-     * @covers \Symfttpd\Symfttpd::getConfigurationFile
+     * @covers \Symfttpd\Factory::createGenerator
+     * @covers \Symfttpd\Symfttpd::setGenerator
+     * @covers \Symfttpd\Symfttpd::getGenerator
      */
     public function testCreate()
     {
@@ -51,13 +51,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $config   = $symfttpd->getConfig();
         $project  = $symfttpd->getProject();
         $server   = $symfttpd->getServer();
-        $generator = $symfttpd->getConfigurationFile();
+        $generator = $symfttpd->getGenerator();
 
         $this->assertInstanceOf('\\Symfttpd\\Symfttpd', $symfttpd);
         $this->assertInstanceOf('\\Symfttpd\\Config', $config);
         $this->assertInstanceOf('\\Symfttpd\\Project\\ProjectInterface', $project);
         $this->assertInstanceOf('\\Symfttpd\\Server\\ServerInterface', $server);
-        $this->assertInstanceOf('\\Symfttpd\\ConfigurationFile\\ConfigurationFileInterface', $generator);
+        $this->assertInstanceOf('\\Symfttpd\\ConfigurationGenerator', $generator);
     }
 
     public function testCreateProject()

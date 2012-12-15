@@ -14,7 +14,7 @@ namespace Symfttpd\Server;
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Server\BaseServer;
-use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
+use Symfttpd\ConfigurationGenerator;
 
 /**
  * Lighttpd class
@@ -54,13 +54,14 @@ class Lighttpd extends BaseServer
 
     /**
      * Start the server.
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configuration
+     *
+     * @param \Symfttpd\ConfigurationGenerator                      $configuration
      * @param \Symfony\Component\Console\Output\OutputInterface     $output
      * @param \Symfttpd\Tail\TailInterface                          $tail
      *
      * @return mixed|void
      */
-    public function start(ConfigurationFileInterface $configuration, OutputInterface $output, TailInterface $tail = null)
+    public function start(ConfigurationGenerator $configuration, OutputInterface $output, TailInterface $tail = null)
     {
         // Regenerate the lighttpd configuration
         $configuration->dump($this, true);
@@ -82,6 +83,7 @@ class Lighttpd extends BaseServer
         while (false !== sleep(1)) {
             /**
              * Regenerate the configuration file. to check if it defers.
+             *
              * @todo check the web dir datetime informations to detect any changes instead.
              */
             $genconf = $configuration->generate($this);
@@ -104,14 +106,13 @@ class Lighttpd extends BaseServer
     }
 
     /**
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configuration
-     * @param \Symfony\Component\Console\Output\OutputInterface     $output
-     * @param \Symfttpd\Tail\TailInterface                          $tail
+     * @param \Symfttpd\ConfigurationGenerator                  $configuration
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
      *
      * @return mixed|void
      */
-    public function restart(ConfigurationFileInterface $configuration, OutputInterface $output, TailInterface $tail = null)
-    {
+    public function restart(ConfigurationGenerator $configuration, OutputInterface $output, TailInterface $tail = null) {
         $this->stop(new \Symfony\Component\Console\Output\NullOutput());
         $this->start($configuration, $output, $tail);
     }

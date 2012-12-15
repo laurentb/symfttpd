@@ -14,7 +14,7 @@ namespace Symfttpd\Server;
 use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Server\BaseServer;
-use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
+use Symfttpd\ConfigurationGenerator;
 
 /**
  * MockServer class
@@ -53,38 +53,42 @@ class MockServer extends BaseServer
     }
 
     /**
-     * Start the server.
+     * Run the server command to start it.
      *
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configuration
-     * @param \Symfony\Component\Console\Output\OutputInterface     $output
-     * @param \Symfttpd\Tail\TailInterface                          $tail
+     * @param \Symfttpd\ConfigurationGenerator                  $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\                                   $tail
      *
-     * @return mixed|void
+     * @return mixed
      */
-    public function start(ConfigurationFileInterface $configuration, OutputInterface $output, TailInterface $tail = null)
+    public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
     {
-
+        // TODO: Implement start() method.
     }
 
     /**
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configuration
+     * Restart the server command to start it.
+     *
+     * @param \Symfttpd\ConfigurationGenerator                      $generator
      * @param \Symfony\Component\Console\Output\OutputInterface     $output
      * @param \Symfttpd\Tail\TailInterface                          $tail
      *
-     * @return mixed|void
+     * @return mixed
      */
-    public function restart(ConfigurationFileInterface $configuration, OutputInterface $output, TailInterface $tail = null)
+    public function restart(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
     {
-
+        // TODO: Implement restart() method.
     }
 
     /**
+     * Stop the server.
+     *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
-     * @return mixed|void
+     * @return mixed
      */
     public function stop(OutputInterface $output)
     {
-
+        // TODO: Implement stop() method.
     }
 }

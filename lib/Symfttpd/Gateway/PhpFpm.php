@@ -12,14 +12,13 @@
 namespace Symfttpd\Gateway;
 
 use Symfttpd\Gateway\BaseGateway;
-use Symfttpd\ConfigurationFile\ConfigurableInterface;
 
 /**
  * PhpFpm description
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class PhpFpm extends BaseGateway implements ConfigurableInterface
+class PhpFpm extends BaseGateway
 {
     /**
      * @return string
