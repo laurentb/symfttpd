@@ -1,21 +1,21 @@
 {% block rules %}
 url.rewrite-once = (
-{% for dir in dirs %}
+{% for dir in server.allowedDirs %}
   "^/{{ dir|preg_quote }}/.+" => "$0",
 {% endfor %}
 
-{% for file in files %}
+{% for file in server.allowedFiles %}
   "^/{{ file|preg_quote }}$" => "$0",
 {% endfor %}
 
-{% for php in phps %}
+{% for php in server.executableFiles %}
   "^/{{ php|preg_quote }}(/[^\?]*)?(\?.*)?" => "/{{ php }}$1$2",
 {% endfor %}
 
-  "^(/[^\?]*)(\?.*)?" => "/{{ default }}$1$2"
+  "^(/[^\?]*)(\?.*)?" => "/{{ server.indexFile }}$1$2"
 )
 
-{% for file in nophp %}
+{% for file in server.unexecutableDirs %}
 {% if in_array(file, dirs) %}
 $HTTP["url"] =~ "^/{{ file }}/" {
   url.access-deny = (".php")

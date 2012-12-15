@@ -28,21 +28,6 @@ interface ConfigurationFileInterface
     public function __construct(\Twig_Environment $twig, Filesystem $filesystem);
 
     /**
-     * @param \Symfttpd\Server\ServerInterface $server
-     *
-     * @return string
-     */
-    public function generate(ServerInterface $server);
-
-    /**
-     * @param \Symfttpd\Server\ServerInterface $server
-     * @param bool                             $force
-     *
-     * @throws \RuntimeException
-     */
-    public function dump(ServerInterface $server, $force = false);
-
-    /**
      * @param $template
      */
     public function setTemplate($template);

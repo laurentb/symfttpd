@@ -52,18 +52,17 @@ class Factory
     }
 
     /**
-     * @return \Symfttpd\Config
+     * Create an initialized Symfttpd instance.
+     *
+     * @param array $config
+     *
+     * @return Symfttpd
      */
-    public function createConfig()
+    public function create(array $config = array())
     {
-        $file = new SymfttpdFile();
-        $file->setProcessor(new Processor());
-        $file->setConfiguration(new Configuration());
+        $symfttpd = $this->createSymfttpd($config);
 
-        $config = new Config();
-        $config->merge($file->read());
-
-        return $config;
+        return $symfttpd;
     }
 
     /**
@@ -80,15 +79,30 @@ class Factory
 
         $project   = $this->createProject($config);
         $server    = $this->createServer($config, $project);
-        $generator = $this->createServerConfigurationFile($config, $server, $project);
+        $generator = $this->createConfigurationFile($config, $server, $project);
 
         $symfttpd = new Symfttpd();
         $symfttpd->setConfig($config);
         $symfttpd->setProject($project);
         $symfttpd->setServer($server);
-        $symfttpd->setServerConfigurationFile($generator);
+        $symfttpd->setConfigurationFile($generator);
 
         return $symfttpd;
+    }
+
+    /**
+     * @return \Symfttpd\Config
+     */
+    public function createConfig()
+    {
+        $file = new SymfttpdFile();
+        $file->setProcessor(new Processor());
+        $file->setConfiguration(new Configuration());
+
+        $config = new Config();
+        $config->merge($file->read());
+
+        return $config;
     }
 
     /**
@@ -173,7 +187,6 @@ class Factory
         $server->setErrorLog($logDir . '/' . $config->get('server_error_log', 'error.log'));
         $server->setAccessLog($logDir . '/' . $config->get('server_access_log', 'access.log'));
 
-        $server->setGateway($config->get('php_cgi_cmd'));
         $server->setPidfile($project->getCacheDir() . '/' . $server->getName(). '/' . $config->get('server_pidfile', '.sf'));
 
         // Configure project relative directories and files
@@ -183,6 +196,8 @@ class Factory
         $server->setAllowedFiles($config->get('project_readable_files', $project->getDefaultReadableFiles()));
         $server->setExecutableFiles($config->get('project_readable_phpfiles', $project->getDefaultExecutableFiles()));
         $server->setUnexecutableDirs($config->get('project_nophp', array()));
+
+        $server->setGateway($this->createGateway($config));
 
         return $server;
     }
@@ -195,16 +210,8 @@ class Factory
      * @return \Symfttpd\ConfigurationFile\ConfigurationFileInterface
      * @throws \InvalidArgumentException
      */
-    public function createServerConfigurationFile(Config $config, ServerInterface $server, ProjectInterface $project)
+    public function createConfigurationFile(Config $config, ServerInterface $server, ProjectInterface $project)
     {
-        $type = $config->get('server_type', 'lighttpd');
-
-        $class = sprintf('Symfttpd\\ConfigurationFile\\%s', ucfirst($type));
-
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
-        }
-
         // Define configuration template storage paths.
         $dirs = array_merge(
             array(__DIR__ . '/Resources/templates/' . $server->getName()),
@@ -226,7 +233,7 @@ class Factory
 
         $filesystem = new Filesystem();
 
-        $configuration = new $class($twig, $filesystem);
+        $configuration = new \Symfttpd\ConfigurationFile\ConfigurationFile($twig, $filesystem);
         $configuration->setTemplate($config->get('server_template', $server->getName() . '.conf.twig'));
 
         $defaultPath = $project->getCacheDir() . '/' . $server->getName(). '/' . $server->getName() . '.conf';
@@ -236,16 +243,25 @@ class Factory
     }
 
     /**
-     * Create an initialized Symfttpd instance.
+     * @param Config $config
      *
-     * @param array $config
-     *
-     * @return Symfttpd
+     * @return Gateway\GatewayInterface
+     * @throws \InvalidArgumentException
      */
-    public function create(array $config = array())
+    public function createGateway(Config $config)
     {
-        $symfttpd = $this->createSymfttpd($config);
+        $type = $config->get('gateway_type', 'fastcgi');
 
-        return $symfttpd;
+        $class = sprintf('Symfttpd\\Gateway\\%s', ucfirst($type));
+
+        if (!class_exists($class)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
+        }
+
+        /** @var \Symfttpd\Gateway\GatewayInterface $gateway */
+        $gateway = new $class();
+        $gateway->setCommand($config->get('gateway_cmd', $config->get('php_cgi_cmd')));
+
+        return $gateway;
     }
 }

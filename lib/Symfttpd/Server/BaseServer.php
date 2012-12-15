@@ -11,6 +11,7 @@
 
 namespace Symfttpd\Server;
 
+use Symfttpd\ConfigurationFile\ConfigurableInterface;
 use Symfttpd\Server\ServerInterface;
 
 /**
@@ -18,7 +19,7 @@ use Symfttpd\Server\ServerInterface;
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-abstract class BaseServer implements ServerInterface
+abstract class BaseServer implements ServerInterface, ConfigurableInterface
 {
     /**
      * @var string

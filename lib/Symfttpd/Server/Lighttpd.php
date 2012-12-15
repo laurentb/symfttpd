@@ -112,7 +112,7 @@ class Lighttpd extends BaseServer
      */
     public function restart(ConfigurationFileInterface $configuration, OutputInterface $output, TailInterface $tail = null)
     {
-        $this->stop(new NullOutput());
+        $this->stop(new \Symfony\Component\Console\Output\NullOutput());
         $this->start($configuration, $output, $tail);
     }
 

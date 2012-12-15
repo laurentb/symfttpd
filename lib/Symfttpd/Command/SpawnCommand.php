@@ -109,7 +109,7 @@ class SpawnCommand extends Command
         $this->handleSignals($server, $output);
 
         try {
-            $configurationFile = $this->symfttpd->getServerConfigurationFile();
+            $configurationFile = $this->symfttpd->getConfigurationFile();
 
             $paths = array_map(function ($path) {
                 $info = pathinfo($path);

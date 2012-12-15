@@ -41,9 +41,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      * @covers \Symfttpd\Factory::createSymfttpd
      * @covers \Symfttpd\Factory::createConfig
      * @covers \Symfttpd\Factory::createProject
-     * @covers \Symfttpd\Factory::createServerConfiguration
-     * @covers \Symfttpd\Symfttpd::setServerConfiguration
-     * @covers \Symfttpd\Symfttpd::getServerConfiguration
+     * @covers \Symfttpd\Factory::createConfigurationFile
+     * @covers \Symfttpd\Symfttpd::setConfigurationFile
+     * @covers \Symfttpd\Symfttpd::getConfigurationFile
      */
     public function testCreate()
     {
@@ -51,7 +51,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $config   = $symfttpd->getConfig();
         $project  = $symfttpd->getProject();
         $server   = $symfttpd->getServer();
-        $generator = $symfttpd->getServerConfigurationFile();
+        $generator = $symfttpd->getConfigurationFile();
 
         $this->assertInstanceOf('\\Symfttpd\\Symfttpd', $symfttpd);
         $this->assertInstanceOf('\\Symfttpd\\Config', $config);
@@ -107,21 +107,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->createServer(
             $config,
-            $this->getMock('\\Symfttpd\\Project\\ProjectInterface')
-        );
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "foo" is not supported
-     */
-    public function testCreateServerConfigurationFileException()
-    {
-        $config = new Config(array('server_type' => 'foo'));
-
-        $this->factory->createServerConfigurationFile(
-            $config,
-            $this->getMock('\\Symfttpd\\Server\\ServerInterface'),
             $this->getMock('\\Symfttpd\\Project\\ProjectInterface')
         );
     }

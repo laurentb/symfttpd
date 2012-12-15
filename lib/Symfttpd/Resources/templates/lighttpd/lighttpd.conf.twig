@@ -1,3 +1,5 @@
+{% set server = configurable %}
+
 {% block modules %}
 server.modules = (
     "mod_rewrite",
@@ -9,11 +11,11 @@ server.modules = (
 {% endblock modules %}
 
 {% block server %}
-server.document-root  = "{{ document_root }}"
+server.document-root  = "{{ server.documentRoot }}"
 server.indexfiles     = ("index.php", "index.html", "index.htm", "default.htm")
-server.port           = {{ port }}
-{%- if bind is not null -%}
-server.bind           = "{{ bind }}"
+server.port           = {{ server.port }}
+{%- if server.address is not null -%}
+server.bind           = "{{ server.address }}"
 {%- endif -%}
 server.follow-symlink = "enable"
 static-file.exclude-extensions = (".php")
@@ -21,10 +23,10 @@ static-file.exclude-extensions = (".php")
 # http://redmine.lighttpd.net/issues/406
 server.force-lowercase-filenames = "disable"
 
-server.pid-file       = "{{ pidfile }}"
+server.pid-file       = "{{ server.pidfile }}"
 
-server.errorlog       = "{{ error_log }}"
-accesslog.filename    = "{{ access_log }}"
+server.errorlog       = "{{ server.errorLog }}"
+accesslog.filename    = "{{ server.accessLog }}"
 
 debug.log-file-not-found = "enable"
 debug.log-request-header-on-error = "enable"
@@ -35,8 +37,8 @@ setenv.add-response-header = ( "X-Symfttpd" => "1")
 fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
-      "socket" => "{{ sys_get_temp_dir() }}/symfttpd-php-" + PID + ".socket",
-      "bin-path" => "{{ php_cgi_cmd }} -d error_log=/dev/stderr'",
+      "socket" => {{ server.gateway.socket|raw }},
+      "bin-path" => "{{ server.gateway.command }} -d error_log=/dev/stderr'",
       "max-procs" => 1,
       "max-load-per-proc" => 1,
       "idle-timeout" => 120,
@@ -51,4 +53,4 @@ fastcgi.server = ( ".php" =>
 {% endblock fastcgi %}
 
 {% include 'mime-types.conf.twig' %}
-{% include 'rules.conf.twig' %}
+{% include 'rules.conf.twig' with {'server': server} %}

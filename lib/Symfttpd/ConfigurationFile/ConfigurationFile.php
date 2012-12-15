@@ -13,14 +13,14 @@ namespace Symfttpd\ConfigurationFile;
 
 use Symfttpd\Filesystem\Filesystem;
 use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
-use Symfttpd\Server\ServerInterface;
+use Symfttpd\ConfigurationFile\ConfigurableInterface;
 
 /**
- * Lighttpd description
+ * ConfigurationFile description
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class Lighttpd implements ConfigurationFileInterface
+class ConfigurationFile implements ConfigurationFileInterface
 {
     /**
      * @var \Twig_Environment
@@ -53,61 +53,6 @@ class Lighttpd implements ConfigurationFileInterface
     }
 
     /**
-     * @param \Symfttpd\Server\ServerInterface $server
-     *
-     * @return string
-     */
-    public function generate(ServerInterface $server)
-    {
-        return $this->twig->render(
-            $this->getTemplate(),
-            array(
-                'document_root' => $server->getDocumentRoot(),
-                'port'          => $server->getPort(),
-                'bind'          => $server->getAddress(),
-                'error_log'     => $server->getErrorLog(),
-                'access_log'    => $server->getAccessLog(),
-                'pidfile'       => $server->getPidfile(),
-                'php_cgi_cmd'   => $server->getGateway(),
-                'dirs'          => $server->getAllowedDirs(),
-                'files'         => $server->getAllowedFiles(),
-                'phps'          => $server->getExecutableFiles(),
-                'nophp'         => $server->getUnexecutableDirs(),
-                'default'       => $server->getIndexFile(),
-            )
-        );
-    }
-
-    /**
-     * @param \Symfttpd\Server\ServerInterface $server
-     * @param bool                             $force
-     *
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function dump(ServerInterface $server, $force = false)
-    {
-        // Don't rewrite existing configuration if not forced to.
-        if (false === $force && file_exists($this->getPath())) {
-            return;
-        }
-
-        $configuration = $this->generate($server);
-
-        $directory = dirname($this->getPath());
-
-        if (!$this->filesystem->exists($directory)) {
-            $this->filesystem->mkdir($directory);
-        }
-
-        if (false === file_put_contents($this->getPath(), $configuration)) {
-            throw new \RuntimeException(sprintf('Cannot generate the file "%s".', $this->getPath()));
-        }
-
-        return $configuration;
-    }
-
-    /**
      * @param $template
      */
     public function setTemplate($template)
@@ -137,5 +82,44 @@ class Lighttpd implements ConfigurationFileInterface
     public function getPath()
     {
         return $this->path;
+    }
+
+    /**
+     * @param ConfigurableInterface $configurable
+     * @param bool                  $force
+     *
+     * @return string
+     * @throws \RuntimeException
+     */
+    public function dump(ConfigurableInterface $configurable, $force = false)
+    {
+        // Don't rewrite existing configuration if not forced to.
+        if (false === $force && file_exists($this->getPath())) {
+            return;
+        }
+
+        $configuration = $this->generate($configurable);
+
+        $directory = dirname($this->getPath());
+
+        if (!$this->filesystem->exists($directory)) {
+            $this->filesystem->mkdir($directory);
+        }
+
+        if (false === file_put_contents($this->getPath(), $configuration)) {
+            throw new \RuntimeException(sprintf('Cannot generate the file "%s".', $this->getPath()));
+        }
+
+        return $configuration;
+    }
+
+    /**
+     * @param ConfigurableInterface $configurable
+     *
+     * @return string
+     */
+    public function generate(ConfigurableInterface $configurable)
+    {
+        return $this->twig->render($this->getTemplate(), array('configurable' => $configurable));
     }
 }

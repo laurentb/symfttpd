@@ -45,7 +45,7 @@ class Symfttpd
     /**
      * @var \Symfttpd\ConfigurationFile\ConfigurationFileInterface
      */
-    protected $serverConfigurationFile;
+    protected $configurationFile;
 
     /**
      * @param \Symfttpd\Config $config
@@ -96,19 +96,19 @@ class Symfttpd
     }
 
     /**
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $serverGenerator
+     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configurationFile
      */
-    public function setServerConfigurationFile(ConfigurationFileInterface $serverGenerator)
+    public function setConfigurationFile(ConfigurationFileInterface $configurationFile)
     {
-        $this->serverConfigurationFile = $serverGenerator;
+        $this->configurationFile = $configurationFile;
     }
 
     /**
      * @return \Symfttpd\ConfigurationFile\ConfigurationFileInterface
      */
-    public function getServerConfigurationFile()
+    public function getConfigurationFile()
     {
-        return $this->serverConfigurationFile;
+        return $this->configurationFile;
     }
 
     /**
