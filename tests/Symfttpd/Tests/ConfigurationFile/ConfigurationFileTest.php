@@ -18,7 +18,7 @@ use Symfttpd\ConfigurationFile\ConfigurationFile;
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class GatewayConfigurationFileTest extends \PHPUnit_Framework_TestCase
+class ConfigurationFileTest extends \PHPUnit_Framework_TestCase
 {
     public $path;
 
@@ -30,6 +30,10 @@ class GatewayConfigurationFileTest extends \PHPUnit_Framework_TestCase
     {
         $this->path = sys_get_temp_dir().'/symfttpd';
 
+        if (!is_dir($this->path)) {
+            mkdir($this->path);
+        }
+
         $this->twig = $this->getMock('\Twig_Environment');
         $this->file = new ConfigurationFile($this->twig, $this->getMock('\Symfttpd\Filesystem\Filesystem'));
     }
@@ -38,6 +42,7 @@ class GatewayConfigurationFileTest extends \PHPUnit_Framework_TestCase
     {
         try {
             unlink($this->path);
+            rmdir($this->path);
         } catch (\Exception $e) {
             // ...
         }
