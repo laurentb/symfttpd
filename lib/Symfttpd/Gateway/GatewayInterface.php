@@ -12,7 +12,6 @@
 namespace Symfttpd\Gateway;
 
 use Symfttpd\Config;
-use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
 
 /**
  * GatewayInterface
@@ -40,16 +39,6 @@ interface GatewayInterface
      * @return String
      */
     public function getCommand();
-
-    /**
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configurationFile
-     */
-    public function setConfigurationFile(ConfigurationFileInterface $configurationFile);
-
-    /**
-     * @return \Symfttpd\ConfigurationFile\ConfigurationFileInterface
-     */
-    public function getConfigurationFile();
 
     /**
      * @param $socket

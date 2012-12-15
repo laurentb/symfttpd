@@ -50,18 +50,4 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo', $this->gateway->getCommand());
     }
-
-    /**
-     * @testdox should set and get a configuration file
-     */
-    public function testConfigurationFile()
-    {
-        $configurationFile = $this->getMockBuilder('\Symfttpd\ConfigurationFile\ConfigurationFileInterface')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
-        $this->gateway->setConfigurationFile($configurationFile);
-
-        $this->assertInstanceOf('\Symfttpd\ConfigurationFile\ConfigurationFileInterface', $this->gateway->getConfigurationFile());
-    }
 }

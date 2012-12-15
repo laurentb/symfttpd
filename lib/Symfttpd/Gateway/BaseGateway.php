@@ -12,7 +12,6 @@
 namespace Symfttpd\Gateway;
 
 use Symfttpd\Config;
-use Symfttpd\ConfigurationFile\ConfigurationFileInterface;
 use Symfttpd\Gateway\GatewayInterface;
 
 /**
@@ -28,17 +27,14 @@ abstract class BaseGateway implements GatewayInterface
     protected $command;
 
     /**
-     * @var \Symfttpd\ConfigurationFile\ConfigurationFileInterface
-     */
-    protected $configurationFile;
-
-    /**
      * @var string
      */
     protected $socket;
 
     /**
      * @param \Symfttpd\Config $config
+     *
+     * @return \Symfttpd\Config|void
      */
     public function configure(Config $config)
     {
@@ -59,22 +55,6 @@ abstract class BaseGateway implements GatewayInterface
     public function getCommand()
     {
         return $this->command;
-    }
-
-    /**
-     * @param \Symfttpd\ConfigurationFile\ConfigurationFileInterface $configurationFile
-     */
-    public function setConfigurationFile(ConfigurationFileInterface $configurationFile)
-    {
-        $this->configurationFile = $configurationFile;
-    }
-
-    /**
-     * @return \Symfttpd\ConfigurationFile\ConfigurationFileInterface
-     */
-    public function getConfigurationFile()
-    {
-        return $this->configurationFile;
     }
 
     /**
