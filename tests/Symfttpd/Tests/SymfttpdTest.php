@@ -12,7 +12,6 @@
 namespace Symfttpd\Tests;
 
 use Symfttpd\Config;
-use Symfttpd\Factory;
 use Symfttpd\Symfttpd;
 
 /**
@@ -23,7 +22,7 @@ use Symfttpd\Symfttpd;
 class SymfttpdTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Symfttpd\Symfttpd
+     * @var \Symfttpd\Symfttpd
      */
     protected $symfttpd;
 
@@ -32,65 +31,43 @@ class SymfttpdTest extends \PHPUnit_Framework_TestCase
         $this->symfttpd = new Symfttpd(new Config(array()));
     }
 
-    public function testGetProject()
+    /**
+     * @covers \Symfttpd\Symfttpd::getProject
+     * @covers \Symfttpd\Symfttpd::setProject
+     */
+    public function testSetGetProject()
     {
-        $factory = new Factory(
-            $this->getMock('\Symfony\Component\Process\ExecutableFinder'),
-            $this->getMock('\Symfttpd\Guesser\ProjectGuesser')
-        );
-
-        $this->symfttpd = new Symfttpd();
-        $this->symfttpd->setConfig(new Config(array(
-            'project_type' => 'symfony',
-            'project_version' => '1'
-        )));
-        $this->symfttpd->setProject($factory->createProject($this->symfttpd->getConfig()));
-
-        $project = $this->symfttpd->getProject();
-
-        $this->assertInstanceof('Symfttpd\\Project\\ProjectInterface', $project);
+        $this->symfttpd->setProject($this->getMock('\Symfttpd\Project\ProjectInterface'));
+        $this->assertInstanceof('\Symfttpd\Project\ProjectInterface', $this->symfttpd->getProject());
     }
 
-    public function testGetServer()
+    /**
+     * @covers \Symfttpd\Symfttpd::getServer
+     * @covers \Symfttpd\Symfttpd::setServer
+     */
+    public function testSetGetServer()
     {
-        $factory = new Factory(
-            $this->getMock('\Symfony\Component\Process\ExecutableFinder'),
-            $this->getMock('\Symfttpd\Guesser\ProjectGuesser')
-        );
+        $this->symfttpd->setServer($this->getMock('\Symfttpd\Server\ServerInterface'));
+        $this->assertInstanceof('\Symfttpd\Server\ServerInterface', $this->symfttpd->getServer());
+    }
 
-        $this->symfttpd = new Symfttpd();
+    /**
+     * @covers \Symfttpd\Symfttpd::getGenerator
+     * @covers \Symfttpd\Symfttpd::setGenerator
+     */
+    public function testSetGetGenerator()
+    {
+        $this->symfttpd->setGenerator($this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false));
+        $this->assertInstanceOf('\Symfttpd\ConfigurationGenerator', $this->symfttpd->getGenerator());
+    }
 
-        $this->symfttpd->setConfig(new Config(array(
-            'project_type' => 'symfony',
-            'project_version' => '1',
-            'server_type' => 'lighttpd',
-            'server_cmd'  => '/foo/lightt',
-        )));
-
-        $project = $this->getMock('\\Symfttpd\\Project\\Symfony1', array(), array(new Config()));
-        $project->expects($this->any())
-            ->method('getLogDir')
-            ->will($this->returnValue(sys_get_temp_dir()));
-
-        $project->expects($this->any())
-            ->method('getCacheDir')
-            ->will($this->returnValue(sys_get_temp_dir()));
-
-        $project->expects($this->once())
-            ->method('getDefaultExecutableFiles')
-            ->will($this->returnValue(array('index.php')));
-
-        $project->expects($this->once())
-            ->method('getDefaultReadableDirs')
-            ->will($this->returnValue(array()));
-
-        $project->expects($this->once())
-            ->method('getDefaultReadableFiles')
-            ->will($this->returnValue(array()));
-
-        $this->symfttpd->setProject($project);
-        $this->symfttpd->setServer($factory->createServer($this->symfttpd->getConfig(), $project));
-
-        $this->assertInstanceof('Symfttpd\\Server\\ServerInterface', $this->symfttpd->getServer());
+    /**
+     * @covers \Symfttpd\Symfttpd::getConfig
+     * @covers \Symfttpd\Symfttpd::setConfig
+     */
+    public function testSetGetConfig()
+    {
+        $this->symfttpd->setConfig(new Config());
+        $this->assertInstanceOf('\Symfttpd\Config', $this->symfttpd->getConfig());
     }
 }

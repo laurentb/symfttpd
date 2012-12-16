@@ -16,17 +16,6 @@ namespace Symfttpd\Server;
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-interface GatewayAwareInterface
+interface GatewayUnawareInterface
 {
-    /**
-     * @param \Symfttpd\Gateway\GatewayInterface $gateway
-     *
-     * @return mixed
-     */
-    public function setGateway(GatewayAwareInterface $gateway);
-
-    /**
-     * @return \Symfttpd\Gateway\GatewayInterface
-     */
-    public function getGateway();
 }
