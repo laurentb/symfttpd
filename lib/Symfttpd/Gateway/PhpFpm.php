@@ -84,15 +84,6 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
      * @todo configure this
      * @return string
      */
-    public function getPidfile()
-    {
-        return sys_get_temp_dir().'/'.$this->getName().'-pidfile.pid';
-    }
-
-    /**
-     * @todo configure this
-     * @return string
-     */
     public function getErrorLog()
     {
         return sys_get_temp_dir().'/'.$this->getName().'-error.log';
