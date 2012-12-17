@@ -122,6 +122,13 @@ class SpawnCommand extends Command
             $filesystem = new Filesystem();
             $filesystem->mkdir($paths);
 
+            // Run the gateway if needed.
+            if ($server instanceof \Symfttpd\Server\GatewayUnawareInterface
+                && ($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface
+            ) {
+                $server->getGateway()->start($generator, $output);
+            }
+
             return $server->start($generator, $output, $multitail) ? 1 : 0;
         } catch (\Exception $e) {
             $output->writeln('<error>The server cannot start</error>');
@@ -178,6 +185,13 @@ TEXT;
     protected function handleSignals(ServerInterface $server, OutputInterface $output)
     {
         $handler = function () use ($server, $output) {
+            // Stop the gateway
+            if ($server instanceof \Symfttpd\Server\GatewayUnawareInterface
+                && ($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface
+            ) {
+                $server->getGateway()->stop($output);
+            }
+
             $server->stop(new NullOutput());
             $output->writeln(PHP_EOL.'<important>Stop serving, bye!</important>');
 
