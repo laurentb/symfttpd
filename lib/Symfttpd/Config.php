@@ -19,33 +19,6 @@ namespace Symfttpd;
 class Config implements \IteratorAggregate
 {
     /**
-     * @var array Keys of the option set of a Server.
-     */
-    protected $serverKeys = array(
-        'php_cgi_cmd',
-        'server_pidfile',     // The pidfile stores the PID of the server process.
-        'server_restartfile', // The file that tells the spawn command to restart the server.
-        'server_access_log',  // The server access log file of the server.
-        'server_error_log',   // The server error log file of the server.
-    );
-
-    /**
-     * @var array Keys of the option set of a project.
-     */
-    protected $projectKeys = array(
-        'project_type',
-        'project_version',
-        'project_readable_dirs',     // readable directories by the server in the web dir.
-        'project_readable_files',    // readable files by the server in the web dir (robots.txt).
-        'project_readable_phpfiles', // executable php files in the web directory (index.php)
-        'project_readable_restrict', // true if no other php files are readable than configured ones or index file.
-        'project_nophp',             // deny PHP execution in the specified directories (default being uploads).
-        'project_log_dir',
-        'project_cache_dir',
-        'project_web_dir',
-    );
-
-    /**
      * @var array
      */
     protected $config = array();
