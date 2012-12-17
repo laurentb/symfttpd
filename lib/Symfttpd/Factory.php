@@ -212,11 +212,17 @@ class Factory
      */
     public function createGenerator(Config $config, ServerInterface $server, ProjectInterface $project)
     {
+        $dirs = array();
+
         // Define configuration template storage paths.
-        $dirs = array_merge(
-            array(__DIR__ . '/Resources/templates/' . $server->getName()),
-            $config->get('server_templates_dirs', array())
-        );
+        $iterator = new \DirectoryIterator(__DIR__ . '/Resources/templates/');
+        foreach ($iterator as $fileInfo) {
+            if (!$fileInfo->isDot() && $fileInfo->isDir()) {
+                $dirs[] = $fileInfo->getRealPath();
+            }
+        }
+
+        $dirs += $config->get('server_templates_dirs', array());
 
         // Configure Twig for the rendering of configuration files.
         $twig = new \Twig_Environment(
@@ -233,13 +239,10 @@ class Factory
 
         $filesystem = new Filesystem();
 
-        $configuration = new \Symfttpd\ConfigurationGenerator($twig, $filesystem);
-        $configuration->setTemplate($config->get('server_template', $server->getName() . '.conf.twig'));
+        $generator = new \Symfttpd\ConfigurationGenerator($twig, $filesystem);
+        $generator->setPath($config->get('server_config_path', $project->getCacheDir() . '/symfttpd/'));
 
-        $defaultPath = $project->getCacheDir() . '/' . $server->getName(). '/' . $server->getName() . '.conf';
-        $configuration->setPath($config->get('server_config_path', $defaultPath));
-
-        return $configuration;
+        return $generator;
     }
 
     /**

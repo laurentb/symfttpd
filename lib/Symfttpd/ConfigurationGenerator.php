@@ -34,11 +34,6 @@ class ConfigurationGenerator
     /**
      * @var string
      */
-    protected $template;
-
-    /**
-     * @var string
-     */
     protected $path;
 
     /**
@@ -49,22 +44,6 @@ class ConfigurationGenerator
     {
         $this->twig = $twig;
         $this->filesystem = $filesystem;
-    }
-
-    /**
-     * @param $template
-     */
-    public function setTemplate($template)
-    {
-        $this->template = $template;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTemplate()
-    {
-        return $this->template;
     }
 
     /**
@@ -92,20 +71,22 @@ class ConfigurationGenerator
      */
     public function dump($subject, $force = false)
     {
+        $file = $this->getPath().'/'.$subject->getName().'.conf';
+
         // Don't rewrite existing configuration if not forced to.
-        if (false === $force && file_exists($this->getPath())) {
+        if (false === $force && file_exists($file)) {
             return;
         }
 
         $configuration = $this->generate($subject);
 
-        $directory = dirname($this->getPath());
+        $directory = $this->getPath();
 
         if (!$this->filesystem->exists($directory)) {
             $this->filesystem->mkdir($directory);
         }
 
-        if (false === file_put_contents($this->getPath(), $configuration)) {
+        if (false === file_put_contents($file, $configuration)) {
             throw new \RuntimeException(sprintf('Cannot generate the file "%s".', $this->getPath()));
         }
 
@@ -119,6 +100,6 @@ class ConfigurationGenerator
      */
     public function generate($subject)
     {
-        return $this->twig->render($this->getTemplate(), array('subject' => $subject));
+        return $this->twig->render($subject->getName().'.conf.twig', array('subject' => $subject));
     }
 }
