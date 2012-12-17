@@ -12,7 +12,7 @@
 namespace Symfttpd\Server;
 
 /**
- * GatewayAwareInterface description
+ * GatewayUnawareInterface description
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */

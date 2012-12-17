@@ -13,9 +13,8 @@ namespace Symfttpd\Server;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\ConfigurationGenerator;
-use Symfttpd\Gateway\GatewayInterface;
 use Symfttpd\Server\BaseServer;
-use Symfttpd\Server\GatewayAwareInterface;
+use Symfttpd\Server\GatewayUnawareInterface;
 use Symfttpd\Tail\TailInterface;
 
 /**
@@ -23,55 +22,62 @@ use Symfttpd\Tail\TailInterface;
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class Nginx extends BaseServer implements GatewayAwareInterface
+class Nginx extends BaseServer implements GatewayUnawareInterface
 {
     /**
-     * Run the server command to start it.
-     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'nginx';
+    }
+
+    /**
      * @param \Symfttpd\ConfigurationGenerator                  $generator
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\                                   $tail
+     * @param \Symfttpd\Tail\TailInterface                      $tail
      *
-     * @return mixed
+     * @return mixed|void
+     * @throws \RuntimeException
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
     {
-        // TODO: Implement start() method.
-    }
+        $generator->dump($this, true);
 
-    /**
-     * Restart the server command to start it.
-     *
-     * @param \Symfttpd\ConfigurationGenerator                      $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface     $output
-     * @param \Symfttpd\Tail\TailInterface                          $tail
-     *
-     * @return mixed
-     */
-    public function restart(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
-    {
-        // TODO: Implement restart() method.
-    }
+        $process = new \Symfony\Component\Process\Process(null);
+        $process->setCommandLine($this->getCommand() . ' -c ' . escapeshellarg($generator->getPath()));
+        $process->setTimeout(null);
+        $process->run();
 
-    /**
-     * Stop the server.
-     *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return mixed
-     */
-    public function stop(OutputInterface $output)
-    {
-        // TODO: Implement stop() method.
-    }
+        $stderr = $process->getErrorOutput();
 
-    public function setGateway(GatewayInterface $gateway)
-    {
-        // TODO : implement setGateway() method.
-    }
+        if (!empty($stderr)) {
+            throw new \RuntimeException($stderr);
+        }
 
-    public function getGateway()
-    {
-        // TODO : implement getGateway() method.
+        $prevGenconf = null;
+        while (false !== sleep(1)) {
+            /**
+             * Regenerate the configuration file. to check if it defers.
+             *
+             * @todo check the web dir datetime informations to detect any changes instead.
+             */
+            $genconf = $generator->generate($this);
+
+            if ($prevGenconf !== null && $prevGenconf !== $genconf) {
+                // This sleep() is so that if a HTTP request just created a file in web/,
+                // the web server isn't restarted right away.
+                sleep(1);
+
+                $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $this->name));
+
+                $this->restart($generator, $output, $tail);
+            }
+            $prevGenconf = $genconf;
+
+            if ($tail instanceof TailInterface) {
+                $tail->consume();
+            }
+        }
     }
 }
