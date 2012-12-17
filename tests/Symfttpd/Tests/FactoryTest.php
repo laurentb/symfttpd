@@ -82,6 +82,17 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Symfttpd\Project\ProjectInterface', $project);
     }
 
+    public function testCreateProjectWithoutProjectType()
+    {
+        $this->guesser->expects($this->once())
+            ->method('guess')
+            ->will($this->returnValue(array('symfony', '1')));
+
+        $project = $this->factory->createProject(new Config());
+
+        $this->assertInstanceOf('\Symfttpd\Project\ProjectInterface', $project);
+    }
+
     /**
      * @dataProvider getInvalidConfig
      *
