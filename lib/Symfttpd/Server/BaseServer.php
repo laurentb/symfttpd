@@ -11,7 +11,10 @@
 
 namespace Symfttpd\Server;
 
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfttpd\ConfigurationGenerator;
 use Symfttpd\Server\ServerInterface;
+use Symfttpd\Tail\TailInterface;
 
 /**
  * BaseServer class.
@@ -315,5 +318,29 @@ abstract class BaseServer implements ServerInterface
     public function getIndexFile()
     {
         return $this->indexFile;
+    }
+
+    /**
+     * @param \Symfttpd\ConfigurationGenerator                  $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
+     *
+     * @return mixed|void
+     */
+    public function restart(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
+    {
+        $this->stop(new \Symfony\Component\Console\Output\NullOutput());
+        $this->start($generator, $output, $tail);
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
+     * @return mixed|void
+     */
+    public function stop(OutputInterface $output)
+    {
+        // Kill the current server process.
+        \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
     }
 }

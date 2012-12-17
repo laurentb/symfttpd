@@ -33,26 +33,6 @@ class Lighttpd extends BaseServer
     }
 
     /**
-     * Return the server command value
-     *
-     * @return string
-     */
-    public function getCommand()
-    {
-        return $this->command;
-    }
-
-    /**
-     * Set the command to use.
-     *
-     * @param $command
-     */
-    public function setCommand($command)
-    {
-        $this->command = $command;
-    }
-
-    /**
      * Start the server.
      *
      * @param \Symfttpd\ConfigurationGenerator                      $configuration
@@ -103,28 +83,5 @@ class Lighttpd extends BaseServer
                 $tail->consume();
             }
         }
-    }
-
-    /**
-     * @param \Symfttpd\ConfigurationGenerator                  $configuration
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\TailInterface                      $tail
-     *
-     * @return mixed|void
-     */
-    public function restart(ConfigurationGenerator $configuration, OutputInterface $output, TailInterface $tail = null) {
-        $this->stop(new \Symfony\Component\Console\Output\NullOutput());
-        $this->start($configuration, $output, $tail);
-    }
-
-    /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return mixed|void
-     */
-    public function stop(OutputInterface $output)
-    {
-        // Kill the current server process.
-        \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
     }
 }
