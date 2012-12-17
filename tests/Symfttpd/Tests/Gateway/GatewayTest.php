@@ -37,17 +37,24 @@ class GatewayTest extends \PHPUnit_Framework_TestCase
     public function testConfigure()
     {
         $this->gateway->configure(new Config(array('gateway_cmd' => '/usr/bin/php-fpm')));
-
         $this->assertEquals('/usr/bin/php-fpm', $this->gateway->getCommand());
     }
 
     /**
      * @testdox should change the command
      */
-    public function testChangeCommand()
+    public function testSetGetCommand()
     {
         $this->gateway->setCommand('foo');
-
         $this->assertEquals('foo', $this->gateway->getCommand());
+    }
+
+    /**
+     * @testdox should change the socket
+     */
+    public function testSetGetSocket()
+    {
+        $this->gateway->setSocket('foo');
+        $this->assertEquals('foo', $this->gateway->getSocket());
     }
 }
