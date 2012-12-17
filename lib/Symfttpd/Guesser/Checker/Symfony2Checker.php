@@ -63,7 +63,8 @@ class Symfony2Checker implements CheckerInterface
             ->in($this->directory)
             ->name('app')
             ->name('src')
-            ->name('vendor')
+            ->name('web')
+            ->depth('== 0')
         ;
 
         return $dirsFinder->count() == 3;
