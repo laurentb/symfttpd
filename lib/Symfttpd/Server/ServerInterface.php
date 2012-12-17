@@ -32,6 +32,7 @@ interface ServerInterface
      * @param \Symfttpd\Tail\                                   $tail
      *
      * @return mixed
+     * @throws \RuntimeException
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null);
 
