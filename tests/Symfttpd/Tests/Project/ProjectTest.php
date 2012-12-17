@@ -86,24 +86,4 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
-
-    /**
-     * @expectedException \Symfttpd\Project\Exception\ProjectException
-     * @expectedExceptionMessage The name must be set.
-     */
-    public function testGetName()
-    {
-        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Config()));
-        $project->getName();
-    }
-
-    /**
-     * @expectedException \Symfttpd\Project\Exception\ProjectException
-     * @expectedExceptionMessage The version must be set.
-     */
-    public function testGetVersion()
-    {
-        $project = $this->getMockForAbstractClass('\\Symfttpd\\Project\\BaseProject', array(new \Symfttpd\Config()));
-        $project->getVersion();
-    }
 }

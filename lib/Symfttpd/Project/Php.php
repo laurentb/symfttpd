@@ -18,8 +18,25 @@ namespace Symfttpd\Project;
  */
 class Php extends BaseProject
 {
-    protected $name = 'php',
-              $version = null;
+    /**
+     * Return the project name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'php';
+    }
+
+    /**
+     * Return the project version.
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return null;
+    }
 
     /**
      * Return the cache directory of the project.
@@ -71,15 +88,5 @@ class Php extends BaseProject
     public function getIndexFile()
     {
         return 'index.php';
-    }
-
-    /**
-     * PHP project does not need a version.
-     *
-     * @return null
-     */
-    public function getVersion()
-    {
-        return $this->version;
     }
 }

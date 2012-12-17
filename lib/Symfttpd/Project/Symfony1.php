@@ -19,18 +19,24 @@ namespace Symfttpd\Project;
 class Symfony1 extends BaseProject
 {
     /**
-     * The name of the project framework.
+     * Return the project name.
      *
-     * @var string
+     * @return string
      */
-    protected $name = 'symfony';
+    public function getName()
+    {
+        return 'symfony';
+    }
 
     /**
-     * The version of the project framework.
+     * Return the project version.
      *
-     * @var string
+     * @return string
      */
-    protected $version = '1';
+    public function getVersion()
+    {
+        return '1';
+    }
 
     /**
      * Return the cache directory of the project.

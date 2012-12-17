@@ -21,9 +21,6 @@ use Symfttpd\Project\BaseProject;
  */
 class TestProject extends BaseProject
 {
-    protected $name = 'test',
-              $version = "1.0";
-
     protected $filesystem;
 
     public function __construct(Config $options, $path = null)
@@ -37,6 +34,26 @@ class TestProject extends BaseProject
         parent::__construct($options, $path);
 
         $this->buildProject();
+    }
+
+    /**
+     * Return the project name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'test';
+    }
+
+    /**
+     * Return the project version.
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return '1';
     }
 
     /**

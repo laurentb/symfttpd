@@ -21,20 +21,6 @@ use Symfttpd\Project\Exception\ProjectException;
 abstract class BaseProject implements ProjectInterface
 {
     /**
-     * The name of the project framework.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The version of the project framework.
-     *
-     * @var string
-     */
-    protected $version;
-
-    /**
      * Directory contained by the web dir, accessible
      * by the web user.
      *
@@ -99,36 +85,6 @@ abstract class BaseProject implements ProjectInterface
         }
 
         $this->rootDir = $realDir;
-    }
-
-    /**
-     * Return the name of the project.
-     *
-     * @return string
-     * @throws \Symfttpd\Project\Exception\ProjectException
-     */
-    public function getName()
-    {
-        if (null == $this->name) {
-            throw new ProjectException('The name must be set.');
-        }
-
-        return $this->name;
-    }
-
-    /**
-     * Return the version of the project.
-     *
-     * @return string
-     * @throws Exception\ProjectException
-     */
-    public function getVersion()
-    {
-        if (null == $this->version) {
-            throw new ProjectException('The version must be set.');
-        }
-
-        return $this->version;
     }
 
     /**
