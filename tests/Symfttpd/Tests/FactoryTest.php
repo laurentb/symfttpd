@@ -21,19 +21,28 @@ use Symfttpd\Factory;
  */
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Symfttpd\Factory
+     */
     public $factory;
+
+    /**
+     * @var \Symfttpd\Guesser\ProjectGuesser
+     */
+    public $guesser;
+
+    /**
+     * @var \Symfony\Component\Process\ExecutableFinder
+     */
+    public $execFinder;
 
     public function setUp()
     {
-        $execFinder = $this->getMock('\Symfony\Component\Process\ExecutableFinder');
+        $this->execFinder = $this->getMock('\Symfony\Component\Process\ExecutableFinder');
 
-        $execFinder->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue('/foo/lighttpd'));
+        $this->guesser = $this->getMock('\Symfttpd\Guesser\ProjectGuesser');
 
-        $guesser = $this->getMock('\Symfttpd\Guesser\ProjectGuesser');
-
-        $this->factory = new Factory($execFinder, $guesser);
+        $this->factory = new Factory($this->execFinder, $this->guesser);
     }
 
     /**
@@ -47,17 +56,21 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreate()
     {
+        $this->execFinder->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue('/foo/lighttpd'));
+
         $symfttpd = $this->factory->create(array('project_type' => 'php', 'project_version' => null));
         $config   = $symfttpd->getConfig();
         $project  = $symfttpd->getProject();
         $server   = $symfttpd->getServer();
         $generator = $symfttpd->getGenerator();
 
-        $this->assertInstanceOf('\\Symfttpd\\Symfttpd', $symfttpd);
-        $this->assertInstanceOf('\\Symfttpd\\Config', $config);
-        $this->assertInstanceOf('\\Symfttpd\\Project\\ProjectInterface', $project);
-        $this->assertInstanceOf('\\Symfttpd\\Server\\ServerInterface', $server);
-        $this->assertInstanceOf('\\Symfttpd\\ConfigurationGenerator', $generator);
+        $this->assertInstanceOf('\Symfttpd\Symfttpd', $symfttpd);
+        $this->assertInstanceOf('\Symfttpd\Config', $config);
+        $this->assertInstanceOf('\Symfttpd\Project\ProjectInterface', $project);
+        $this->assertInstanceOf('\Symfttpd\Server\ServerInterface', $server);
+        $this->assertInstanceOf('\Symfttpd\ConfigurationGenerator', $generator);
     }
 
     public function testCreateProject()
@@ -66,14 +79,15 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $project = $this->factory->createProject($config);
 
-        $this->assertInstanceOf('\\Symfttpd\\Project\\Symfony1', $project);
-        $this->assertEquals('1', $project->getVersion());
-        $this->assertEquals('symfony', $project->getName());
+        $this->assertInstanceOf('\Symfttpd\Project\ProjectInterface', $project);
     }
 
     /**
      * @dataProvider getInvalidConfig
+     *
      * @param $config
+     * @param $exception
+     * @param $exceptionMessage
      */
     public function testCreateProjectException($config, $exception, $exceptionMessage)
     {
@@ -86,12 +100,12 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 'config' => new Config(array('project_type' => 'foo')),
-                'exception' => '\\InvalidArgumentException',
+                'exception' => '\InvalidArgumentException',
                 'exceptionMessage' => '"foo" is not supported.'
             ),
             array(
                 'config' => new Config(array('project_type' => 'foo', 'project_version' => 3)),
-                'exception' => '\\InvalidArgumentException',
+                'exception' => '\InvalidArgumentException',
                 'exceptionMessage' => '"foo" (with version "3") is not supported.'
             )
         );
@@ -107,7 +121,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->factory->createServer(
             $config,
-            $this->getMock('\\Symfttpd\\Project\\ProjectInterface')
+            $this->getMock('\Symfttpd\Project\ProjectInterface')
         );
     }
 
@@ -121,7 +135,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config($config);
 
-        $project = $this->getMock('\\Symfttpd\\Project\\ProjectInterface');
+        $project = $this->getMock('\Symfttpd\Project\ProjectInterface');
         $project->expects($this->once())->method('getLogDir')->will($this->returnValue('/tmp'));
         $project->expects($this->once())->method('getCacheDir')->will($this->returnValue('/tmp'));
         $project->expects($this->once())->method('getWebDir')->will($this->returnValue('/web'));

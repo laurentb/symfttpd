@@ -27,12 +27,12 @@ class SymfttpdFileTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $processor = $this->getMock('\\Symfony\\Component\\Config\\Definition\\Processor');
+        $processor = $this->getMock('\Symfony\Component\Config\Definition\Processor');
         $processor->expects($this->any())
             ->method('processConfiguration')
             ->will($this->returnValue(array()));
 
-        $configuration = $this->getMock('\\Symfony\\Component\\Config\\Definition\\ConfigurationInterface');
+        $configuration = $this->getMock('\Symfony\Component\Config\Definition\ConfigurationInterface');
 
         $this->file = new SymfttpdFile();
         $this->file->setProcessor($processor);
