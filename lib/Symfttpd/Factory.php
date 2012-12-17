@@ -255,11 +255,17 @@ class Factory
     {
         $type = $config->get('gateway_type', 'fastcgi');
 
-        $class = sprintf('Symfttpd\\Gateway\\%s', ucfirst($type));
+        // @todo find a better way...
+        $mapping = array(
+            'fastcgi' => '\Symfttpd\Gateway\Fastcgi',
+            'php-fpm' => '\Symfttpd\Gateway\PhpFpm',
+        );
 
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not supported.', $type));
+        if (!array_key_exists($type, $mapping)) {
+            throw new \InvalidArgumentException(sprintf('"%s" gateway is not supported.', $type));
         }
+
+        $class = $mapping[$type];
 
         /** @var \Symfttpd\Gateway\GatewayInterface $gateway */
         $gateway = new $class();
