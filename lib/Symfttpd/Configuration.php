@@ -34,6 +34,7 @@ class Configuration implements ConfigurationInterface
 
         $this->addServerConfiguration($root);
         $this->addProjectConfiguration($root);
+        $this->addGatewayConfiguration($root);
 
         $this->addGlobalValidate($root);
 
@@ -71,7 +72,6 @@ class Configuration implements ConfigurationInterface
                     ->info('The server error log file of the server.')
                     ->defaultValue('error_log')
                 ->end()
-                ->scalarNode('php_cgi_cmd')->end()
             ->end();
 
         return $node;
@@ -207,5 +207,20 @@ class Configuration implements ConfigurationInterface
             })
             ->end()
         ;
+    }
+
+    public function addGatewayConfiguration(NodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->scalarNode('gateway_type')
+                    ->defaultValue('fastcgi')
+                ->end()
+                ->scalarNode('gateway_cmd')->end()
+                // BC
+                ->scalarNode('php_cgi_cmd')->end()
+            ->end();
+
+        return $node;
     }
 }

@@ -24,7 +24,7 @@
 $options['php_cgi_cmd'] = realpath(PHP_BINDIR.'/php-cgi');
 
 // Required options
-$options['project_type']    = 'php'; // Can be php or symfony
+$options['project_type']    = null; // Can be php or symfony
 $options['project_version'] = null; // null only if type is php
 
 // Not required options
@@ -42,7 +42,7 @@ $options['server_type'] = 'lighttpd';
 
 // Not required options
 $options['server_cmd']         = null; // The server error log file of the server.
-$options['server_pidfile']     = 'server_pidfile'; // The pidfile stores the PID of the server process.
+$options['server_pidfile']     = null; // The pidfile stores the PID of the server process.
 $options['server_restartfile'] = 'server_restartfile'; // The file that tells the spawn command to restart the server.
 $options['server_access_log']  = 'access.log'; // The server access log file of the server.
 $options['server_error_log']   = 'error.log'; // The server error log file of the server.
