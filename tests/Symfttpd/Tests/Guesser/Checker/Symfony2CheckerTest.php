@@ -20,7 +20,7 @@ class Symfony2CheckerTest extends \PHPUnit_Framework_TestCase
         $filesystem->mkdir(array(
             $basedir.'/app',
             $basedir.'/src',
-            $basedir.'/vendor',
+            $basedir.'/web',
         ));
 
         $filesystem->touch(array(
