@@ -141,7 +141,7 @@ class Factory
             throw new \InvalidArgumentException(sprintf('%s is not supported.', $message));
         }
 
-        return new $class($config, getcwd());
+        return new $class($config);
     }
 
     /**

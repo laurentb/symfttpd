@@ -20,7 +20,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->project = new \Symfttpd\Tests\Fixtures\TestProject(new \Symfttpd\Config());
+        $this->project = new \Symfttpd\Tests\Mock\MockProject(new \Symfttpd\Config());
 
     }
     public function tearDown()

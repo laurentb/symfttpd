@@ -35,7 +35,7 @@ class Php extends BaseProject
      */
     public function getVersion()
     {
-        return null;
+        return '';
     }
 
     /**

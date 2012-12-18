@@ -9,17 +9,18 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Tests\Fixtures;
+namespace Symfttpd\Tests\Mock;
 
 use Symfttpd\Config;
 use Symfttpd\Project\BaseProject;
+
 /**
- * TestProject class
+ * MockProject class
  * This class allow us to test the abstract BaseProject class.
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  */
-class TestProject extends BaseProject
+class MockProject extends BaseProject
 {
     protected $filesystem;
 
@@ -134,17 +135,7 @@ class TestProject extends BaseProject
      */
     public function removeProject()
     {
-        $this->filesystem->remove(array(
-            $this->getWebDir().'/'.$this->getIndexFile(),
-            $this->getWebDir().'/class.php',
-            $this->getWebDir().'/phpinfo.php',
-            $this->getWebDir().'/authors.txt',
-            $this->getWebDir().'/uploads/picture.png',
-            $this->getRootDir(),
-            $this->getCacheDir(),
-            $this->getLogDir(),
-            $this->getWebDir(),
-        ));
+        $this->filesystem->remove($this->getRootDir());
     }
 
     public function __destruct()

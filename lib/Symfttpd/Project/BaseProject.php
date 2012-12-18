@@ -55,7 +55,7 @@ abstract class BaseProject implements ProjectInterface
 
     public function __construct(\Symfttpd\Config $config, $path = null)
     {
-        $this->rootDir = $path;
+        $this->rootDir = $path ?: getcwd();
         $this->config  = $config;
     }
 
