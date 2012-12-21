@@ -33,6 +33,6 @@ class Fastcgi extends BaseGateway
      */
     public function getSocket()
     {
-        return '"'.sys_get_temp_dir().'/symfttpd" + PID + ".socket"';
+        return sys_get_temp_dir().'/symfttpd" + PID + ".socket';
     }
 }

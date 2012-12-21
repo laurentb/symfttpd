@@ -37,7 +37,7 @@ setenv.add-response-header = ( "X-Symfttpd" => "1")
 fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
-      "socket" => {{ server.gateway.socket|raw }},
+      "socket" => "{{ server.gateway.socket|raw }}",
       "bin-path" => "{{ server.gateway.command }} -d error_log=/dev/stderr'",
       "max-procs" => 1,
       "max-load-per-proc" => 1,
