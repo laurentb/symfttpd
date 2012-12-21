@@ -64,9 +64,9 @@ class ConfigurationGenerator
 
     /**
      * @param \Symfttpd\Server\ServerInterface|\Symfttpd\Gateway\GatewayInterface $subject
-     * @param bool                  $force
+     * @param bool                                                                $force
      *
-     * @return string The generated file
+     * @return string            The generated file
      * @throws \RuntimeException
      */
     public function dump($subject, $force = false)

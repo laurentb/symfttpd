@@ -11,8 +11,6 @@
 
 namespace Symfttpd\Project;
 
-use Symfttpd\Project\Exception\ProjectException;
-
 /**
  * BaseProject class
  *

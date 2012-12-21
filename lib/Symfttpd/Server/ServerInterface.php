@@ -40,9 +40,9 @@ interface ServerInterface
      * Restart the server command to start it.
      *
      * @abstract
-     * @param \Symfttpd\ConfigurationGenerator $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface     $output
-     * @param \Symfttpd\Tail\TailInterface                          $tail
+     * @param \Symfttpd\ConfigurationGenerator                  $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
      *
      * @return mixed
      */

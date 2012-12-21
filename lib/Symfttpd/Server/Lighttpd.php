@@ -35,9 +35,9 @@ class Lighttpd extends BaseServer
     /**
      * Start the server.
      *
-     * @param \Symfttpd\ConfigurationGenerator                      $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface     $output
-     * @param \Symfttpd\Tail\TailInterface                          $tail
+     * @param \Symfttpd\ConfigurationGenerator                  $generator
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfttpd\Tail\TailInterface                      $tail
      *
      * @return mixed|void
      */
