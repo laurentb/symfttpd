@@ -182,12 +182,14 @@ class Factory
             $server->setCommand($cmd);
         }
 
+        // @todo: the configuration must be done in the Server itself
+
         // Configure logging directory
         $logDir = $config->get('server_log_dir', $project->getLogDir() . '/' . $server->getName());
         $server->setErrorLog($logDir . '/' . $config->get('server_error_log', 'error.log'));
         $server->setAccessLog($logDir . '/' . $config->get('server_access_log', 'access.log'));
 
-        $server->setPidfile($project->getCacheDir() . '/' . $server->getName(). '/' . $config->get('server_pidfile', '.sf'));
+        $server->setPidfile($project->getCacheDir() . '/symfttpd/' . $config->get('server_pidfile', '.sf'));
 
         // Configure project relative directories and files
         $server->setDocumentRoot($project->getWebDir());
@@ -240,7 +242,7 @@ class Factory
         $filesystem = new Filesystem();
 
         $generator = new \Symfttpd\ConfigurationGenerator($twig, $filesystem);
-        $generator->setPath($config->get('server_config_path', $project->getCacheDir() . '/symfttpd/'));
+        $generator->setPath($config->get('server_config_path', $project->getCacheDir() . '/symfttpd'));
 
         return $generator;
     }

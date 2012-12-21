@@ -342,5 +342,7 @@ abstract class BaseServer implements ServerInterface
     {
         // Kill the current server process.
         \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
+
+        $output->writeln($this->getName().' stopped');
     }
 }

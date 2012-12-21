@@ -43,11 +43,8 @@ class Lighttpd extends BaseServer
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
     {
-        // Regenerate the lighttpd configuration
-        $generator->dump($this, true);
-
         $process = new \Symfony\Component\Process\Process(null);
-        $process->setCommandLine($this->getCommand() . ' -f ' . escapeshellarg($generator->getPath()));
+        $process->setCommandLine(implode(' ', array($this->getCommand(), '-f', $generator->dump($this, true))));
         $process->setTimeout(null);
 
         // Run lighttpd

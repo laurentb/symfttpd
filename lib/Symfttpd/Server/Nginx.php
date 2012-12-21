@@ -42,10 +42,10 @@ class Nginx extends BaseServer implements GatewayUnawareInterface
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
     {
-        $generator->dump($this, true);
+        touch($this->getPidfile());
 
         $process = new \Symfony\Component\Process\Process(null);
-        $process->setCommandLine($this->getCommand() . ' -c ' . escapeshellarg($generator->getPath()));
+        $process->setCommandLine(implode(' ', array($this->getCommand(), '-c', $generator->dump($this, true))));
         $process->setTimeout(null);
         $process->run();
 

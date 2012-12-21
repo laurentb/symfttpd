@@ -81,7 +81,7 @@ http {
         }
 
         location ~ ({{ server.executableFiles|join('|')|replace({'.php': ''}) }})\.php(/|$) {
-            fastcgi_pass   {{ server.gateway.socket|raw }};
+            fastcgi_pass unix:{{ server.gateway.socket|raw }};
             fastcgi_split_path_info ^(.+\.php)(/.*)$;
             {%- include 'fastcgi.conf.twig' -%}
             fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;

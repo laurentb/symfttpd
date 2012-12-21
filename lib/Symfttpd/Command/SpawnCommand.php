@@ -189,7 +189,7 @@ TEXT;
             if ($server instanceof \Symfttpd\Server\GatewayUnawareInterface
                 && ($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface
             ) {
-                $server->getGateway()->stop($output);
+                $server->getGateway()->stop(new NullOutput());
             }
 
             $server->stop(new NullOutput());

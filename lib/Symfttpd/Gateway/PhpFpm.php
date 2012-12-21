@@ -46,10 +46,11 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output)
     {
-        $generator->dump($this, false);
+        // Create the socket file first.
+        touch($this->getSocket());
 
         $this->process = new Process(null);
-        $this->process->setCommandLine(implode(' ', array($this->getCommand(), '-y', $generator->getPath())));
+        $this->process->setCommandLine(implode(' ', array($this->getCommand(), '-y', $generator->dump($this, false))));
         $this->process->setTimeout(null);
         $this->process->run();
 
@@ -75,6 +76,14 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
     /**
      * @return string
      */
+    public function getPidfile()
+    {
+        return sys_get_temp_dir().'/symfttpd-php-fpm.pid';
+    }
+
+    /**
+     * @return string
+     */
     public function getSocket()
     {
         return sys_get_temp_dir().'/symfttpd-php-fpm.sock';
@@ -88,4 +97,27 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
     {
         return sys_get_temp_dir().'/'.$this->getName().'-error.log';
     }
+
+    /**
+     * Return the name of the user.
+     *
+     * @return string
+     */
+    public function getUser()
+    {
+        return get_current_user();
+    }
+
+    /**
+     * Return the name of the user's group
+     *
+     * @return mixed
+     */
+    public function getGroup()
+    {
+        $group = posix_getgrgid(posix_getgid());
+
+        return $group['name'];
+    }
+
 }
