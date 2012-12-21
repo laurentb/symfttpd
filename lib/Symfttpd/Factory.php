@@ -214,16 +214,7 @@ class Factory
      */
     public function createGenerator(Config $config, ServerInterface $server, ProjectInterface $project)
     {
-        $dirs = array();
-
-        // Define configuration template storage paths.
-        $iterator = new \DirectoryIterator(__DIR__ . '/Resources/templates/');
-        foreach ($iterator as $fileInfo) {
-            if (!$fileInfo->isDot() && $fileInfo->isDir()) {
-                $dirs[] = $fileInfo->getRealPath();
-            }
-        }
-
+        $dirs = array(__DIR__ . '/Resources/templates/');
         $dirs += $config->get('server_templates_dirs', array());
 
         // Configure Twig for the rendering of configuration files.

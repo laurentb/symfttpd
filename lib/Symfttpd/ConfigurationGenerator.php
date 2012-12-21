@@ -100,6 +100,6 @@ class ConfigurationGenerator
      */
     public function generate($subject)
     {
-        return $this->twig->render($subject->getName().'.conf.twig', array('subject' => $subject));
+        return $this->twig->render($subject->getName().'/'.$subject->getName().'.conf.twig', array('subject' => $subject));
     }
 }

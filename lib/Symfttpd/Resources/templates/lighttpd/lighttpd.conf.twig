@@ -52,5 +52,5 @@ fastcgi.server = ( ".php" =>
 )
 {% endblock fastcgi %}
 
-{% include 'mime-types.conf.twig' %}
-{% include 'rules.conf.twig' with {'server': server} %}
+{% include 'lighttpd/mime-types.conf.twig' %}
+{% include 'lighttpd/rules.conf.twig' with {'server': server} %}
