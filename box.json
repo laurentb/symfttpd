@@ -1,11 +1,11 @@
 {
     "alias": "symfttpd.phar",
     "blacklist": ["Compiler.php"],
-    "directories": ["lib"],
+    "directories": ["src"],
     "finder": [
         {
             "name": ["*.php", "*.twig"],
-            "in": ["lib"],
+            "in": ["src"],
             "exclude": ["Tests"]
         },
         {

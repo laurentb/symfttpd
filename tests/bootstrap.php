@@ -10,4 +10,4 @@
  */
 
 $loader = require __DIR__.'/../vendor/autoload.php';
-$loader->add('Symfttpd', array(__DIR__.'/../lib/', __DIR__));
+$loader->add('Symfttpd', array(__DIR__.'/../src/', __DIR__));
