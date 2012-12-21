@@ -69,11 +69,11 @@ class ConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->twig->expects($this->once())
             ->method('render')
-            ->with($this->equalTo($name.'.conf.twig'), $this->isType('array'))
+            ->with($this->equalTo($name.'/'.$name.'.conf.twig'), $this->isType('array'))
             ->will($this->returnValue('foo'));
 
         $subject = $this->getMock('\Symfttpd\Gateway\GatewayInterface');
-        $subject->expects($this->once())
+        $subject->expects($this->exactly(2))
             ->method('getName')
             ->will($this->returnValue($name));
 
