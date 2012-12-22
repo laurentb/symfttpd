@@ -111,11 +111,11 @@ class SpawnCommand extends Command
         try {
             $generator = $this->symfttpd->getGenerator();
 
-            $paths = array_map(function ($path) {
-                $info = pathinfo($path);
-
-                return $info['dirname'];
-            }, array($generator->getPath(), $server->getAccessLog(), $server->getErrorLog()));
+            $paths = array_filter(array($generator->getPath(), $server->getAccessLog(), $server->getErrorLog()), function ($path) {
+                if ($dirname = dirname($path)) {
+                    return $dirname;
+                };
+            });
 
             array_unique($paths);
 

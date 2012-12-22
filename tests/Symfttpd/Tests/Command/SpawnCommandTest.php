@@ -50,6 +50,7 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->assertRegExp('/symfttpd started on 127.0.0.1, port 4043./', $commandTester->getDisplay());
         $this->assertRegExp('#http://127\.0\.0\.1:4043/index.php#', $commandTester->getDisplay());
+        $this->assertNotRegExp('/The server cannot start/', $commandTester->getDisplay());
     }
 
     /**
