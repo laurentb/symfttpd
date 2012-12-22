@@ -70,7 +70,7 @@ abstract class BaseServer implements ServerInterface
     /**
      * @var string
      */
-    protected $fastcgi;
+    protected $gateway;
 
     /**
      * @var array
@@ -272,7 +272,7 @@ abstract class BaseServer implements ServerInterface
      */
     public function setGateway($fastcgi)
     {
-        $this->fastcgi = $fastcgi;
+        $this->gateway = $fastcgi;
     }
 
     /**
@@ -280,7 +280,7 @@ abstract class BaseServer implements ServerInterface
      */
     public function getGateway()
     {
-        return $this->fastcgi;
+        return $this->gateway;
     }
 
     /**
