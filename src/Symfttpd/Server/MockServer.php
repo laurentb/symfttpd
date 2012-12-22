@@ -24,12 +24,11 @@ use Symfttpd\ConfigurationGenerator;
 class MockServer extends BaseServer
 {
     /**
-     * Constructor
-     * Set the name of the server.
+     * @return string
      */
-    public function __construct()
+    public function getName()
     {
-        $this->name = 'mock';
+        return 'mock';
     }
 
     /**

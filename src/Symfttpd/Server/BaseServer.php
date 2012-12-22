@@ -24,11 +24,6 @@ use Symfttpd\Tail\TailInterface;
 abstract class BaseServer implements ServerInterface
 {
     /**
-     * @var string
-     */
-    protected $name;
-
-    /**
      * Server address
      *
      * @var string
@@ -101,22 +96,6 @@ abstract class BaseServer implements ServerInterface
      * @var string
      */
     protected $indexFile;
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
 
     /**
      * @param      $address

@@ -70,7 +70,7 @@ class Lighttpd extends BaseServer
                 // the web server isn't restarted right away.
                 sleep(1);
 
-                $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $this->name));
+                $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $this->getName()));
 
                 return $this->restart($generator, $output, $tail);
             }

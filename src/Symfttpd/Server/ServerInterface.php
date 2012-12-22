@@ -66,11 +66,6 @@ interface ServerInterface
     public function bind($address, $port = null);
 
     /**
-     * @param string $name
-     */
-    public function setName($name);
-
-    /**
      * @return string
      */
     public function getName();
