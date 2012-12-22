@@ -55,26 +55,7 @@ class Nginx extends BaseServer implements GatewayUnawareInterface
             throw new \RuntimeException($stderr);
         }
 
-        $prevGenconf = null;
         while (false !== sleep(1)) {
-            /**
-             * Regenerate the configuration file. to check if it defers.
-             *
-             * @todo check the web dir datetime informations to detect any changes instead.
-             */
-            $genconf = $generator->generate($this);
-
-            if ($prevGenconf !== null && $prevGenconf !== $genconf) {
-                // This sleep() is so that if a HTTP request just created a file in web/,
-                // the web server isn't restarted right away.
-                sleep(1);
-
-                $output->writeln(sprintf('<comment>Something in web/ changed. Restarting %s.</comment>', $this->name));
-
-                $this->restart($generator, $output, $tail);
-            }
-            $prevGenconf = $genconf;
-
             if ($tail instanceof TailInterface) {
                 $tail->consume();
             }
