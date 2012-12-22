@@ -24,22 +24,20 @@ use Symfttpd\ConfigurationGenerator;
 class Lighttpd extends BaseServer
 {
     /**
-     * Constructor
-     * Set the name of the server.
+     * @return string
      */
-    public function __construct()
+    public function getName()
     {
-        $this->name = 'lighttpd';
+        return 'lighttpd';
     }
 
     /**
-     * Start the server.
-     *
      * @param \Symfttpd\ConfigurationGenerator                  $generator
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      * @param \Symfttpd\Tail\TailInterface                      $tail
      *
      * @return mixed|void
+     * @throws \RuntimeException
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
     {
