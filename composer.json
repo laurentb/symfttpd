@@ -1,7 +1,7 @@
 {
     "name": "benjam1/symfttpd",
     "description": "PHP webserver",
-    "keywords": ["symfony", "server", "webserver", "lighttpd"],
+    "keywords": ["symfony", "server", "webserver", "lighttpd", "nginx", "php-fpm"],
     "type": "library",
     "licence": "MIT",
     "authors": [
