@@ -75,7 +75,7 @@ class SymfttpdFile
     }
 
     /**
-     * @return String
+     * @return array
      */
     public function getPaths()
     {

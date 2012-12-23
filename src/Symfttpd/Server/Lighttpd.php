@@ -59,7 +59,7 @@ class Lighttpd extends BaseServer
             /**
              * Regenerate the configuration file. to check if it defers.
              *
-             * @todo check the web dir datetime informations to detect any changes instead.
+             * @todo check the web dir datetime information to detect any changes instead.
              */
             $genconf = $generator->generate($this);
 

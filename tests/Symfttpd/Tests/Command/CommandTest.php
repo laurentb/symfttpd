@@ -11,7 +11,6 @@
 
 namespace Symfttpd\Tests\Command;
 
-use Symfttpd\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**

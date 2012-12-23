@@ -15,7 +15,6 @@ use Symfttpd\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfttpd\Symfttpd;
 use Symfttpd\Configuration\Exception\ConfigurationException;
 
 /**
@@ -50,7 +49,7 @@ EOT
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        // Don't print the Symfttpd version if ouput option is set.
+        // Don't print the Symfttpd version if output option is set.
         if (null == $input->getOption('output')) {
             parent::initialize($input, $output);
         }
@@ -91,7 +90,7 @@ EOT
             }
 
         } catch (ConfigurationException $e) {
-            $output->writeln('<error>An error occured while file generation.</error>');
+            $output->writeln('<error>An error occurred while file generation.</error>');
             $output->writeln('<error>'.$e->getMessage().'</error>');
 
             return 1;

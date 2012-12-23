@@ -51,7 +51,7 @@ class Symfony1Checker implements CheckerInterface
     }
 
     /**
-     * Check that directory structures matchs
+     * Check that directory structures matches
      * the Symfony Standard Edition one.
      *
      * @return bool

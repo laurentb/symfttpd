@@ -30,6 +30,8 @@ use Symfttpd\Tail\Tail;
  *
  * @author Laurent Bachelier <laurent@bachelier.name>
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
+ *
+ * @toto Add an exception and an error handler to stop the running server and its gateway.
  */
 class SpawnCommand extends Command
 {
@@ -181,6 +183,7 @@ TEXT;
     /**
      * @param \Symfttpd\Server\ServerInterface                  $server
      * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @todo create a signal handler to make this function testable
      */
     protected function handleSignals(ServerInterface $server, OutputInterface $output)
     {
