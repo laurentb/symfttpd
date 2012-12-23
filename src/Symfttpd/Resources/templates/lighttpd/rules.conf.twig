@@ -1,15 +1,15 @@
 {% block rules %}
 url.rewrite-once = (
 {% for dir in server.allowedDirs %}
-  "^/{{ dir|preg_quote }}/.+" => "$0",
+  "^/{{ dir|replace({'/':'\/'}) }}/.+" => "$0",
 {% endfor %}
 
 {% for file in server.allowedFiles %}
-  "^/{{ file|preg_quote }}$" => "$0",
+  "^/{{ file|replace({'/':'\/'}) }}$" => "$0",
 {% endfor %}
 
 {% for php in server.executableFiles %}
-  "^/{{ php|preg_quote }}(/[^\?]*)?(\?.*)?" => "/{{ php }}$1$2",
+  "^/{{ php|replace({'/':'\/'}) }}(/[^\?]*)?(\?.*)?" => "/{{ php }}$1$2",
 {% endfor %}
 
   "^(/[^\?]*)(\?.*)?" => "/{{ server.indexFile }}$1$2"

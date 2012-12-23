@@ -212,12 +212,10 @@ class Factory
             )
         );
 
-        $twig->addExtension(new TwigExtension());
-
         $filesystem = new Filesystem();
 
         $generator = new \Symfttpd\ConfigurationGenerator($twig, $filesystem);
-        $generator->setPath($config->get('server_config_path', $project->getCacheDir() . '/symfttpd'));
+        $generator->setPath($config->get('server_config_path', $config->get('symfttpd_dir') . '/conf'));
 
         return $generator;
     }
