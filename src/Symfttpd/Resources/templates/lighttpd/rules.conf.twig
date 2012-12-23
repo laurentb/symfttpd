@@ -16,7 +16,7 @@ url.rewrite-once = (
 )
 
 {% for file in server.unexecutableDirs %}
-{% if in_array(file, dirs) %}
+{% if dirs[file] is defined %}
 $HTTP["url"] =~ "^/{{ file }}/" {
   url.access-deny = (".php")
 }

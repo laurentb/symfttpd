@@ -49,7 +49,6 @@ class TwigExtension extends \Twig_Extension
     {
         return array(
             'sys_get_temp_dir' => new \Twig_Function_Function('sys_get_temp_dir'),
-            'in_array'         => new \Twig_Function_Function('in_array'),
         );
     }
 }
