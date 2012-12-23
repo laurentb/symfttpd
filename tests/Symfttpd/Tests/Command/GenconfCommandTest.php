@@ -11,10 +11,10 @@
 
 namespace Symfttpd\Tests\Command;
 
-use Symfttpd\Command\GenconfCommand;
-use Symfttpd\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfttpd\Command\GenconfCommand;
 
 /**
  * GenconfCommand test class
@@ -24,7 +24,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 class GenconfCommandTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Symfttpd\Filesystem\Filesystem $filesystem
+     * @var Symfony\Component\Filesystem\Filesystem $filesystem
      */
     protected $filesystem;
 

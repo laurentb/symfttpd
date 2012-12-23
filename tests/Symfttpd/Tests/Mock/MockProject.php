@@ -30,7 +30,7 @@ class MockProject extends BaseProject
             $path = sys_get_temp_dir().'/symfttpd-project-test';
         }
 
-        $this->filesystem = new \Symfttpd\Filesystem\Filesystem();
+        $this->filesystem = new \Symfony\Component\Filesystem\Filesystem();
 
         parent::__construct($options, $path);
 

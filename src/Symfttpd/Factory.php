@@ -12,13 +12,13 @@
 namespace Symfttpd;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfttpd\Guesser\Exception\UnguessableException;
-use Symfttpd\Guesser\ProjectGuesser;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Config;
 use Symfttpd\Configuration;
 use Symfttpd\Exception\ExecutableNotFoundException;
-use Symfttpd\Filesystem\Filesystem;
+use Symfttpd\Guesser\Exception\UnguessableException;
+use Symfttpd\Guesser\ProjectGuesser;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
 

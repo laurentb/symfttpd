@@ -35,7 +35,7 @@ class ConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->twig = $this->getMock('\Twig_Environment');
-        $this->generator = new ConfigurationGenerator($this->twig, $this->getMock('\Symfttpd\Filesystem\Filesystem'));
+        $this->generator = new ConfigurationGenerator($this->twig, $this->getMock('\Symfony\Component\Filesystem\Filesystem'));
     }
 
     public function tearDown()

@@ -12,7 +12,7 @@
 namespace Symfttpd\Tests;
 
 use Symfttpd\SymfttpdFile;
-use Symfttpd\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * SymfttpdFileTest description

@@ -11,7 +11,7 @@
 
 namespace Symfttpd;
 
-use Symfttpd\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * ConfigurationGenerator generates and dumps the configuration
@@ -27,7 +27,7 @@ class ConfigurationGenerator
     protected $twig;
 
     /**
-     * @var \Symfttpd\Filesystem\Filesystem
+     * @var \Symfony\Component\Filesystem\Filesystem
      */
     protected $filesystem;
 
@@ -37,8 +37,8 @@ class ConfigurationGenerator
     protected $path;
 
     /**
-     * @param \Twig_Environment               $twig
-     * @param \Symfttpd\Filesystem\Filesystem $filesystem
+     * @param \Twig_Environment                        $twig
+     * @param \Symfony\Component\Filesystem\Filesystem $filesystem
      */
     public function __construct(\Twig_Environment $twig, Filesystem $filesystem)
     {
