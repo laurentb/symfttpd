@@ -32,6 +32,7 @@ class Configuration implements ConfigurationInterface
         $builder = new TreeBuilder();
         $root    = $builder->root('symfttpd');
 
+        $this->addSymfttpdConfiguration($root);
         $this->addServerConfiguration($root);
         $this->addProjectConfiguration($root);
         $this->addGatewayConfiguration($root);
@@ -39,6 +40,23 @@ class Configuration implements ConfigurationInterface
         $this->addGlobalValidate($root);
 
         return $builder;
+    }
+
+    /**
+     * @param \Symfony\Component\Config\Definition\Builder\NodeDefinition $node
+     *
+     * @return \Symfony\Component\Config\Definition\Builder\NodeDefinition
+     */
+    public function addSymfttpdConfiguration(NodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->scalarNode('symfttpd_dir')
+                    ->defaultValue(getcwd().'/symfttpd')
+                ->end()
+            ->end();
+
+        return $node;
     }
 
     /**
