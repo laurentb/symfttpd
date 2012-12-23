@@ -113,13 +113,13 @@ class SpawnCommand extends Command
         try {
             $generator = $this->symfttpd->getGenerator();
 
-            $paths = array_filter(array($generator->getPath(), $server->getAccessLog(), $server->getErrorLog()), function ($path) {
-                if ($dirname = dirname($path)) {
-                    return $dirname;
-                };
-            });
 
-            array_unique($paths);
+            $paths = array();
+            foreach (array($generator->getPath(), $server->getAccessLog(), $server->getErrorLog()) as $path) {
+                if (null !== $path && $dirname = dirname($path)) {
+                    $paths[] = $dirname;
+                }
+            }
 
             $filesystem = new Filesystem();
             $filesystem->mkdir($paths);
