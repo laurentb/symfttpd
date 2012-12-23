@@ -11,7 +11,6 @@
 
 namespace Symfttpd;
 
-use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Config;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
