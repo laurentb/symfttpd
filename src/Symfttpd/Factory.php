@@ -79,7 +79,7 @@ class Factory
 
         $project   = $this->createProject($config);
         $server    = $this->createServer($config, $project);
-        $generator = $this->createGenerator($config, $server, $project);
+        $generator = $this->createGenerator($config);
 
         $symfttpd = new Symfttpd();
         $symfttpd->setConfig($config);
@@ -190,13 +190,11 @@ class Factory
 
     /**
      * @param \Symfttpd\Config                   $config
-     * @param \Symfttpd\Server\ServerInterface   $server
-     * @param \Symfttpd\Project\ProjectInterface $project
      *
      * @return \Symfttpd\ConfigurationGenerator
      * @throws \InvalidArgumentException
      */
-    public function createGenerator(Config $config, ServerInterface $server, ProjectInterface $project)
+    public function createGenerator(Config $config)
     {
         $dirs = array(__DIR__ . '/Resources/templates/');
         $dirs += $config->get('server_templates_dirs', array());
