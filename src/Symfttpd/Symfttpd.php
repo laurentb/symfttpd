@@ -108,33 +108,4 @@ class Symfttpd
     {
         return $this->generator;
     }
-
-    /**
-     * Find executables.
-     */
-    public function findExecutables()
-    {
-        $this->findPhpCgiCmd();
-    }
-
-    /**
-     * Set the php-cgi command value in the Symfttpd option
-     * if it is not already set.
-     *
-     * @throws \Symfttpd\Exception\ExecutableNotFoundException
-     */
-    protected function findPhpCgiCmd()
-    {
-        if (false === $this->getConfig()->has('php_cgi_cmd')) {
-            $exeFinder = new ExecutableFinder();
-            $exeFinder->addSuffix('');
-            $cmd = $exeFinder->find('php-cgi');
-
-            if (false == (boolean) $cmd) {
-                throw new \Symfttpd\Exception\ExecutableNotFoundException('php-cgi executable not found.');
-            }
-
-            $this->getConfig()->set('php_cgi_cmd', $cmd);
-        }
-    }
 }
