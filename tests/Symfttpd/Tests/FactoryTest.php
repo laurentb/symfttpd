@@ -147,8 +147,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $config = new Config($config);
 
         $project = $this->getMock('\Symfttpd\Project\ProjectInterface');
-        $project->expects($this->once())->method('getLogDir')->will($this->returnValue('/tmp'));
-        $project->expects($this->once())->method('getCacheDir')->will($this->returnValue('/tmp'));
         $project->expects($this->once())->method('getWebDir')->will($this->returnValue('/web'));
         $project->expects($this->once())->method('getIndexFile')->will($this->returnValue('index.php'));
         $project->expects($this->once())->method('getDefaultExecutableFiles')->will($this->returnValue(array('index.php')));

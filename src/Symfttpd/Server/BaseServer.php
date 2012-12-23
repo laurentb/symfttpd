@@ -12,7 +12,9 @@
 namespace Symfttpd\Server;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
+use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
 use Symfttpd\Tail\TailInterface;
 
@@ -96,6 +98,32 @@ abstract class BaseServer implements ServerInterface
      * @var string
      */
     protected $indexFile;
+
+    /**
+     * Configure the server.
+     *
+     * @param \Symfttpd\Config                   $config
+     * @param \Symfttpd\Project\ProjectInterface $project
+     */
+    public function configure(Config $config, ProjectInterface $project)
+    {
+        $baseDir = $config->get('symfttpd_dir', getcwd().'/symfttpd');
+
+        $this->setPidfile($baseDir . '/' . $config->get('server_pidfile', $this->getName().'.pid'));
+
+        // Configure logging directory
+        $logDir = $config->get('server_log_dir', $baseDir .'/log');
+        $this->setErrorLog($logDir . '/' . $config->get('server_error_log', 'error.log'));
+        $this->setAccessLog($logDir . '/' . $config->get('server_access_log', 'access.log'));
+
+        // Configure project relative directories and files
+        $this->setDocumentRoot($project->getWebDir());
+        $this->setIndexFile($project->getIndexFile());
+        $this->setAllowedDirs($config->get('project_readable_dirs', $project->getDefaultReadableDirs()));
+        $this->setAllowedFiles($config->get('project_readable_files', $project->getDefaultReadableFiles()));
+        $this->setExecutableFiles($config->get('project_readable_phpfiles', $project->getDefaultExecutableFiles()));
+        $this->setUnexecutableDirs($config->get('project_nophp', array()));
+    }
 
     /**
      * @param      $address

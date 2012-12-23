@@ -12,8 +12,10 @@
 namespace Symfttpd\Server;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfttpd\Tail\TailInterface;
+use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
+use Symfttpd\Project\ProjectInterface;
+use Symfttpd\Tail\TailInterface;
 
 /**
  * ServerInterface interface
@@ -56,6 +58,14 @@ interface ServerInterface
      * @return mixed
      */
     public function stop(OutputInterface $output);
+
+    /**
+     * Configure the server.
+     *
+     * @param \Symfttpd\Config                   $config
+     * @param \Symfttpd\Project\ProjectInterface $project
+     */
+    public function configure(Config $config, ProjectInterface $project);
 
     /**
      * @param      $address

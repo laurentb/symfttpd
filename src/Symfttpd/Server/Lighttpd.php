@@ -11,10 +11,10 @@
 
 namespace Symfttpd\Server;
 
-use Symfttpd\Tail\TailInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfttpd\Server\BaseServer;
 use Symfttpd\ConfigurationGenerator;
+use Symfttpd\Server\BaseServer;
+use Symfttpd\Tail\TailInterface;
 
 /**
  * Lighttpd class
