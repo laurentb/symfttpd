@@ -75,7 +75,7 @@ class ConfigurationGenerator
 
         // Don't rewrite existing configuration if not forced to.
         if (false === $force && file_exists($file)) {
-            return;
+            return $file;
         }
 
         $configuration = $this->generate($subject);
