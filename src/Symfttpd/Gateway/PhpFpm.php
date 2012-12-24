@@ -68,7 +68,7 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
      */
     public function stop(OutputInterface $output)
     {
-        $this->process->stop(0);
+        \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
 
         $output->writeln('<info>'.$this->getName().' stopped</info>');
     }

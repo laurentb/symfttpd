@@ -38,7 +38,9 @@ fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
       "socket" => "{{ server.gateway.socket|raw }}",
-      "bin-path" => "{{ server.gateway.command }} -d error_log=/dev/stderr'",
+      {%- if server.gateway.start is not defined -%}
+      "bin-path" => "{{ server.gateway.command }}",
+      {%- endif -%}
       "max-procs" => 1,
       "max-load-per-proc" => 1,
       "idle-timeout" => 120,

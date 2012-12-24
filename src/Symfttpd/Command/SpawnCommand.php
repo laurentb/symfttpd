@@ -113,9 +113,7 @@ class SpawnCommand extends Command
             $filesystem->mkdir($paths);
 
             // Run the gateway if needed.
-            if ($server instanceof \Symfttpd\Server\GatewayUnawareInterface
-                && ($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface
-            ) {
+            if (($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface) {
                 $server->getGateway()->start($generator, $output);
             }
 
@@ -177,9 +175,7 @@ TEXT;
     {
         $handler = function () use ($server, $output) {
             // Stop the gateway
-            if ($server instanceof \Symfttpd\Server\GatewayUnawareInterface
-                && ($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface
-            ) {
+            if (($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface) {
                 $server->getGateway()->stop(new NullOutput());
             }
 

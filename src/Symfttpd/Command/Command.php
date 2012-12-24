@@ -12,9 +12,10 @@
 namespace Symfttpd\Command;
 
 use Symfttpd\Symfttpd;
+use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command as BaseCommand;
 
 /**
  * Command class
