@@ -38,17 +38,24 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute()
     {
-        $symfttpd = $this->getSymfttpd();
-        $symfttpd->expects($this->any())
-            ->method('getServer')
-            ->will($this->returnValue($this->getServer()));
+        $server = new MockServer();
+        $server->setExecutableFiles(array('index.php'));
 
-        $this->command->setSymfttpd($symfttpd);
+        $application = new \Symfttpd\Console\Application();
+        $application->setContainer(array(
+            'server'     => $server,
+            'generator'  => $this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false),
+            'filesystem' => $this->getMock('\Symfony\Component\Filesystem\Filesystem'),
+        ));
+        $application->add($this->command);
 
         $commandTester = new CommandTester($this->command);
-        $commandTester->execute(array('-p' => 4043));
+        $commandTester->execute(array(
+            'command' => $this->command->getName(),
+            '-p' => 4043
+        ));
 
-        $this->assertRegExp('/symfttpd started on 127.0.0.1, port 4043./', $commandTester->getDisplay());
+        $this->assertRegExp('/started on 127.0.0.1, port 4043./', $commandTester->getDisplay());
         $this->assertRegExp('#http://127\.0\.0\.1:4043/index.php#', $commandTester->getDisplay());
         $this->assertNotRegExp('/The server cannot start/', $commandTester->getDisplay());
     }
@@ -62,55 +69,24 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
         $server = new MockServer();
         $server->setExecutableFiles(array('index.php'));
 
-        $symfttpd = $this->getSymfttpd();
-        $symfttpd->expects($this->any())
-            ->method('getServer')
-            ->will($this->returnValue($server));
-
-        $this->command->setSymfttpd($symfttpd);
+        $application = new \Symfttpd\Console\Application();
+        $application->setContainer(array(
+                'server'     => $server,
+                'generator'  => $this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false),
+                'filesystem' => $this->getMock('\Symfony\Component\Filesystem\Filesystem'),
+            ));
+        $application->add($this->command);
 
         $commandTester = new CommandTester($this->command);
-        $commandTester->execute(array('-p' => 4043, '--all' => true));
+        $commandTester->execute(array(
+            'command' => $this->command->getName(),
+            '-p' => 4043,
+            '--all' => true
+        ));
 
         $this->assertRegExp('/started on all interfaces, port 4043./', $commandTester->getDisplay());
         $this->assertRegExp('#http://localhost:4043/index.php#', $commandTester->getDisplay());
-    }
-
-    public function getSymfttpd()
-    {
-        $symfttpd = $this->getMock('\Symfttpd\Symfttpd');
-        $symfttpd->expects($this->once())
-            ->method('getGenerator')
-            ->will($this->returnValue($this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false)));
-
-        return $symfttpd;
-    }
-
-    public function getServer()
-    {
-        $server = $this->getMock('\Symfttpd\Server\ServerInterface');
-
-        $server->expects($this->any())
-            ->method('getAddress')
-            ->will($this->returnValue('127.0.0.1'));
-
-        $server->expects($this->any())
-            ->method('getPort')
-            ->will($this->returnValue('4043'));
-
-        $server->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('symfttpd'));
-
-        $server->expects($this->any())
-            ->method('getExecutableFiles')
-            ->will($this->returnValue(array('index.php')));
-
-        $server->expects($this->any())
-            ->method('start')
-            ->will($this->returnValue(1));
-
-        return $server;
+        $this->assertNotRegExp('/The server cannot start/', $commandTester->getDisplay());
     }
 
     public function testGetMessage()

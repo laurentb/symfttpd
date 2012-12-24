@@ -11,11 +11,11 @@
 
 namespace Symfttpd\Command;
 
-use Symfttpd\Symfttpd;
-use Symfony\Component\Console\Command\Command as BaseCommand;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfttpd\Symfttpd;
 
 /**
  * Command class
@@ -24,33 +24,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Command extends BaseCommand
 {
-    /**
-     * @var \Symfttpd\Symfttpd $symfttpd
-     */
-    public $symfttpd;
-
-    /**
-     * Return the current Symfttpd instance.
-     *
-     * @return \Symfttpd\Symfttpd
-     */
-    public function getSymfttpd()
-    {
-        if (null === $this->symfttpd) {
-            throw new \RuntimeException('The command does not know Symfttpd.');
-        }
-
-        return $this->symfttpd;
-    }
-
-    /**
-     * @param \Symfttpd\Symfttpd $symfttpd
-     */
-    public function setSymfttpd(Symfttpd $symfttpd)
-    {
-        $this->symfttpd = $symfttpd;
-    }
-
     /**
      * Initialize the command.
      *

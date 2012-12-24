@@ -46,7 +46,8 @@ class SpawnCommand extends Command
         $this->setDescription('Launch the webserver.');
 
         // Spawning options
-        $this->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port to listen', 4042)
+        $this
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port to listen', 4042)
             ->addOption('bind', 'b', InputOption::VALUE_OPTIONAL, 'The address to bind', '127.0.0.1')
             ->addOption('all', 'a', InputOption::VALUE_NONE, 'Bind on all addresses')
             ->addOption('tail', 't', InputOption::VALUE_NONE, 'Print the log in the console')
@@ -64,7 +65,9 @@ class SpawnCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $server = $this->getSymfttpd()->getServer();
+        $container = $this->getApplication()->getContainer();
+
+        $server = $container['server'];
 
         $address = true == $input->getOption('all') ? null : $input->getOption('bind');
         $port    = $input->getOption('port');
@@ -100,7 +103,7 @@ class SpawnCommand extends Command
         $this->handleSignals($server, $output);
 
         try {
-            $generator = $this->symfttpd->getGenerator();
+            $generator = $container['generator'];
 
             $paths = array();
             foreach (array($generator->getPath(), $server->getAccessLog(), $server->getErrorLog()) as $path) {
@@ -109,7 +112,7 @@ class SpawnCommand extends Command
                 }
             }
 
-            $filesystem = new Filesystem();
+            $filesystem = $container['filesystem'];
             $filesystem->mkdir($paths);
 
             // Run the gateway if needed.

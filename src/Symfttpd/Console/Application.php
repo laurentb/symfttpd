@@ -11,17 +11,24 @@
 
 namespace Symfttpd\Console;
 
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Command\GenconfCommand;
 use Symfttpd\Command\SelfupdateCommand;
 use Symfttpd\Command\SpawnCommand;
-use Symfttpd\Factory;
+use Symfttpd\Config;
+use Symfttpd\Configuration;
+use Symfttpd\ConfigurationGenerator;
+use Symfttpd\Exception\ExecutableNotFoundException;
 use Symfttpd\Guesser\Checker\Symfony2Checker;
 use Symfttpd\Guesser\Checker\Symfony1Checker;
+use Symfttpd\Guesser\Exception\UnguessableException;
 use Symfttpd\Guesser\ProjectGuesser;
 use Symfttpd\Symfttpd;
+use Symfttpd\SymfttpdFile;
 
 /**
  * Application class
@@ -31,28 +38,179 @@ use Symfttpd\Symfttpd;
 class Application extends BaseApplication
 {
     /**
-     * @var \Symfttpd\Symfttpd
+     * @var \Pimple
      */
-    protected $symfttpd;
-
-    /**
-     * @var \Symfttpd\Factory
-     */
-    protected $factory;
+    protected $container;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $guesser = new ProjectGuesser();
-        $guesser->registerChecker(new Symfony2Checker());
-        $guesser->registerChecker(new Symfony1Checker());
-
-        $this->factory = new Factory(new ExecutableFinder(), $guesser);
-
         parent::__construct('Symfttpd', Symfttpd::VERSION);
 
+        $this->container = $c = new \Pimple();
+
+        // Configure the project guesser.
+        $c['project.symfony1_checker'] = $c->share(function () {
+            return new Symfony1Checker();
+        });
+
+        $c['project.symfony2_checker'] = $c->share(function () {
+            return new Symfony2Checker();
+        });
+
+        $c['project.guesser'] = $c->share(function ($c) {
+            $guesser = new ProjectGuesser();
+            $guesser->registerChecker($c['project.symfony1_checker']);
+            $guesser->registerChecker($c['project.symfony2_checker']);
+
+            return $guesser;
+        });
+
+        $c['finder'] = $c->share(function ($c) {
+            return new ExecutableFinder();
+        });
+
+        $c['symfttpd_file'] = $c->share(function ($c) {
+            $file = new SymfttpdFile();
+            $file->setProcessor(new Processor());
+            $file->setConfiguration(new Configuration());
+
+            return $file;
+        });
+
+        $c['config'] = $c->share(function ($c) {
+            $config = new Config();
+            $config->merge($c['symfttpd_file']->read());
+
+            return $config;
+        });
+
+        $c['twig'] = $c->share(function ($c) {
+            $dirs = array(__DIR__ . '/../Resources/templates/');
+            $dirs += $c['config']->get('server_templates_dirs', array());
+
+            return new \Twig_Environment(
+                new \Twig_Loader_Filesystem($dirs),
+                array(
+                    'debug'            => true,
+                    'strict_variables' => true,
+                    'auto_reload'      => true,
+                    'cache'            => false,
+                )
+            );
+        });
+
+        $c['filesystem'] = $c->share(function ($c) {
+            return new Filesystem();
+        });
+
+        $c['generator'] = $c->share(function ($c) {
+            $config = $c['config'];
+            $generator = new \Symfttpd\ConfigurationGenerator($c['twig'], $c['filesystem']);
+            $generator->setPath($config->get('server_config_path', $config->get('symfttpd_dir') . '/conf'));
+
+            return $generator;
+        });
+
+        $c['project'] = $c->share(function ($c) {
+            /** @var $config \Symfttpd\Config */
+            $config = $c['config'];
+
+            if (!$config->has('project_type')) {
+                try {
+                    list($type, $version) = $c['project.guesser']->guess();
+                } catch (UnguessableException $e) {
+                    $type = 'php';
+                    $version = null;
+                }
+            } else {
+                $type = $config->get('project_type', null);
+                $version = substr($config->get('project_version', null), 0, 1);
+            }
+
+            $class = sprintf('Symfttpd\\Project\\%s', ucfirst($type) . str_replace(array('.', '-', 'O'), '', $version));
+
+            if (!class_exists($class)) {
+                if (!$version) {
+                    $message = sprintf('"%s"', $type);
+                } else {
+                    $message = sprintf('"%s" (with version "%s")', $type, $version);
+                }
+
+                throw new \InvalidArgumentException(sprintf('Project %s is not supported.', $message));
+            }
+
+            // @todo create a configure method in the project to not inject anything in the constructor.
+            return new $class($config);
+        });
+
+        $c['server'] = $c->share(function ($c) {
+            /** @var $config \Symfttpd\Config */
+            $config = $c['config'];
+
+            $type = $config->get('server_type', null);
+
+            $mapping = array(
+                'lighttpd' => '\Symfttpd\Server\Lighttpd',
+                'nginx'    => '\Symfttpd\Server\Nginx',
+            );
+
+            if (!array_key_exists($type, $mapping) || !class_exists($mapping[$type])) {
+                throw new \InvalidArgumentException(sprintf('Server "%s" is not supported.', $type));
+            }
+
+            $class = $mapping[$type];
+
+            /** @var \Symfttpd\Server\ServerInterface $server */
+            $server = new $class();
+            $server->bind($config->get('server_address', '127.0.0.1'), $config->get('server_port', '4042'));
+
+            if ($config->has('server_cmd')) {
+                $server->setCommand($config->get('server_cmd'));
+            } else {
+                $c['finder']->addSuffix('');
+
+                // Try to guess the executable command of the server.
+                if (null == $cmd = $c['finder']->find($type)) {
+                    throw new ExecutableNotFoundException($type.' executable not found.');
+                }
+
+                $server->setCommand($cmd);
+            }
+
+            $server->configure($config, $c['project']);
+            $server->setGateway($c['gateway']);
+
+            return $server;
+        });
+
+        $c['gateway'] = $c->share(function ($c) {
+            /** @var $config \Symfttpd\Config */
+            $config = $c['config'];
+            $type = $config->get('gateway_type', 'fastcgi');
+
+            // @todo find a better way...
+            $mapping = array(
+                'fastcgi' => '\Symfttpd\Gateway\Fastcgi',
+                'php-fpm' => '\Symfttpd\Gateway\PhpFpm',
+            );
+
+            if (!array_key_exists($type, $mapping) || !class_exists($mapping[$type])) {
+                throw new \InvalidArgumentException(sprintf('"%s" gateway is not supported.', $type));
+            }
+
+            $class = $mapping[$type];
+
+            /** @var \Symfttpd\Gateway\GatewayInterface $gateway */
+            $gateway = new $class();
+
+            // @todo guess the command
+            $gateway->setCommand($config->get('gateway_cmd', $config->get('php_cgi_cmd')));
+
+            return $gateway;
+        });
     }
 
     /**
@@ -60,33 +218,17 @@ class Application extends BaseApplication
      *
      * @return \Symfttpd\Symfttpd
      */
-    public function getSymfttpd()
+    public function getContainer()
     {
-        if ($this->symfttpd === null) {
-            $this->symfttpd = $this->factory->create();
-        }
-
-        return $this->symfttpd;
+        return $this->container;
     }
 
     /**
-     * @param \Symfttpd\Symfttpd $symfttpd
+     * @param $container
      */
-    public function setSymfttpd(Symfttpd $symfttpd)
+    public function setContainer($container)
     {
-        $this->symfttpd = $symfttpd;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function add(Command $command)
-    {
-        if ($command instanceof \Symfttpd\Command\Command) {
-            $command->setSymfttpd($this->getSymfttpd());
-        }
-
-        return parent::add($command);
+        $this->container = $container;
     }
 
     /**
