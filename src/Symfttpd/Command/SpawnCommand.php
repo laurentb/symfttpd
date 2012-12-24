@@ -55,17 +55,6 @@ class SpawnCommand extends Command
     }
 
     /**
-     * @param \Symfony\Component\Console\Input\InputInterface   $input
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        parent::initialize($input, $output);
-
-        $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
-    }
-
-    /**
      * Run the Symttpd configured server.
      *
      * @param \Symfony\Component\Console\Input\InputInterface   $input

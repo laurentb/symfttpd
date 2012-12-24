@@ -58,6 +58,8 @@ class Command extends BaseCommand
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        $output->getFormatter()->setStyle('important', new OutputFormatterStyle('yellow', null, array('bold')));
+
         $output->writeln(sprintf('<comment>Symfttpd - version %s</comment>', Symfttpd::VERSION));
     }
 }
