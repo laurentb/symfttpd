@@ -173,6 +173,12 @@ TEXT;
      */
     protected function handleSignals(ServerInterface $server, OutputInterface $output)
     {
+        if (!function_exists('pcntl_signal')) {
+            $output->writeln('<info>PCNTL is no enabled in your PHP CLI version. You will have to kill processes manually.</info>');
+
+            return;
+        }
+
         $handler = function () use ($server, $output) {
             // Stop the gateway
             if (($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface) {
