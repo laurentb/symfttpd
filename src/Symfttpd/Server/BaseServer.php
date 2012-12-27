@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
+use Symfttpd\Log\LoggerInterface;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
 use Symfttpd\Tail\TailInterface;
@@ -104,6 +105,11 @@ abstract class BaseServer implements ServerInterface
      * @var \Symfony\Component\Process\ProcessBuilder
      */
     protected $processBuilder;
+
+    /**
+     * @var \Symfttpd\Log\LoggerInterface
+     */
+    protected $logger;
 
     /**
      * Configure the server.
@@ -356,6 +362,11 @@ abstract class BaseServer implements ServerInterface
         // Kill the current server process.
         \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
 
+
+        if (null !== $this->logger) {
+            $this->logger->debug("{$this->getName()} stopped.");
+        }
+
         $output->writeln($this->getName().' stopped');
     }
 
@@ -375,4 +386,11 @@ abstract class BaseServer implements ServerInterface
         return $this->processBuilder;
     }
 
+    /**
+     * @param \Symfttpd\Log\LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 }

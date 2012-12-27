@@ -11,6 +11,7 @@
 
 namespace Symfttpd\Console;
 
+use Monolog\Handler\StreamHandler;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
@@ -27,6 +28,7 @@ use Symfttpd\Guesser\Checker\Symfony2Checker;
 use Symfttpd\Guesser\Checker\Symfony1Checker;
 use Symfttpd\Guesser\Exception\UnguessableException;
 use Symfttpd\Guesser\ProjectGuesser;
+use Symfttpd\Log\Logger;
 use Symfttpd\Symfttpd;
 use Symfttpd\SymfttpdFile;
 
@@ -84,6 +86,10 @@ class Application extends BaseApplication
             $config = new Config();
             $config->merge($c['symfttpd_file']->read());
 
+            if (!$config->has('symfttpd_dir')) {
+                $config->get('symfttpd_dir', getcwd().'/symfttpd');
+            }
+
             return $config;
         });
 
@@ -108,7 +114,7 @@ class Application extends BaseApplication
 
         $c['generator'] = $c->share(function ($c) {
             $config = $c['config'];
-            $generator = new \Symfttpd\ConfigurationGenerator($c['twig'], $c['filesystem']);
+            $generator = new \Symfttpd\ConfigurationGenerator($c['twig'], $c['filesystem'], $c['logger']);
             $generator->setPath($config->get('server_config_path', $config->get('symfttpd_dir') . '/conf'));
 
             return $generator;
@@ -183,6 +189,7 @@ class Application extends BaseApplication
             $server->configure($config, $c['project']);
             $server->setGateway($c['gateway']);
             $server->setProcessBuilder($c['process_builder']);
+            $server->setLogger($c['logger']);
 
             return $server;
         });
@@ -210,6 +217,7 @@ class Application extends BaseApplication
             // @todo guess the command
             $gateway->setCommand($config->get('gateway_cmd', $config->get('php_cgi_cmd')));
             $gateway->setProcessBuilder($c['process_builder']);
+            $gateway->setLogger($c['logger']);
 
             return $gateway;
         });
@@ -220,6 +228,13 @@ class Application extends BaseApplication
 
             return $pb;
         };
+
+        $c['logger'] = $c->share(function ($c) {
+            $logger = new Logger($this->getName());
+            $logger->pushHandler(new StreamHandler($c['config']->get('symfttpd_dir').'/log/symfttpd.log'), Logger::DEBUG);
+
+            return $logger;
+        });
     }
 
     /**

@@ -56,6 +56,10 @@ class Nginx extends BaseServer implements GatewayUnawareInterface
             throw new \RuntimeException($stderr);
         }
 
+        if (null !== $this->logger) {
+            $this->logger->debug("{$this->getName()} started.");
+        }
+
         while (false !== sleep(1)) {
             if ($tail instanceof TailInterface) {
                 $tail->consume();

@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
+use Symfttpd\Log\LoggerInterface;
 use Symfttpd\ProcessAwareInterface;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Tail\TailInterface;
@@ -203,4 +204,9 @@ interface ServerInterface extends ProcessAwareInterface
      * @return string
      */
     public function getIndexFile();
+
+    /**
+     * @param \Symfttpd\Log\LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger);
 }

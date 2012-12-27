@@ -55,6 +55,10 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
         if (!empty($stderr)) {
             throw new \RuntimeException($stderr);
         }
+
+        if (null !== $this->logger) {
+            $this->logger->debug("{$this->getName()} started.");
+        }
     }
 
     /**
@@ -65,6 +69,10 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
     public function stop(OutputInterface $output)
     {
         \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
+
+        if (null !== $this->logger) {
+            $this->logger->debug("{$this->getName()} stopped.");
+        }
 
         $output->writeln('<info>'.$this->getName().' stopped</info>');
     }

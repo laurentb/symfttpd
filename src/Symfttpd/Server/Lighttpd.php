@@ -53,6 +53,10 @@ class Lighttpd extends BaseServer
             throw new \RuntimeException($stderr);
         }
 
+        if (null !== $this->logger) {
+            $this->logger->debug("{$this->getName()} started.");
+        }
+
         // @todo move this part in the spawn command.
         $prevGenconf = null;
         while (false !== sleep(1)) {

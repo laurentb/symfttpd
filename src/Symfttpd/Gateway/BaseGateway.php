@@ -14,6 +14,7 @@ namespace Symfttpd\Gateway;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\Gateway\GatewayInterface;
+use Symfttpd\Log\LoggerInterface;
 
 /**
  * BaseGateway
@@ -36,6 +37,11 @@ abstract class BaseGateway implements GatewayInterface
      * @var \Symfony\Component\Process\ProcessBuilder
      */
     protected $processBuilder;
+
+    /**
+     * @var \Symfttpd\Log\LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @param \Symfttpd\Config $config
@@ -93,5 +99,13 @@ abstract class BaseGateway implements GatewayInterface
     public function getProcessBuilder()
     {
         return $this->processBuilder;
+    }
+
+    /**
+     * @param \Symfttpd\Log\LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }

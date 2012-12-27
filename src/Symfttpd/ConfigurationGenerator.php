@@ -12,6 +12,7 @@
 namespace Symfttpd;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfttpd\Log\LoggerInterface;
 
 /**
  * ConfigurationGenerator generates and dumps the configuration
@@ -32,6 +33,11 @@ class ConfigurationGenerator
     protected $filesystem;
 
     /**
+     * @var \Symfttpd\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var string
      */
     protected $path;
@@ -39,11 +45,13 @@ class ConfigurationGenerator
     /**
      * @param \Twig_Environment                        $twig
      * @param \Symfony\Component\Filesystem\Filesystem $filesystem
+     * @param \Symfttpd\Log\LoggerInterface            $logger
      */
-    public function __construct(\Twig_Environment $twig, Filesystem $filesystem)
+    public function __construct(\Twig_Environment $twig, Filesystem $filesystem, LoggerInterface $logger = null)
     {
-        $this->twig = $twig;
+        $this->twig       = $twig;
         $this->filesystem = $filesystem;
+        $this->logger     = $logger;
     }
 
     /**
@@ -88,6 +96,10 @@ class ConfigurationGenerator
 
         if (false === file_put_contents($file, $configuration)) {
             throw new \RuntimeException(sprintf('Cannot generate the file "%s".', $this->getPath()));
+        }
+
+        if (null !== $this->logger) {
+            $this->logger->debug("Configuration for {$subject->getName()} generated in {$file}.");
         }
 
         return $file;

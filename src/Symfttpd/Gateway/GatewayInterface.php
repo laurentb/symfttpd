@@ -12,6 +12,7 @@
 namespace Symfttpd\Gateway;
 
 use Symfttpd\Config;
+use Symfttpd\Log\LoggerInterface;
 use Symfttpd\ProcessAwareInterface;
 
 /**
@@ -50,4 +51,9 @@ interface GatewayInterface extends ProcessAwareInterface
      * @return string
      */
     public function getSocket();
+
+    /**
+     * @param \Symfttpd\Log\LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger);
 }

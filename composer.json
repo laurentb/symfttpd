@@ -24,7 +24,8 @@
         "symfony/filesystem": "2.2.*",
         "symfony/config":     "2.2.*",
         "twig/twig":          ">=1.10,<2.0-dev",
-        "pimple/pimple":      "dev-master"
+        "pimple/pimple":      "dev-master",
+        "monolog/monolog":    "dev-master"
     },
     "autoload": {
         "psr-0": {

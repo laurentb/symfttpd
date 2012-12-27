@@ -1,8 +1,8 @@
 # Project
-vendor
-tests/fixtures
-log
-cache
+/vendor
+/tests/fixtures
+/log
+/cache
 
 # IDE files
 /.idea
@@ -15,4 +15,4 @@ cache
 /build
 
 # Symfttpd generated phar
-symfttpd*.phar
+/symfttpd*.phar
