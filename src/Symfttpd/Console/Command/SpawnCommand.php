@@ -11,7 +11,7 @@ declare(ticks = 1);
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Command;
+namespace Symfttpd\Console\Command;
 
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfttpd\Command\Command;
+use Symfttpd\Console\Command\Command;
 use Symfttpd\Server\ServerInterface;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;

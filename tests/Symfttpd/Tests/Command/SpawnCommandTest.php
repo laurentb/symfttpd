@@ -13,7 +13,7 @@ namespace Symfttpd\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfttpd\Server\MockServer;
-use Symfttpd\Command\SpawnCommand;
+use Symfttpd\Console\Command\SpawnCommand;
 
 /**
  * SpawnCommand test class.
@@ -33,8 +33,8 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \Symfttpd\Command\SpawnCommand::execute
-     * @covers \Symfttpd\Command\SpawnCommand::getMessage
+     * @covers \Symfttpd\Console\Command\SpawnCommand::execute
+     * @covers \Symfttpd\Console\Command\SpawnCommand::getMessage
      */
     public function testExecute()
     {
@@ -61,8 +61,8 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \Symfttpd\Command\SpawnCommand::execute
-     * @covers \Symfttpd\Command\SpawnCommand::getMessage
+     * @covers \Symfttpd\Console\Command\SpawnCommand::execute
+     * @covers \Symfttpd\Console\Command\SpawnCommand::getMessage
      */
     public function testExecuteOnAllInterfaces()
     {
