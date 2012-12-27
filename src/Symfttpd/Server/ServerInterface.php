@@ -12,6 +12,7 @@
 namespace Symfttpd\Server;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
 use Symfttpd\Project\ProjectInterface;
@@ -28,13 +29,15 @@ interface ServerInterface
     /**
      * Run the server command to start it.
      *
-     * @abstract
      * @param \Symfttpd\ConfigurationGenerator                  $generator
      * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\                                   $tail
+     * @param \Symfttpd\Tail\TailInterface                      $tail
      *
      * @return mixed
      * @throws \RuntimeException
+     *
+     * @todo Move away the OutputInterface and TailInterface as they do not have anything
+     *       to do neither in the start and in the stop process.
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null);
 
@@ -199,4 +202,14 @@ interface ServerInterface
      * @return string
      */
     public function getIndexFile();
+
+    /**
+     * @param Symfony\Component\Process\ProcessBuilder $pb
+     */
+    public function setProcessBuilder(ProcessBuilder $pb);
+
+    /**
+     * @return \Symfony\Component\Process\ProcessBuilder
+     */
+    public function getProcessBuilder();
 }

@@ -182,6 +182,7 @@ class Application extends BaseApplication
 
             $server->configure($config, $c['project']);
             $server->setGateway($c['gateway']);
+            $server->setProcessBuilder($c['process_builder']);
 
             return $server;
         });
@@ -211,6 +212,13 @@ class Application extends BaseApplication
 
             return $gateway;
         });
+
+        $c['process_builder'] = function ($c) {
+            $pb = new \Symfony\Component\Process\ProcessBuilder();
+            $pb->setTimeout(null);
+
+            return $pb;
+        };
     }
 
     /**

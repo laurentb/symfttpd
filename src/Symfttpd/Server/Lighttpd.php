@@ -41,11 +41,10 @@ class Lighttpd extends BaseServer
      */
     public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null)
     {
-        $process = new \Symfony\Component\Process\Process(null);
-        $process->setCommandLine(implode(' ', array($this->getCommand(), '-f', $generator->dump($this, true))));
-        $process->setTimeout(null);
+        $process = $this->getProcessBuilder()
+            ->setArguments(array($this->getCommand(), '-f', $generator->dump($this, true)))
+            ->getProcess();
 
-        // Run lighttpd
         $process->run();
 
         $stderr = $process->getErrorOutput();
@@ -54,6 +53,7 @@ class Lighttpd extends BaseServer
             throw new \RuntimeException($stderr);
         }
 
+        // @todo move this part in the spawn command.
         $prevGenconf = null;
         while (false !== sleep(1)) {
             /**

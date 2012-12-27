@@ -12,6 +12,7 @@
 namespace Symfttpd\Server;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
 use Symfttpd\Project\ProjectInterface;
@@ -98,6 +99,11 @@ abstract class BaseServer implements ServerInterface
      * @var string
      */
     protected $indexFile;
+
+    /**
+     * @var \Symfony\Component\Process\ProcessBuilder
+     */
+    protected $processBuilder;
 
     /**
      * Configure the server.
@@ -352,4 +358,21 @@ abstract class BaseServer implements ServerInterface
 
         $output->writeln($this->getName().' stopped');
     }
+
+    /**
+     * @param Symfony\Component\Process\ProcessBuilder $pb
+     */
+    public function setProcessBuilder(ProcessBuilder $pb)
+    {
+        $this->processBuilder = $pb;
+    }
+
+    /**
+     * @return \Symfony\Component\Process\ProcessBuilder
+     */
+    public function getProcessBuilder()
+    {
+        return $this->processBuilder;
+    }
+
 }
