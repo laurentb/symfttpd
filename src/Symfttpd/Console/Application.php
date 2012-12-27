@@ -209,6 +209,7 @@ class Application extends BaseApplication
 
             // @todo guess the command
             $gateway->setCommand($config->get('gateway_cmd', $config->get('php_cgi_cmd')));
+            $gateway->setProcessBuilder($c['process_builder']);
 
             return $gateway;
         });

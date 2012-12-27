@@ -25,11 +25,6 @@ use Symfttpd\ConfigurationGenerator;
 class PhpFpm extends BaseGateway implements GatewayProcessableInterface
 {
     /**
-     * @var \Symfony\Component\Process\Process
-     */
-    protected $process;
-
-    /**
      * @return string
      */
     public function getName()
@@ -49,12 +44,13 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
         // Create the socket file first.
         touch($this->getSocket());
 
-        $this->process = new Process(null);
-        $this->process->setCommandLine(implode(' ', array($this->getCommand(), '-y', $generator->dump($this, false))));
-        $this->process->setTimeout(null);
-        $this->process->run();
+        $process = $this->getProcessBuilder()
+            ->setArguments(array($this->getCommand(), '-y', $generator->dump($this, false)))
+            ->getProcess();
 
-        $stderr = $this->process->getErrorOutput();
+        $process->run();
+
+        $stderr = $process->getErrorOutput();
 
         if (!empty($stderr)) {
             throw new \RuntimeException($stderr);
@@ -119,5 +115,4 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
 
         return $group['name'];
     }
-
 }

@@ -11,6 +11,7 @@
 
 namespace Symfttpd\Gateway;
 
+use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\Gateway\GatewayInterface;
 
@@ -30,6 +31,11 @@ abstract class BaseGateway implements GatewayInterface
      * @var string
      */
     protected $socket;
+
+    /**
+     * @var \Symfony\Component\Process\ProcessBuilder
+     */
+    protected $processBuilder;
 
     /**
      * @param \Symfttpd\Config $config
@@ -71,5 +77,21 @@ abstract class BaseGateway implements GatewayInterface
     public function getSocket()
     {
         return $this->socket;
+    }
+
+    /**
+     * @param \Symfony\Component\Process\ProcessBuilder $pb
+     */
+    public function setProcessBuilder(ProcessBuilder $pb)
+    {
+        $this->processBuilder = $pb;
+    }
+
+    /**
+     * @return \Symfony\Component\Process\ProcessBuilder
+     */
+    public function getProcessBuilder()
+    {
+        return $this->processBuilder;
     }
 }

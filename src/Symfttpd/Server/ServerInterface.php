@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
+use Symfttpd\ProcessAwareInterface;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Tail\TailInterface;
 
@@ -24,7 +25,7 @@ use Symfttpd\Tail\TailInterface;
  * @author Benjamin Grandfond <benjaming@theodo.fr>
  * @todo Complete this interface.
  */
-interface ServerInterface
+interface ServerInterface extends ProcessAwareInterface
 {
     /**
      * Run the server command to start it.
@@ -202,14 +203,4 @@ interface ServerInterface
      * @return string
      */
     public function getIndexFile();
-
-    /**
-     * @param Symfony\Component\Process\ProcessBuilder $pb
-     */
-    public function setProcessBuilder(ProcessBuilder $pb);
-
-    /**
-     * @return \Symfony\Component\Process\ProcessBuilder
-     */
-    public function getProcessBuilder();
 }

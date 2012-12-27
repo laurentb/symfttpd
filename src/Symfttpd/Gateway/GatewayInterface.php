@@ -12,13 +12,14 @@
 namespace Symfttpd\Gateway;
 
 use Symfttpd\Config;
+use Symfttpd\ProcessAwareInterface;
 
 /**
  * GatewayInterface
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-interface GatewayInterface
+interface GatewayInterface extends ProcessAwareInterface
 {
     /**
      * @return string
