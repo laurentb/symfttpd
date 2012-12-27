@@ -100,7 +100,7 @@ class SpawnCommand extends Command
             $multitail->consume();
         }
 
-        $this->handleSignals($server, $output);
+        \Symfttpd\Debug\SignalHandler::register($server, $output);
 
         try {
             $generator = $container['generator'];
@@ -142,59 +142,23 @@ class SpawnCommand extends Command
             $address = 'localhost';
         }
 
-        $apps = array();
+        $urls = "";
         foreach ($server->getExecutableFiles() as $file) {
             if (preg_match('/.+\.php$/', $file)) {
-                $apps[$file] = ' http://' . $address . ':' . $server->getPort() . '/<info>' . $file . '</info>';
+                $urls .= ' http://' . $address . ':' . $server->getPort() . '/<info>' . $file . '</info>'.PHP_EOL;
             }
         }
 
-        // Pretty information. Nothing interesting code-wise.
-        $text = <<<TEXT
-%s started on <info>%s</info>, port <info>%s</info>.
+        $address = null === $server->getAddress() ? 'all interfaces' : $server->getAddress();
+
+        return <<<TEXT
+{$server->getName()} started on <info>{$address}</info>, port <info>{$server->getPort()}</info>.
 
 Available applications:
-%s
+{$urls}
 
 <important>Press Ctrl+C to stop serving.</important>
 
 TEXT;
-
-        return sprintf(
-            $text,
-            $server->getName(),
-            null === $server->getAddress() ? 'all interfaces' : $server->getAddress(),
-            $server->getPort(),
-            implode("\n", $apps)
-        );
-    }
-
-    /**
-     * @param \Symfttpd\Server\ServerInterface                  $server
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @todo create a signal handler to make this function testable
-     */
-    protected function handleSignals(ServerInterface $server, OutputInterface $output)
-    {
-        if (!function_exists('pcntl_signal')) {
-            $output->writeln('<info>PCNTL is no enabled in your PHP CLI version. You will have to kill processes manually.</info>');
-
-            return;
-        }
-
-        $handler = function () use ($server, $output) {
-            // Stop the gateway
-            if (($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface) {
-                $server->getGateway()->stop(new NullOutput());
-            }
-
-            $server->stop(new NullOutput());
-            $output->writeln(PHP_EOL.'<important>Stop serving, bye!</important>');
-
-            exit(0);
-        };
-
-        pcntl_signal(SIGTERM, $handler);
-        pcntl_signal(SIGINT, $handler);
     }
 }
