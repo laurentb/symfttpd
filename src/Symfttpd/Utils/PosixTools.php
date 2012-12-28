@@ -21,25 +21,21 @@ class PosixTools
     /**
      * Get a process ID from a file, and kill it, and remove the file either way.
      *
-     * @param                                                   $pidfile
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param string $pidfile
      *
      * @return bool
      */
-    public static function killPid($pidfile, \Symfony\Component\Console\Output\OutputInterface $output)
+    public static function killPid($pidfile)
     {
         if (file_exists($pidfile)) {
             $pid = intval(trim(file_get_contents($pidfile)));
             unlink($pidfile);
             if ($pid) {
                 posix_kill($pid, SIGTERM);
-                $output->writeln('<error>Process ' . $pid . ' killed</error>');
 
                 return true;
             }
         }
-
-        $output->writeln('No running process found', true);
 
         return false;
     }
