@@ -12,11 +12,11 @@
 namespace Symfttpd;
 
 /**
- * ServerConfiguration handles the configuration of a server.
+ * Config handles the configuration of Symfttpd.
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class Config implements \IteratorAggregate
+class Config implements \IteratorAggregate, \ArrayAccess
 {
     /**
      * @var array
@@ -132,5 +132,54 @@ class Config implements \IteratorAggregate
     public function set($name, $value)
     {
         $this->config[$name] = $value;
+    }
+
+    /**
+     * Whether a offset exists
+     *
+     * @param mixed $offset An offset to check for.
+     *
+     * @return boolean true on success or false on failure.
+     */
+    public function offsetExists($offset)
+    {
+        return $this->has($offset);
+    }
+
+    /**
+     * Offset to retrieve
+     *
+     * @param mixed $offset The offset to retrieve.
+     *
+     * @return mixed Can return all value types.
+     */
+    public function offsetGet($offset)
+    {
+        $this->get($offset);
+    }
+
+    /**
+     * Offset to set
+     *
+     * @param mixed $offset The offset to assign the value to.
+     * @param mixed $value  The value to set.
+     *
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->set($offset, $value);
+    }
+
+    /**
+     * Offset to unset
+     *
+     * @param mixed $offset The offset to unset.
+     *
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->remove($offset);
     }
 }
