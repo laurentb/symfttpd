@@ -36,7 +36,7 @@ class Tail implements TailInterface
     }
 
     /**
-     * Read a new line a long as it is possible.
+     * Read a new line as long as it is possible.
      * Goes straight to the end the first time if the file exists.
      * @return mixed a string (including line return), false (EOF) or null (failure)
      *
