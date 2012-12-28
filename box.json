@@ -12,8 +12,11 @@
             "name": ["*.php"],
             "in": ["vendor"],
             "exclude": [
-                "vendor/twig/doc",
-                "vendor/twig/test",
+                "vendor/twig/twig/doc",
+                "vendor/twig/twig/test",
+                "vendor/monolog/monolog/doc",
+                "vendor/monolog/monolog/tests",
+                "vendor/pimple/pimple/tests",
                 "vendor/bin",
                 "vendor/phpmd",
                 "vendor/pdepend"
