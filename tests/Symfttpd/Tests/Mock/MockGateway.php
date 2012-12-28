@@ -12,6 +12,7 @@
 namespace Symfttpd\Tests\Mock;
 
 use Symfttpd\Gateway\BaseGateway;
+use Symfttpd\ConfigurationGenerator;
 
 /**
  * MockGateway description
@@ -20,9 +21,26 @@ use Symfttpd\Gateway\BaseGateway;
  */
 class MockGateway extends BaseGateway
 {
-    public function getName()
+    public function getType()
     {
         return 'mock';
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getCommandLineArguments(ConfigurationGenerator $generator)
+    {
+        return array();
+    }
+
+    public function stop()
+    {
+        // do nothing
+    }
+
+    public function start(ConfigurationGenerator $generator)
+    {
+        // do nothing
+    }
 }

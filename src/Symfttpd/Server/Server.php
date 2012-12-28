@@ -125,11 +125,8 @@ class Server implements ServerInterface
 
         $process->run();
 
-        // @todo refactore this
-        $stderr = $process->getErrorOutput();
-
-        if (!empty($stderr)) {
-            throw new \RuntimeException($stderr);
+        if (!$process->isSuccessful()) {
+            throw new \RuntimeException($process->getErrorOutput());
         }
 
         if (null !== $this->logger) {

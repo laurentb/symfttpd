@@ -11,10 +11,7 @@
 
 namespace Symfttpd\Gateway;
 
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 use Symfttpd\Gateway\BaseGateway;
-use Symfttpd\Gateway\GatewayProcessableInterface;
 use Symfttpd\ConfigurationGenerator;
 
 /**
@@ -22,105 +19,23 @@ use Symfttpd\ConfigurationGenerator;
  *
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
-class PhpFpm extends BaseGateway implements GatewayProcessableInterface
+class PhpFpm extends BaseGateway
 {
+    const TYPE_PHPFPM = 'php-fpm';
+
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName()
+    public function getType()
     {
-        return 'php-fpm';
+        return self::TYPE_PHPFPM;
     }
 
     /**
-     * @param \Symfttpd\ConfigurationGenerator                  $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return mixed|void
-     * @throws \RuntimeException
+     * {@inheritdoc}
      */
-    public function start(ConfigurationGenerator $generator, OutputInterface $output)
+    protected function getCommandLineArguments(ConfigurationGenerator $generator)
     {
-        // Create the socket file first.
-        touch($this->getSocket());
-
-        $process = $this->getProcessBuilder()
-            ->setArguments(array($this->getCommand(), '-y', $generator->dump($this, true)))
-            ->getProcess();
-
-        $process->run();
-
-        $stderr = $process->getErrorOutput();
-
-        if (!empty($stderr)) {
-            throw new \RuntimeException($stderr);
-        }
-
-        if (null !== $this->logger) {
-            $this->logger->debug("{$this->getName()} started.");
-        }
-    }
-
-    /**
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return mixed
-     */
-    public function stop(OutputInterface $output)
-    {
-        \Symfttpd\Utils\PosixTools::killPid($this->getPidfile(), $output);
-
-        if (null !== $this->logger) {
-            $this->logger->debug("{$this->getName()} stopped.");
-        }
-
-        $output->writeln('<info>'.$this->getName().' stopped</info>');
-    }
-
-    /**
-     * @return string
-     */
-    public function getPidfile()
-    {
-        return sys_get_temp_dir().'/symfttpd-php-fpm.pid';
-    }
-
-    /**
-     * @return string
-     */
-    public function getSocket()
-    {
-        return sys_get_temp_dir().'/symfttpd-php-fpm.sock';
-    }
-
-    /**
-     * @todo configure this
-     * @return string
-     */
-    public function getErrorLog()
-    {
-        return sys_get_temp_dir().'/'.$this->getName().'-error.log';
-    }
-
-    /**
-     * Return the name of the user.
-     *
-     * @return string
-     */
-    public function getUser()
-    {
-        return get_current_user();
-    }
-
-    /**
-     * Return the name of the user's group
-     *
-     * @return mixed
-     */
-    public function getGroup()
-    {
-        $group = posix_getgrgid(posix_getgid());
-
-        return $group['name'];
+        return array($this->getExecutable(), '-y', $generator->dump($this, true));
     }
 }

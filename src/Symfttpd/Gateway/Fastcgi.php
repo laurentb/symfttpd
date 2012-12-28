@@ -12,6 +12,7 @@
 namespace Symfttpd\Gateway;
 
 use Symfttpd\Gateway\BaseGateway;
+use Symfttpd\ConfigurationGenerator;
 
 /**
  * Fastcgi description
@@ -20,19 +21,36 @@ use Symfttpd\Gateway\BaseGateway;
  */
 class Fastcgi extends BaseGateway
 {
+    const TYPE_FASTCGI = 'fastcgi';
     /**
      * @return string
      */
-    public function getName()
+    public function getType()
     {
-        return 'fastcgi';
+        return self::TYPE_FASTCGI;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getSocket()
+    protected function getCommandLineArguments(ConfigurationGenerator $generator)
     {
-        return sys_get_temp_dir().'/symfttpd" + PID + ".socket';
+        return array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function start(ConfigurationGenerator $generator)
+    {
+        // Do nothing yet see issue https://github.com/benja-M-1/symfttpd/issues/38
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stop()
+    {
+        // Do nothing yet see issue https://github.com/benja-M-1/symfttpd/issues/38
     }
 }
