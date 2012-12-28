@@ -45,6 +45,9 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
         $process->expects($this->once())
             ->method('run')
             ->will($this->returnValue(1));
+        $process->expects($this->once())
+            ->method('isSuccessful')
+            ->will($this->returnValue(true));
 
         $pb = $this->getMock('\Symfony\Component\Process\ProcessBuilder');
         $pb->expects($this->once())
@@ -91,6 +94,9 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
         $process->expects($this->once())
             ->method('run')
             ->will($this->returnValue(1));
+        $process->expects($this->once())
+            ->method('isSuccessful')
+            ->will($this->returnValue(true));
 
         $pb = $this->getMock('\Symfony\Component\Process\ProcessBuilder');
         $pb->expects($this->once())

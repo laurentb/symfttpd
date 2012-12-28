@@ -87,6 +87,9 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $process->expects($this->once())
             ->method('run')
             ->will($this->returnValue(0));
+        $process->expects($this->once())
+            ->method('isSuccessful')
+            ->will($this->returnValue(true));
 
         $processBuilder = $this->getMock('\Symfony\Component\Process\ProcessBuilder');
         $processBuilder->expects($this->once())
