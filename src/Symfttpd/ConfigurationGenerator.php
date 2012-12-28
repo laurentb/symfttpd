@@ -79,7 +79,7 @@ class ConfigurationGenerator
      */
     public function dump($subject, $force = false)
     {
-        $file = $this->getPath().'/'.$subject->getName().'.conf';
+        $file = $this->getPath().'/'.$subject->getType().'.conf';
 
         // Don't rewrite existing configuration if not forced to.
         if (false === $force && file_exists($file)) {
@@ -99,7 +99,7 @@ class ConfigurationGenerator
         }
 
         if (null !== $this->logger) {
-            $this->logger->debug("Configuration for {$subject->getName()} generated in {$file}.");
+            $this->logger->debug("Configuration for {$subject->getType()} generated in {$file}.");
         }
 
         return $file;
@@ -112,6 +112,6 @@ class ConfigurationGenerator
      */
     public function generate($subject)
     {
-        return $this->twig->render($subject->getName().'/'.$subject->getName().'.conf.twig', array('subject' => $subject));
+        return $this->twig->render($subject->getType().'/'.$subject->getType().'.conf.twig', array('subject' => $subject));
     }
 }

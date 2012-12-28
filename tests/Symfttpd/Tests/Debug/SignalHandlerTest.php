@@ -22,7 +22,7 @@ class SignalHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function testShutdown()
     {
-        $gateway = $this->getMock('\Symfttpd\Gateway\GatewayProcessableInterface');
+        $gateway = $this->getMock('\Symfttpd\Gateway\GatewayInterface');
         $gateway->expects($this->once())
             ->method('stop');
 

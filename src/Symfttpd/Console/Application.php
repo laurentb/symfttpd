@@ -183,8 +183,8 @@ class Application extends BaseApplication
 
             // @todo find a better way...
             $mapping = array(
-                'fastcgi' => '\Symfttpd\Gateway\Fastcgi',
-                'php-fpm' => '\Symfttpd\Gateway\PhpFpm',
+                \Symfttpd\Gateway\Fastcgi::TYPE_FASTCGI => '\Symfttpd\Gateway\Fastcgi',
+                \Symfttpd\Gateway\PhpFpm::TYPE_PHPFPM   => '\Symfttpd\Gateway\PhpFpm',
             );
 
             if (!array_key_exists($type, $mapping) || !class_exists($mapping[$type])) {
@@ -197,7 +197,7 @@ class Application extends BaseApplication
             $gateway = new $class();
 
             // @todo guess the command
-            $gateway->setCommand($config->get('gateway_cmd', $config->get('php_cgi_cmd')));
+            $gateway->configure($config);
             $gateway->setProcessBuilder($c['process_builder']);
             $gateway->setLogger($c['logger']);
 

@@ -180,16 +180,6 @@ class Server implements ServerInterface
         return $arguments;
     }
 
-
-    /**
-     * @return mixed
-     * @deprecated Use getType instead
-     */
-    public function getName()
-    {
-        return $this->getType();
-    }
-
     /**
      * {@inheritdoc}
      */

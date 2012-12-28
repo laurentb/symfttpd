@@ -74,7 +74,7 @@ class ConfigurationGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $subject = $this->getMock('\Symfttpd\Gateway\GatewayInterface');
         $subject->expects($this->exactly(2))
-            ->method('getName')
+            ->method('getType')
             ->will($this->returnValue($name));
 
         $configuration = $this->generator->generate($subject);

@@ -74,11 +74,11 @@ class SignalHandler
      */
     public function shutdown()
     {
-        if (($gateway = $this->server->getGateway()) instanceof GatewayProcessableInterface) {
-            $gateway->stop(new \Symfony\Component\Console\Output\NullOutput());
+        if (null !== $gateway = $this->server->getGateway()) {
+            $gateway->stop();
         }
 
-        $this->server->stop(new \Symfony\Component\Console\Output\NullOutput());
+        $this->server->stop();
 
         if (null != $this->output) {
             $this->output->writeln(PHP_EOL.'<important>Stop serving, bye!</important>');

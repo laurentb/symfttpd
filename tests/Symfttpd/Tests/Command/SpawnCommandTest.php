@@ -103,7 +103,7 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
         $server = new Server();
         $server->configure(new Config(array('server_type' => 'lighttpd', 'project_readable_phpfiles' => array('index.php'))), $this->getMock('\Symfttpd\Project\ProjectInterface'));
         $server->setProcessBuilder($pb);
-        
+
         $application = new \Symfttpd\Console\Application();
         $application->setContainer(new \Pimple(array(
             'server'     => $server,
