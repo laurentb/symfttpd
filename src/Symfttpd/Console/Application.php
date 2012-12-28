@@ -156,37 +156,19 @@ class Application extends BaseApplication
             /** @var $config \Symfttpd\Config */
             $config = $c['config'];
 
-            $type = $config->get('server_type', null);
+            $server = new \Symfttpd\Server\Server();
+            $server->configure($config, $c['project']);
 
-            $mapping = array(
-                'lighttpd' => '\Symfttpd\Server\Lighttpd',
-                'nginx'    => '\Symfttpd\Server\Nginx',
-            );
-
-            if (!array_key_exists($type, $mapping) || !class_exists($mapping[$type])) {
-                throw new \InvalidArgumentException(sprintf('Server "%s" is not supported.', $type));
-            }
-
-            $class = $mapping[$type];
-
-            /** @var \Symfttpd\Server\ServerInterface $server */
-            $server = new $class();
-            $server->bind($config->get('server_address', '127.0.0.1'), $config->get('server_port', '4042'));
-
-            if ($config->has('server_cmd')) {
-                $server->setCommand($config->get('server_cmd'));
-            } else {
+            if (null == $cmd = $config->get('server_cmd')) {
                 $c['finder']->addSuffix('');
 
                 // Try to guess the executable command of the server.
-                if (null == $cmd = $c['finder']->find($type)) {
-                    throw new ExecutableNotFoundException($type.' executable not found.');
+                if (null == $cmd = $c['finder']->find($server->getType())) {
+                    throw new ExecutableNotFoundException($server->getType().' executable not found.');
                 }
-
-                $server->setCommand($cmd);
             }
 
-            $server->configure($config, $c['project']);
+            $server->setExecutable($cmd);
             $server->setGateway($c['gateway']);
             $server->setProcessBuilder($c['process_builder']);
             $server->setLogger($c['logger']);

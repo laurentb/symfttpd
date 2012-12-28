@@ -11,57 +11,43 @@
 
 namespace Symfttpd\Server;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
-use Symfttpd\Log\LoggerInterface;
 use Symfttpd\ProcessAwareInterface;
 use Symfttpd\Project\ProjectInterface;
-use Symfttpd\Tail\TailInterface;
 
 /**
- * ServerInterface interface
+ * ServerInterface
  *
  * @author Benjamin Grandfond <benjaming@theodo.fr>
- * @todo Complete this interface.
  */
 interface ServerInterface extends ProcessAwareInterface
 {
     /**
      * Run the server command to start it.
      *
-     * @param \Symfttpd\ConfigurationGenerator                  $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\TailInterface                      $tail
+     * @param \Symfttpd\ConfigurationGenerator $generator
      *
      * @return mixed
      * @throws \RuntimeException
-     *
-     * @todo Move away the OutputInterface and TailInterface as they do not have anything
-     *       to do neither in the start and in the stop process.
      */
-    public function start(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null);
-
-    /**
-     * Restart the server command to start it.
-     *
-     * @abstract
-     * @param \Symfttpd\ConfigurationGenerator                  $generator
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     * @param \Symfttpd\Tail\TailInterface                      $tail
-     *
-     * @return mixed
-     */
-    public function restart(ConfigurationGenerator $generator, OutputInterface $output, TailInterface $tail = null);
+    public function start(ConfigurationGenerator $generator);
 
     /**
      * Stop the server.
      *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @return mixed
+     */
+    public function stop();
+
+    /**
+     * Restart the server command to start it.
+     *
+     * @param \Symfttpd\ConfigurationGenerator $generator
      *
      * @return mixed
      */
-    public function stop(OutputInterface $output);
+    public function restart(ConfigurationGenerator $generator);
 
     /**
      * Configure the server.
@@ -74,138 +60,105 @@ interface ServerInterface extends ProcessAwareInterface
     /**
      * @param      $address
      * @param null $port
-     *
-     * @return mixed
      */
     public function bind($address, $port = null);
 
-    /**
-     * @return string
-     */
-    public function getName();
 
     /**
+     * Return the type of the server, e.g. lighttpd or nginx.
+     *
+     * @return mixed
+     */
+    public function getType();
+
+    /**
+     * Return the bounded address of the server e.g. 127.0.0.1.
+     *
      * @return string
      */
     public function getAddress();
 
     /**
+     * Return the bounded port of the server.
+     *
      * @return string
      */
     public function getPort();
 
     /**
-     * @param string $command
-     */
-    public function setCommand($command);
-
-    /**
+     * Return the executable used to run the server, e.g. /usr/bin/lighttpd.
+     *
      * @return string
      */
-    public function getCommand();
+    public function getExecutable();
 
     /**
-     * @param string $pidfile
-     */
-    public function setPidfile($pidfile);
-
-    /**
-     * @return string
-     */
-    public function getPidfile();
-
-    /**
-     * @param string $accessLog
-     */
-    public function setAccessLog($accessLog);
-
-    /**
-     * @return string
-     */
-    public function getAccessLog();
-
-    /**
-     * @param array $allowedDirs
-     */
-    public function setAllowedDirs(array $allowedDirs);
-
-    /**
-     * @return array
-     */
-    public function getAllowedDirs();
-
-    /**
-     * @param array $allowedFiles
-     */
-    public function setAllowedFiles(array $allowedFiles);
-
-    /**
-     * @return array
-     */
-    public function getAllowedFiles();
-
-    /**
-     * @param array $unexecutableDirs
-     */
-    public function setUnexecutableDirs(array $unexecutableDirs);
-
-    /**
-     * @return array
-     */
-    public function getUnexecutableDirs();
-
-    /**
-     * @param string $documentRoot
-     */
-    public function setDocumentRoot($documentRoot);
-
-    /**
+     * Return the document root of the application.
+     *
      * @return string
      */
     public function getDocumentRoot();
 
     /**
-     * @param string $errorLog
-     */
-    public function setErrorLog($errorLog);
-
-    /**
-     * @return string
-     */
-    public function getErrorLog();
-
-    /**
-     * @param array $executableFiles
-     */
-    public function setExecutableFiles(array $executableFiles);
-
-    /**
-     * @return array
-     */
-    public function getExecutableFiles();
-
-    /**
-     * @param string $gateway
-     */
-    public function setGateway($gateway);
-
-    /**
-     * @return string
-     */
-    public function getGateway();
-
-    /**
-     * @param string $indexFile
-     */
-    public function setIndexFile($indexFile);
-
-    /**
+     * Return the index file of the application.
+     *
      * @return string
      */
     public function getIndexFile();
 
     /**
-     * @param \Symfttpd\Log\LoggerInterface $logger
+     * Return the pidfile of the server.
+     *
+     * @return string
      */
-    public function setLogger(LoggerInterface $logger);
+    public function getPidfile();
+
+    /**
+     * Return the access log file used by the server.
+     *
+     * @return string
+     */
+    public function getAccessLog();
+
+    /**
+     * Return the error log file used by the server.
+     *
+     * @return string
+     */
+    public function getErrorLog();
+
+    /**
+     * Return the list of files that the server can execute e.g. app.php.
+     *
+     * @return array
+     */
+    public function getExecutableFiles();
+
+    /**
+     * Return the list of directories that the server allow access e.g. uploads.
+     *
+     * @return array
+     */
+    public function getAllowedDirs();
+
+    /**
+     * Return the list that the server can read e.g. favicon.ico.
+     *
+     * @return array
+     */
+    public function getAllowedFiles();
+
+    /**
+     * Return the list of directories where files should not be executed e.g. uploads.
+     *
+     * @return array
+     */
+    public function getUnexecutableDirs();
+
+    /**
+     * Return the gateway instance used by the server e.g. php-fpm, fastcgi.
+     *
+     * @return \Symfttpd\Gateway\GatewayInterface
+     */
+    public function getGateway();
 }

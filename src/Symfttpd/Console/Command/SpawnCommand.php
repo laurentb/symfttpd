@@ -114,9 +114,9 @@ class SpawnCommand extends Command
             $filesystem = $container['filesystem'];
             $filesystem->mkdir($paths);
 
-            // Run the gateway if needed.
+            // Start the gateway if needed.
             if (($gateway = $server->getGateway()) instanceof \Symfttpd\Gateway\GatewayProcessableInterface) {
-                $server->getGateway()->start($generator, $output);
+                $gateway->start($generator);
             }
 
             return $server->start($generator, $output, $multitail) ? 1 : 0;
