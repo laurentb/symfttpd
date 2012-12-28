@@ -15,6 +15,9 @@ use Monolog\Handler\StreamHandler;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Console\Command\GenconfCommand;
@@ -51,7 +54,12 @@ class Application extends BaseApplication
     {
         parent::__construct('Symfttpd', Symfttpd::VERSION);
 
+        // Add options to Symfttpd globally
+        $this->getDefinition()->addOption(new InputOption('--debug', null, InputOption::VALUE_NONE, 'Switches on debug mode.'));
+
         $this->container = $c = new \Pimple();
+
+        $c['debug'] = false;
 
         // Configure the project guesser.
         $c['project.symfony1_checker'] = $c->share(function () {
@@ -212,8 +220,14 @@ class Application extends BaseApplication
         };
 
         $c['logger'] = $c->share(function ($c) {
+            $level = Logger::ERROR;
+
+            if (true === $c['debug']) {
+                $level = Logger::DEBUG;
+            }
+
             $logger = new Logger($this->getName());
-            $logger->pushHandler(new StreamHandler($c['config']->get('symfttpd_dir').'/log/symfttpd.log'), Logger::DEBUG);
+            $logger->pushHandler(new StreamHandler($c['config']->get('symfttpd_dir').'/log/symfttpd.log', $level));
 
             return $logger;
         });
@@ -257,5 +271,17 @@ class Application extends BaseApplication
         $commands[] = new SelfupdateCommand();
 
         return $commands;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function doRun(InputInterface $input, OutputInterface $output)
+    {
+        if (true === $input->hasParameterOption('--debug')) {
+            $this->container['debug'] = true;
+        }
+
+        return parent::doRun($input, $output);
     }
 }
