@@ -217,6 +217,13 @@ class Application extends BaseApplication
 
             return $logger;
         });
+
+        $c['watcher'] = $c->share(function ($c) {
+            $watcher = new \Symfttpd\Watcher\Watcher();
+            $watcher->setLogger($c['logger']);
+
+            return $watcher;
+        });
     }
 
     /**

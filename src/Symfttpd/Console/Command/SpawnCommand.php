@@ -19,10 +19,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfttpd\ConfigurationGenerator;
 use Symfttpd\Console\Command\Command;
 use Symfttpd\Server\ServerInterface;
 use Symfttpd\Tail\MultiTail;
 use Symfttpd\Tail\Tail;
+use Symfttpd\Tail\TailInterface;
 
 /**
  * SpawnCommand class
@@ -119,7 +121,28 @@ class SpawnCommand extends Command
                 $gateway->start($generator);
             }
 
-            return $server->start($generator, $output, $multitail) ? 1 : 0;
+            // Start the server
+            $server->start($generator);
+
+            /** @var $watcher \Symfttpd\Watcher\Watcher */
+            $watcher = $this->getApplication()->getContainer()->offsetGet('watcher');
+
+            // Watch at the document root content and restart the server if it changed.
+            $watcher->track($server->getDocumentRoot(), function ($resource) use ($server, $generator, $output) {
+                $output->writeln("<comment>Something in {$server->getDocumentRoot()} changed. Restarting {$server->getType()}.</comment>");
+
+                $server->restart($generator);
+            });
+
+            // Watch at server log files
+            if ($multitail instanceof TailInterface) {
+                $watcher->track($server->getErrorLog(), array($multitail, 'consume'));
+                $watcher->track($server->getAccessLog(), array($multitail, 'consume'));
+            }
+
+            // Start watching
+            $watcher->start();
+
         } catch (\Exception $e) {
             $output->writeln('<error>The server cannot start</error>');
             $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
@@ -151,11 +174,10 @@ class SpawnCommand extends Command
         $address = null === $server->getAddress() ? 'all interfaces' : $server->getAddress();
 
         return <<<TEXT
-{$server->getName()} started on <info>{$address}</info>, port <info>{$server->getPort()}</info>.
+{$server->getType()} started on <info>{$address}</info>, port <info>{$server->getPort()}</info>.
 
 Available applications:
 {$urls}
-
 <important>Press Ctrl+C to stop serving.</important>
 
 TEXT;

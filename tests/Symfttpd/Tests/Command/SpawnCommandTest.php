@@ -12,7 +12,8 @@
 namespace Symfttpd\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfttpd\Tests\Mock\MockServer;
+use Symfttpd\Config;
+use Symfttpd\Server\Server;
 use Symfttpd\Console\Command\SpawnCommand;
 
 /**
@@ -38,15 +39,33 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute()
     {
-        $server = new MockServer();
-        $server->setExecutableFiles(array('index.php'));
+        $process = $this->getMockBuilder('\Symfony\Component\Process\Process')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $process->expects($this->once())
+            ->method('run')
+            ->will($this->returnValue(1));
 
-        $application = new \Symfttpd\Console\Application();
-        $application->setContainer(array(
+        $pb = $this->getMock('\Symfony\Component\Process\ProcessBuilder');
+        $pb->expects($this->once())
+            ->method('setArguments')
+            ->will($this->returnSelf());
+        $pb->expects($this->once())
+            ->method('getProcess')
+            ->will($this->returnValue($process));
+
+        $server = new Server();
+        $server->configure(new Config(array('server_type' => 'lighttpd', 'project_readable_phpfiles' => array('index.php'))), $this->getMock('\Symfttpd\Project\ProjectInterface'));
+        $server->setProcessBuilder($pb);
+
+        $pimple = new \Pimple(array(
             'server'     => $server,
             'generator'  => $this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false),
             'filesystem' => $this->getMock('\Symfony\Component\Filesystem\Filesystem'),
+            'watcher'    => $this->getMock('\Symfttpd\Watcher\Watcher')
         ));
+        $application = new \Symfttpd\Console\Application();
+        $application->setContainer($pimple);
         $application->add($this->command);
 
         $commandTester = new CommandTester($this->command);
@@ -66,15 +85,32 @@ class SpawnCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteOnAllInterfaces()
     {
-        $server = new MockServer();
-        $server->setExecutableFiles(array('index.php'));
+        $process = $this->getMockBuilder('\Symfony\Component\Process\Process')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $process->expects($this->once())
+            ->method('run')
+            ->will($this->returnValue(1));
 
+        $pb = $this->getMock('\Symfony\Component\Process\ProcessBuilder');
+        $pb->expects($this->once())
+            ->method('setArguments')
+            ->will($this->returnSelf());
+        $pb->expects($this->once())
+            ->method('getProcess')
+            ->will($this->returnValue($process));
+
+        $server = new Server();
+        $server->configure(new Config(array('server_type' => 'lighttpd', 'project_readable_phpfiles' => array('index.php'))), $this->getMock('\Symfttpd\Project\ProjectInterface'));
+        $server->setProcessBuilder($pb);
+        
         $application = new \Symfttpd\Console\Application();
-        $application->setContainer(array(
-                'server'     => $server,
-                'generator'  => $this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false),
-                'filesystem' => $this->getMock('\Symfony\Component\Filesystem\Filesystem'),
-            ));
+        $application->setContainer(new \Pimple(array(
+            'server'     => $server,
+            'generator'  => $this->getMock('\Symfttpd\ConfigurationGenerator', array(), array(), '', false),
+            'filesystem' => $this->getMock('\Symfony\Component\Filesystem\Filesystem'),
+            'watcher'    => $this->getMock('\Symfttpd\Watcher\Watcher')
+        )));
         $application->add($this->command);
 
         $commandTester = new CommandTester($this->command);
