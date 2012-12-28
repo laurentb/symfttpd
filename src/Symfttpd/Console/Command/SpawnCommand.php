@@ -127,7 +127,7 @@ class SpawnCommand extends Command
             $server->start($generator);
 
             /** @var $watcher \Symfttpd\Watcher\Watcher */
-            $watcher = $this->getApplication()->getContainer()->offsetGet('watcher');
+            $watcher = $container['watcher'];
 
             // Watch at the document root content and restart the server if it changed.
             $watcher->track($server->getDocumentRoot(), function ($resource) use ($server, $generator, $output) {
@@ -144,7 +144,6 @@ class SpawnCommand extends Command
 
             // Start watching
             $watcher->start();
-
         } catch (\Exception $e) {
             $output->writeln('<error>The server cannot start</error>');
             $output->writeln(sprintf('<error>%s</error>', trim($e->getMessage(), " \0\t\r\n")));
