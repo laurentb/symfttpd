@@ -45,7 +45,7 @@ class PhpFpm extends BaseGateway implements GatewayProcessableInterface
         touch($this->getSocket());
 
         $process = $this->getProcessBuilder()
-            ->setArguments(array($this->getCommand(), '-y', $generator->dump($this, false)))
+            ->setArguments(array($this->getCommand(), '-y', $generator->dump($this, true)))
             ->getProcess();
 
         $process->run();
