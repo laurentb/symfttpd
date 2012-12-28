@@ -101,7 +101,9 @@ class SpawnCommand extends Command
             $multitail->consume();
         }
 
-        \Symfttpd\Debug\SignalHandler::register($server, $output);
+        $signalHandler = \Symfttpd\Debug\SignalHandler::register($server);
+        $signalHandler->setOutput($output);
+        $signalHandler->setLogger($container['logger']);
 
         try {
             $generator = $container['generator'];
