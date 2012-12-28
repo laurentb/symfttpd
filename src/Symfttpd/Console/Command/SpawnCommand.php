@@ -103,7 +103,9 @@ class SpawnCommand extends Command
 
         $signalHandler = \Symfttpd\Debug\SignalHandler::register($server);
         $signalHandler->setOutput($output);
-        $signalHandler->setLogger($container['logger']);
+        if ($container->offsetExists('logger')) {
+            $signalHandler->setLogger($container['logger']);
+        }
 
         try {
             $generator = $container['generator'];

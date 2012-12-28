@@ -241,9 +241,9 @@ class Application extends BaseApplication
     }
 
     /**
-     * Return Symfttpd
+     * Return the service container
      *
-     * @return \Symfttpd\Symfttpd
+     * @return \Pimple
      */
     public function getContainer()
     {
