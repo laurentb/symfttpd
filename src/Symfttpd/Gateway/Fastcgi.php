@@ -15,13 +15,18 @@ use Symfttpd\Gateway\BaseGateway;
 use Symfttpd\ConfigurationGenerator;
 
 /**
- * Fastcgi description
+ * Fastcgi gateway definition.
  *
+ * Fastcgi is mainly used with lighttpd. For the moment
+ * we don't care about making it working with NGinx.
+ *
+ * @see issue https://github.com/benja-M-1/symfttpd/issues/38
  * @author Benjamin Grandfond <benjamin.grandfond@gmail.com>
  */
 class Fastcgi extends BaseGateway
 {
     const TYPE_FASTCGI = 'fastcgi';
+
     /**
      * @return string
      */
@@ -43,7 +48,10 @@ class Fastcgi extends BaseGateway
      */
     public function start(ConfigurationGenerator $generator)
     {
-        // Do nothing yet see issue https://github.com/benja-M-1/symfttpd/issues/38
+        // Fastcgi is run by Lighttpd we don't need to start a process.
+        if (null !== $this->logger) {
+            $this->logger->debug("{$this->getType()} started.");
+        }
     }
 
     /**
@@ -51,6 +59,8 @@ class Fastcgi extends BaseGateway
      */
     public function stop()
     {
-        // Do nothing yet see issue https://github.com/benja-M-1/symfttpd/issues/38
+        if (null !== $this->logger) {
+            $this->logger->debug("{$this->getType()} stopped.");
+        }
     }
 }

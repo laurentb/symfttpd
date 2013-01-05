@@ -38,8 +38,8 @@ fastcgi.server = ( ".php" =>
   ( "localhost" =>
     (
       "socket" => "{{ server.gateway.socket|raw }}",
-      {%- if server.gateway.start is not defined -%}
-      "bin-path" => "{{ server.gateway.command }}",
+      {%- if server.gateway.executable is defined -%}
+      "bin-path" => "{{ server.gateway.executable }}",
       {%- endif -%}
       "max-procs" => 1,
       "max-load-per-proc" => 1,
