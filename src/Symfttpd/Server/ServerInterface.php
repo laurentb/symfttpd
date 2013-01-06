@@ -63,7 +63,6 @@ interface ServerInterface extends ProcessAwareInterface
      */
     public function bind($address, $port = null);
 
-
     /**
      * Return the type of the server, e.g. lighttpd or nginx.
      *

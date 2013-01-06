@@ -64,29 +64,24 @@ EOT
     {
         if (true === $input->getOption('output')) {
             // Set the output to null to not print any comment.
+            $baseOutput = $output;
             $output = new \Symfony\Component\Console\Output\NullOutput();
         }
 
         $output->writeln('Starting generating symfttpd configuration.');
 
-        $this->getSymfttpd()->getProject()->setRootDir($input->getOption('path'));
-        $server = $this->getSymfttpd()->getServer();
-        $server->options->set('port', $input->getOption('port'));
-        $server->options->set('bind', $input->getOption('bind'));
+        $container = $this->getApplication()->getContainer();
+
+        $container['project']->setRootDir($input->getOption('path'));
+        $server = $container['server'];
+        $server->bind($input->getOption('bind'), $input->getOption('port'));
 
         try {
-            $output->writeln(sprintf(
-                'Generate <comment>%s</comment> and <comment>%s</comment> in <info>"%s"</info>.',
-                $server->getConfigFilename(),
-                $server->getRulesFilename(),
-                $server->getCacheDir()
-            ));
-            $server->generate($this->getSymfttpd()->getConfiguration());
 
             if (null == $input->getOption('output')) {
-                $server->write(true);
+                $container['generator']->dump($server, true);
             } else {
-                print $server->read();
+                $baseOutput->write($container['generator']->generate($server));
             }
 
         } catch (ConfigurationException $e) {
