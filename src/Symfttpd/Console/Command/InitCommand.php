@@ -37,7 +37,24 @@ class InitCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $file = new \Symfttpd\SymfttpdFile('symfttpd.conf.php');
+
+        if ($input->isInteractive() && file_exists($file->getFilePath())) {
+            $dialog = $this->getHelper('dialog');
+            if (!$dialog->askConfirmation($output, $dialog->getQuestion('The file already exists, do you overwrite it', 'yes', '?'), true)) {
+                $output->writeln('<error>Generation aborted</error>');
+
+                return 1;
+            }
+        }
+
         $file->write($this->userChoices);
+
+        $output->writeln(array(
+            '',
+            '<comment>Symfttpd file successfuly created!</comment>',
+            '',
+            '<info>You can now start your webserver: <comment>"php symfttpd.phar spawn"</comment>.</info>'
+        ));
     }
 
     /**
@@ -48,7 +65,7 @@ class InitCommand extends Command
         $container = $this->getApplication()->getContainer();
 
         /** @var $dialog \Symfony\Component\Console\Helper\DialogHelper */
-        $dialog = $this->getHelperSet()->get('dialog');
+        $dialog = $this->getHelper('dialog');
 
         // Project related configuration
         $output->writeln(array('','Configure your project.',''));
