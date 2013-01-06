@@ -165,6 +165,11 @@ class Application extends BaseApplication
             return new $class($config);
         });
 
+        $c['supported_servers'] = array(
+            \Symfttpd\Server\Server::TYPE_LIGHTTPD,
+            \Symfttpd\Server\Server::TYPE_NGINX,
+        );
+
         $c['server'] = $c->share(function ($c) {
             /** @var $config \Symfttpd\Config */
             $config = $c['config'];
@@ -187,27 +192,35 @@ class Application extends BaseApplication
             return $server;
         });
 
+        $c['supported_gateways'] = array(
+            \Symfttpd\Gateway\Fastcgi::TYPE_FASTCGI,
+            \Symfttpd\Gateway\PhpFpm::TYPE_PHPFPM,
+        );
+
         $c['gateway'] = $c->share(function ($c) {
             /** @var $config \Symfttpd\Config */
             $config = $c['config'];
             $type = $config->get('gateway_type', 'fastcgi');
 
-            // @todo find a better way...
+            if (!in_array($type, $c['supported_gateways'])) {
+                throw new \InvalidArgumentException(sprintf('"%s" gateway is not supported.', $type));
+            }
+
             $mapping = array(
                 \Symfttpd\Gateway\Fastcgi::TYPE_FASTCGI => '\Symfttpd\Gateway\Fastcgi',
                 \Symfttpd\Gateway\PhpFpm::TYPE_PHPFPM   => '\Symfttpd\Gateway\PhpFpm',
             );
-
-            if (!array_key_exists($type, $mapping) || !class_exists($mapping[$type])) {
-                throw new \InvalidArgumentException(sprintf('"%s" gateway is not supported.', $type));
-            }
 
             $class = $mapping[$type];
 
             /** @var \Symfttpd\Gateway\GatewayInterface $gateway */
             $gateway = new $class();
 
-            // @todo guess the command
+            // Guess the gateway command if it is not porvided.
+            if (!$config->has('gateway_cmd')) {
+                $config->set('gateway_cmd', $c['finder']->find($gateway->getType()));
+            }
+
             $gateway->configure($config);
             $gateway->setProcessBuilder($c['process_builder']);
             $gateway->setLogger($c['logger']);

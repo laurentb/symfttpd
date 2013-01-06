@@ -48,8 +48,14 @@ class InitCommandTest extends \PHPUnit_Framework_TestCase
             ->method('find')
             ->will($this->returnValue('/usr/bin/foo'));
 
+        $container = new \Pimple(array(
+            'finder'             => $finder,
+            'supported_servers'  => array('lighttpd', 'nginx'),
+            'supported_gateways' => array('fastcgi', 'php-fpm'),
+        ));
+
         $application = new \Symfttpd\Console\Application();
-        $application->setContainer(new \Pimple(array('finder' => $finder)));
+        $application->setContainer($container);
         $application->add($command);
 
         // Mock the dialog helper to control answers to questions

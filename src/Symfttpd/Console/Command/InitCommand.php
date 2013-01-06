@@ -66,7 +66,7 @@ class InitCommand extends Command
         // Server related configuration
         $output->writeln(array('', 'Configure the server used by Symfttpd', ''));
 
-        $servers = array('lighttpd', 'nginx');
+        $servers = $container['supported_servers'];
         $type = $dialog->select($output, '<info>Which server server do you want to use?</info>', $servers);
         $this->userChoices['server_type'] = $servers[$type];
 
@@ -76,7 +76,7 @@ class InitCommand extends Command
         // gateway related configuration
         $output->writeln(array('', 'Configure the gateway used by the server.', ''));
 
-        $gateways = array('fastcgi', 'php-fpm');
+        $gateways = $container['supported_gateways'];
         $type = $dialog->select($output, '<info>Which gateway do you want to use?</info>', $gateways);
         $this->userChoices['gateway_type'] = $gateways[$type];
 
