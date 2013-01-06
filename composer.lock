@@ -7,16 +7,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog",
-                "reference": "52b454f89041c41c548bc242482aaf9dc6fee5d8"
+                "reference": "dd55acf3e0874ca80a3e0e8670ecb990ce035d2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Seldaek/monolog/archive/52b454f89041c41c548bc242482aaf9dc6fee5d8.zip",
-                "reference": "52b454f89041c41c548bc242482aaf9dc6fee5d8",
+                "url": "https://github.com/Seldaek/monolog/archive/dd55acf3e0874ca80a3e0e8670ecb990ce035d2b.zip",
+                "reference": "dd55acf3e0874ca80a3e0e8670ecb990ce035d2b",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.3.0",
+                "psr/log": ">=1.0,<2.0"
             },
             "require-dev": {
                 "mlehner/gelf-php": "1.0.*"
@@ -26,7 +27,7 @@
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
                 "ext-mongo": "Allow sending log messages to a MongoDB server"
             },
-            "time": "2012-12-21 09:35:52",
+            "time": "2013-01-05 14:53:48",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -64,18 +65,18 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Pimple.git",
-                "reference": "v1.0.1"
+                "reference": "f145dc796b76635e5419354e6d7dce4d6c8cd04d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Pimple/archive/v1.0.1.zip",
-                "reference": "v1.0.1",
+                "url": "https://github.com/fabpot/Pimple/archive/f145dc796b76635e5419354e6d7dce4d6c8cd04d.zip",
+                "reference": "f145dc796b76635e5419354e6d7dce4d6c8cd04d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "2012-11-11 08:32:34",
+            "time": "2013-01-04 16:53:43",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -106,24 +107,63 @@
             ]
         },
         {
+            "name": "psr/log",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/php-fig/log/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "time": "2012-12-21 11:40:51",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Psr\\Log\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ]
+        },
+        {
             "name": "symfony/config",
             "version": "dev-master",
             "target-dir": "Symfony/Component/Config",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Config",
-                "reference": "ab422ad472259c7775d70831182f586f444c77a3"
+                "reference": "28cdd4825abcabcecdfc8e1764c36f7f929cfc65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Config/archive/ab422ad472259c7775d70831182f586f444c77a3.zip",
-                "reference": "ab422ad472259c7775d70831182f586f444c77a3",
+                "url": "https://github.com/symfony/Config/archive/28cdd4825abcabcecdfc8e1764c36f7f929cfc65.zip",
+                "reference": "28cdd4825abcabcecdfc8e1764c36f7f929cfc65",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-12-20 07:41:17",
+            "time": "2013-01-05 17:52:40",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -160,18 +200,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "388ea8dbc1b3e1f96721e2799eb2d037e411a281"
+                "reference": "1f654c06c5b716d2ee0080e03f0e08915b2ad9b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/archive/388ea8dbc1b3e1f96721e2799eb2d037e411a281.zip",
-                "reference": "388ea8dbc1b3e1f96721e2799eb2d037e411a281",
+                "url": "https://github.com/symfony/Console/archive/1f654c06c5b716d2ee0080e03f0e08915b2ad9b1.zip",
+                "reference": "1f654c06c5b716d2ee0080e03f0e08915b2ad9b1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-12-19 07:09:49",
+            "time": "2013-01-06 10:18:09",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -208,18 +248,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Filesystem",
-                "reference": "1747c69853d974a9bc87fb9a0e5b55ad2a785577"
+                "reference": "bd936471934f0a718bce5b057ae658079c71b97c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Filesystem/archive/1747c69853d974a9bc87fb9a0e5b55ad2a785577.zip",
-                "reference": "1747c69853d974a9bc87fb9a0e5b55ad2a785577",
+                "url": "https://github.com/symfony/Filesystem/archive/bd936471934f0a718bce5b057ae658079c71b97c.zip",
+                "reference": "bd936471934f0a718bce5b057ae658079c71b97c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-12-14 22:27:02",
+            "time": "2013-01-05 17:52:40",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -256,18 +296,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder",
-                "reference": "bd672f52f4336df87e665f456c3be1605a2ac75a"
+                "reference": "f6def71f171a9c897d4abcbb653919f9bd01dc9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Finder/archive/bd672f52f4336df87e665f456c3be1605a2ac75a.zip",
-                "reference": "bd672f52f4336df87e665f456c3be1605a2ac75a",
+                "url": "https://github.com/symfony/Finder/archive/f6def71f171a9c897d4abcbb653919f9bd01dc9d.zip",
+                "reference": "f6def71f171a9c897d4abcbb653919f9bd01dc9d",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-12-20 07:41:17",
+            "time": "2013-01-04 16:58:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -304,18 +344,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Process",
-                "reference": "7f55bdf84a2b439492aadaea71e8d9824ea783d5"
+                "reference": "cad46749e8c89792df9c3b2474e528e925790642"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Process/archive/7f55bdf84a2b439492aadaea71e8d9824ea783d5.zip",
-                "reference": "7f55bdf84a2b439492aadaea71e8d9824ea783d5",
+                "url": "https://github.com/symfony/Process/archive/cad46749e8c89792df9c3b2474e528e925790642.zip",
+                "reference": "cad46749e8c89792df9c3b2474e528e925790642",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-12-20 07:22:35",
+            "time": "2013-01-05 18:24:35",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -351,18 +391,18 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/fabpot/Twig.git",
-                "reference": "f095f3a1777431412954e478f92e8a10cb7b6495"
+                "reference": "ddd4b732f9aa182edb54b89891c7fd25668354a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/fabpot/Twig/archive/f095f3a1777431412954e478f92e8a10cb7b6495.zip",
-                "reference": "f095f3a1777431412954e478f92e8a10cb7b6495",
+                "url": "https://github.com/fabpot/Twig/archive/ddd4b732f9aa182edb54b89891c7fd25668354a4.zip",
+                "reference": "ddd4b732f9aa182edb54b89891c7fd25668354a4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "2012-12-18 10:01:32",
+            "time": "2013-01-05 10:14:46",
             "type": "library",
             "extra": {
                 "branch-alias": {
