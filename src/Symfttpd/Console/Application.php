@@ -21,6 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfttpd\Console\Command\GenconfCommand;
+use Symfttpd\Console\Command\Helper\DialogHelper;
+use Symfttpd\Console\Command\InitCommand;
 use Symfttpd\Console\Command\SelfupdateCommand;
 use Symfttpd\Console\Command\SpawnCommand;
 use Symfttpd\Config;
@@ -79,7 +81,10 @@ class Application extends BaseApplication
         });
 
         $c['finder'] = $c->share(function ($c) {
-            return new ExecutableFinder();
+            $finder = new ExecutableFinder();
+            $finder->addSuffix('');
+
+            return $finder;
         });
 
         $c['symfttpd_file'] = $c->share(function ($c) {
@@ -168,8 +173,6 @@ class Application extends BaseApplication
             $server->configure($config, $c['project']);
 
             if (null == $cmd = $config->get('server_cmd')) {
-                $c['finder']->addSuffix('');
-
                 // Try to guess the executable command of the server.
                 if (null == $cmd = $c['finder']->find($server->getType())) {
                     throw new ExecutableNotFoundException($server->getType().' executable not found.');
@@ -266,6 +269,7 @@ class Application extends BaseApplication
     public function getDefaultCommands()
     {
         $commands = parent::getDefaultCommands();
+        $commands[] = new InitCommand();
         $commands[] = new GenconfCommand();
         $commands[] = new SpawnCommand();
         $commands[] = new SelfupdateCommand();
@@ -283,5 +287,19 @@ class Application extends BaseApplication
         }
 
         return parent::doRun($input, $output);
+    }
+
+    /**
+     * Gets the default helper set with the helpers that should always be available.
+     *
+     * @return HelperSet A HelperSet instance
+     */
+    protected function getDefaultHelperSet()
+    {
+        $helperSet = parent::getDefaultHelperSet();
+
+        $helperSet->set(new DialogHelper(), 'dialog');
+
+        return $helperSet;
     }
 }

@@ -71,4 +71,22 @@ class SymfttpdFileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $configuration);
     }
+
+    public function testWrite()
+    {
+        $file = new SymfttpdFile();
+        $file->write(array('foo' => 'bar'));
+
+        $this->assertFileExists($file->getFilePath());
+        $this->assertEquals(<<<PHP
+<?php
+
+\$options = array (
+  'foo' => 'bar',
+);
+PHP
+        , file_get_contents($file->getFilePath()));
+
+        unlink($file->getFilePath());
+    }
 }

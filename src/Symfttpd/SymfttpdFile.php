@@ -11,7 +11,9 @@
 
 namespace Symfttpd;
 
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfttpd\Exception\FileNotFoundException;
 
 /**
@@ -32,6 +34,11 @@ class SymfttpdFile
     protected $name;
 
     /**
+     * @var \Symfony\Component\Filesystem\Filesystem
+     */
+    protected $filesystem;
+
+    /**
      * @var \Symfony\Component\Config\Definition\Processor
      */
     protected $processor;
@@ -41,12 +48,14 @@ class SymfttpdFile
      */
     protected $configuration;
 
+
     /**
      * Set default paths.
      */
-    public function __construct($name = 'symfttpd.conf.php')
+    public function __construct($name = 'symfttpd.conf.php', Filesystem $filesystem = null)
     {
         $this->name = $name;
+        $this->filesystem = $filesystem ?: new Filesystem();
 
         foreach ($this->getDefaultPaths() as $path) {
             try {
@@ -70,8 +79,18 @@ class SymfttpdFile
             getenv('HOME').'/.symfttpd',    // ~/.symfttpd/symfttpd.conf.php
             getenv('HOME'),                 // ~/.symfttpd.conf.php
             getcwd().'/config',             // project configuration
-            getcwd().'/',
+            $this->getCurrentPath(),
         );
+    }
+
+    /**
+     * Return the path where Symfttpd lives.
+     *
+     * @return string
+     */
+    public function getCurrentPath()
+    {
+        return getcwd() . '/';
     }
 
     /**
@@ -93,6 +112,16 @@ class SymfttpdFile
         }
 
         $this->paths[] = $path;
+    }
+
+    /**
+     * Return the file path from where Symfttpd lives.
+     *
+     * @return string
+     */
+    public function getFilePath()
+    {
+        return $this->getCurrentPath().$this->name;
     }
 
     /**
@@ -129,6 +158,22 @@ class SymfttpdFile
     }
 
     /**
+     * Write the configuration file in the current directory.
+     */
+    public function write($config = array())
+    {
+        $this->filesystem->touch($this->getFilePath());
+
+        $template = <<<PHP
+<?php
+
+\$options = %s;
+PHP;
+
+        file_put_contents($this->getFilePath(), sprintf($template, var_export($config, true)));
+    }
+
+    /**
      * Process the configuration from
      * the configuration definition.
      *
@@ -144,7 +189,7 @@ class SymfttpdFile
     /**
      * @param \Symfony\Component\Config\Definition\ConfigurationInterface $configuration
      */
-    public function setConfiguration($configuration)
+    public function setConfiguration(ConfigurationInterface $configuration)
     {
         $this->configuration = $configuration;
     }
@@ -160,7 +205,7 @@ class SymfttpdFile
     /**
      * @param \Symfony\Component\Config\Definition\Processor $processor
      */
-    public function setProcessor($processor)
+    public function setProcessor(Processor $processor)
     {
         $this->processor = $processor;
     }
