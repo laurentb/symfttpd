@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Symfttpd\Console\Command\Helper;
+namespace Symfttpd\Console\Helper;
 
 use Symfony\Component\Console\Helper\DialogHelper as BaseHelper;
 

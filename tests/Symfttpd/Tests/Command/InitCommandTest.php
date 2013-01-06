@@ -53,7 +53,7 @@ class InitCommandTest extends \PHPUnit_Framework_TestCase
         $application->add($command);
 
         // Mock the dialog helper to control answers to questions
-        $dialog = $this->getMock('\Symfttpd\Console\Command\Helper\DialogHelper');
+        $dialog = $this->getMock('\Symfttpd\Console\Helper\DialogHelper');
         $application->getHelperSet()->set($dialog, 'dialog');
 
         $input = new \Symfony\Component\Console\Input\ArrayInput(array('command' => $command->getName()));
