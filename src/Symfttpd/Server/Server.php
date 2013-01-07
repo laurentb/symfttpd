@@ -60,6 +60,7 @@ class Server implements ServerInterface
     protected $allowedFiles = array();
     protected $executableFiles = array();
     protected $unexecutableDirs = array();
+    protected $tempPath;
 
     /**
      * Configure the server.
@@ -72,6 +73,8 @@ class Server implements ServerInterface
     public function configure(Config $config, ProjectInterface $project)
     {
         $baseDir = $config->get('symfttpd_dir', getcwd().'/symfttpd');
+
+        $this->tempPath = $baseDir.'/tmp';
 
         $this->setType($config->get('server_type'));
 
@@ -364,5 +367,15 @@ class Server implements ServerInterface
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * Return the temporary path
+     *
+     * @return string
+     */
+    public function getTempPath()
+    {
+      return $this->tempPath;
     }
 }

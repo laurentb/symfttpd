@@ -3,9 +3,6 @@
 worker_processes  2;
 pid {{ server.pidfile }};
 
-# [ debug | info | notice | warn | error | crit ]
-error_log  {{ server.errorLog }}  debug;
-
 {% block events %}
 events {
     worker_connections   200;
@@ -28,6 +25,7 @@ http {
     '"$http_range" "$sent_http_content_range"';
 
     client_header_timeout  3m;
+    client_body_temp_path  {{ server.tempPath }} 1 2;
     client_body_timeout    3m;
     send_timeout           3m;
 
@@ -48,7 +46,6 @@ http {
     tcp_nopush       on;
 
     tcp_nodelay      on;
-    send_lowat       12000;
 
     keepalive_timeout  75 20;
 
@@ -63,6 +60,9 @@ http {
             server_name   {{ server.address }};
         {%- endif -%}
         root          {{ server.documentRoot }};
+
+        # [ debug | info | notice | warn | error | crit ]
+        error_log  {{ server.errorLog }}  debug;
 
         access_log    {{ server.accessLog }}  main;
 

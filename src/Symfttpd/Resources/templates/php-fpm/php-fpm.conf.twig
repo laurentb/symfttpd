@@ -138,7 +138,7 @@ error_log = {{ gateway.errorLog }}
 ; Unix user/group of processes
 ; Note: The user is mandatory. If the group is not set, the default user's group
 ;       will be used.
-;user = _www
+user = {{ gateway.user }}
 ;group = _www
 
 ; The address on which to accept FastCGI requests.
