@@ -242,7 +242,7 @@ class Application extends BaseApplication
                 $level = Logger::DEBUG;
             }
 
-            $logger = new Logger($this->getName());
+            $logger = new Logger('symfttpd');
             $logger->pushHandler(new StreamHandler($c['config']->get('symfttpd_dir').'/log/symfttpd.log', $level));
 
             return $logger;
