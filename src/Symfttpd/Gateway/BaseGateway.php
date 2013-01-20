@@ -50,10 +50,13 @@ abstract class BaseGateway implements GatewayInterface
     {
         $baseDir = $config->get('symfttpd_dir', getcwd().'/symfttpd');
 
+        // Create an id for the socket file
+        $id = $this->getType().time();
+
         $this->executable  = $config->get('gateway_cmd', $config->get('php_cgi_cmd'));
         $this->errorLog    = $config->get('gateway_error_log', "$baseDir/log/{$this->getType()}-error.log");
         $this->pidfile     = $config->get('gateway_pidfile', "$baseDir/symfttpd-{$this->getType()}.pid");
-        $this->socket      = $config->get('gateway_socket', "$baseDir/symfttpd-{$this->getType()}.sock");
+        $this->socket      = $config->get('gateway_socket', "$baseDir/symfttpd-{$id}.sock");
 
         $group = posix_getgrgid(posix_getgid());
         $this->group = $group['name'];
