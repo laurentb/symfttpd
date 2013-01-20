@@ -1,15 +1,15 @@
-# symfttpd - [![Build Status](https://secure.travis-ci.org/benja-M-1/symfttpd.png?branch=2.0.0)](http://travis-ci.org/benja-M-1/symfttpd)
+# symfttpd - [![Build Status](https://secure.travis-ci.org/benja-M-1/symfttpd.png?branch=master)](http://travis-ci.org/benja-M-1/symfttpd)
 
-symfttpd is a set of tools to run a web server in your php project,
+Symfttpd is a command line tool to run a web server in your php project,
 aimed at lazy developers and sysadmins.
 
 **This version of symfttpd is under development, this documentation can be outdated and contains some errors.**
 
 
-`spawn` will setup and start a lighttpd server with a minimal
+`spawn` will setup and start a web server (lighttpd or nginx) with a minimal
 configuration to serve one PHP project. The server will not be run as
 a separate user, which is ideal for developers; also, the server logs
-will be written in the project's "log" directory and will include PHP errors.
+will be written in the symfttpd's "log" directory and will include PHP errors.
 
 
 `genconf` will generate all the rules necessary to setup a vhost in lighttpd.
@@ -17,15 +17,29 @@ It leverages the `include_shell` directive which means no endless
 copy/pasting and easy updates (only restarting lighttpd is necessary).
 
 
-Once configured (which is straightforward), it will take only one command
-to create all the symlinks.
-
-
 ## Installation
 
 ### Locally
 
+#### As PHAR archive
+
 [Download](https://github.com/downloads/benja-M-1/symfttpd/symfttpd.phar) the `.phar` file.
+
+#### As requirement of your project
+
+Add Symfttpd as a requirement of your project with Composer:
+
+    {
+        …
+        "require-dev": {
+            "benjam1/symfttpd": "2.1.*@        },
+        "config": {
+            "bin-dir": "bin/"
+        }
+    }
+
+Then you can use Symfttpd running ```bin/symfttpd```.
+
 
 ### Globally
 
@@ -54,7 +68,7 @@ Then compile symfttpd in your project to create an executable `.phar` file
 
 **In order to compile you have to set the `phar.readonly` setting to `Off` in you php.ini file.**
 
-    benjamin:~/dev/project benjamin $ php ../symfttpd/bin/compile
+    benjamin:~/dev/project benjamin $ php box.phar build
     benjamin:~/dev/project benjamin $ php symfttpd.phar --help
     Usage:
      help [--xml] [command_name]
@@ -88,7 +102,13 @@ Then compile symfttpd in your project to create an executable `.phar` file
 
 ### How?
 
-First of all you need to configure symfttpd with a `symfttpd.conf.php` file. Symfttpd looks for the configuration file:
+First of all you need to configure symfttpd with a `symfttpd.conf.php` file. 
+
+    benjamin:~/dev/project benjamin $ php symfttpd.phar init
+    
+*The init command is available since the version 2.1 of Symfttpd.*
+
+Symfttpd looks for the configuration file:
 
 * in you home directory, this file must be named `.symfttpd.conf.php`
 * in the root directory of your project (or in config/ for a symfony 1.x project)
@@ -105,8 +125,9 @@ The minimal information symfttpd needs is a project type and a project version.
     $options['project_type']    = "symfony";
     $options['project_version'] = "2";
 
+This will tell Symfttpd to run a Lighttpd (using fastcgi) server in your Symfony 2 project.
 
-You can check the [reference](https://github.com/benja-M-1/symfttpd/blob/2.0.0/doc/Reference.md) for more options to configure.
+*You can check the [reference](https://github.com/benja-M-1/symfttpd/blob/master/doc/Reference.md) for more options to configure.*
 
 
 ## spawn
@@ -130,8 +151,6 @@ It will display something like that:
     Available applications:
      http://127.0.0.1:4042/app.php
      http://127.0.0.1:4042/app_dev.php
-     http://127.0.0.1:4042/config.php
-     http://127.0.0.1:4042/index.php
 
     Press Ctrl+C to stop serving.
     error: 2012-05-26 20:19:25: (log.c.166) server started 
@@ -139,33 +158,30 @@ It will display something like that:
 
 ### Configuration
 
-You can alter the default `lighttpd.conf` template and the default paths,
-by using the `symfttpd.conf.php` mechanism. Check the [reference](https://github.com/benja-M-1/symfttpd/blob/2.0.0/doc/Reference.md#server-configuration) for more options to configure.
+You can alter the default configuration of the server, by using the `symfttpd.conf.php` mechanism. Check the [reference](https://github.com/benja-M-1/symfttpd/blob/master/doc/Reference.md#server-configuration) for more options to configure.
 
 
 ### Available options
 
 * `--port=<port>` or `-p<port>`: Use a different port (default is `4042`)
     (useful for running multiple projects at the same time)
-* `--all` or `-A`: Listen on all interfaces (overrides `--bind`)
 * `--bind=<port>` or `-b<ip>`: Listen on a specific IP (default is `127.0.0.1`)
+* `--all` or `-A`: Listen on all interfaces (overrides `--bind`)
 * `--tail` or `-t`: Display server logs in the console
     (like the UNIX `tail` command would do)
-* `--single-process` or `-s`: Do not try to run lighttpd in another process
-    (not recommended, you will lose auto-reloading of the rewriting rules)
 
 
 ## genconf
 
-If you don't want to copy/paste lighttpd configs, handle regular expressions
+If you don't want to copy/paste your server configs, handle regular expressions
 when you add files, or fight rewriting issues (which can often happen
 considering that most available examples are badly written),
-then this tool is for you. It is also used internally by `spawn`.
+then this tool is for you.
 
 
 ### Quick start
 
-Typical lighttpd config:
+Typical Lighttpd config:
 
     $HTTP["host"] == "example.com" {
       include_shell "php /path/to/symfttpd.phar genconf -p /path/to/example.com/web"
@@ -176,12 +192,6 @@ or if you want a different default application:
     $HTTP["host"] == "mobile.example.com" {
       include_shell "php /path/to/symfttpd.phar genconf -p /path/to/example.com/web -d mobile"
     }
-
-If symfttpd is running in single-process mode, or you only running an independent
-lighttpd, you have to restart it each time you add a file in the `web/` root.
-Hopefully, it doesn't happen often.
-Also, in a symfony project, don't forget to run `php symfony plugin:publish-assets`.
-
 
 ### Available options
 
@@ -209,11 +219,6 @@ No, and it probably never will be.
 Yes. I'd say you _should_, since the command line options of `genconf` are
 thought for that particular use. `genconf` does not run symfony or any other
 external files, nor writes anything anywhere, so it is very little risk.
-
-
-### Can I use mksymlinks in production?
-
-Yes.
 
 
 ### Can I use spawn in production?

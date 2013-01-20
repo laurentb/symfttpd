@@ -3,7 +3,6 @@
 ## Project configuration
 
 ```
-<?php
 // Project options
 
 // Required options
@@ -24,15 +23,33 @@ $options['project_web_dir'] = 'web';
 ## Server configuration
 
 ```
-<?php
 // Server options
 
 // Required options
-$options['server_type'] = 'lighttpd';
+$options['server_type'] = 'lighttpd'; // The server to use, can be lighttpd or nginx
 
 // Not required options
-$options['server_pidfile'] = 'server_pidfile';     // The pidfile stores the PID of the server process.
+$options['server_cmd'] = '/usr/bin/lighttpd'; // The command used to run the server
+$options['server_pidfile'] = 'server_pidfile'; // The pidfile stores the PID of the server process.
 $options['server_restartfile'] = 'server_restartfile'; // The file that tells the spawn command to restart the server.
+$options['server_log_dir'] = '/var/log/';
 $options['server_access_log'] = 'access_log';  // The server access log file of the server.
 $options['server_error_log'] = 'error_log';   // The server error log file of the server.
+```
+
+## Gateway configuration
+
+The gateway is the CGI interface used by the web serveur.
+
+```
+// Server options
+
+// Required options
+$options['gateway_type'] = 'php-fpm'; // The gateway the server will user, can be fastcgi or php-fpm
+
+// Required options
+$options['gateway_cmd'] = '/usr/bin/php-fpm'; // The command to run the gateway
+$options['gateway_error_log'] = '/var/log/symfttpd-error.log'; // The error.log file used by the gateway
+$options['gateway_pidfile'] = '/tmp/symfttpd-pidfile.pid'; // The pidfile of the gateway
+$options['gateway_socket'] = '/tmp/symfttpd-socket.sock'; // The socket used by the gateway
 ```
