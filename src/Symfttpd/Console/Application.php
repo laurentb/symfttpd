@@ -12,6 +12,7 @@
 namespace Symfttpd\Console;
 
 use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
@@ -33,7 +34,6 @@ use Symfttpd\Guesser\Checker\Symfony2Checker;
 use Symfttpd\Guesser\Checker\Symfony1Checker;
 use Symfttpd\Guesser\Exception\UnguessableException;
 use Symfttpd\Guesser\ProjectGuesser;
-use Symfttpd\Log\Logger;
 use Symfttpd\Symfttpd;
 use Symfttpd\SymfttpdFile;
 

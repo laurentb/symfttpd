@@ -13,7 +13,7 @@ namespace Symfttpd\Debug;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfttpd\Gateway\GatewayProcessableInterface;
-use Symfttpd\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfttpd\Server\ServerInterface;
 
 /**
@@ -39,7 +39,7 @@ class SignalHandler
     protected $output;
 
     /**
-     * @var \Symfttpd\Log\LoggerInterface
+     * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
@@ -60,7 +60,7 @@ class SignalHandler
     }
 
     /**
-     * @param \Symfttpd\Log\LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger)
     {

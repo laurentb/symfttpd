@@ -11,11 +11,11 @@
 
 namespace Symfttpd\Gateway;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
 use Symfttpd\Gateway\GatewayInterface;
-use Symfttpd\Log\LoggerInterface;
 
 /**
  * BaseGateway
@@ -30,7 +30,7 @@ abstract class BaseGateway implements GatewayInterface
     protected $processBuilder;
 
     /**
-     * @var \Symfttpd\Log\LoggerInterface
+     * @var \Psr\Log\LoggerInterface;
      */
     protected $logger;
 
@@ -137,7 +137,7 @@ abstract class BaseGateway implements GatewayInterface
     }
 
     /**
-     * @param \Symfttpd\Log\LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger)
     {

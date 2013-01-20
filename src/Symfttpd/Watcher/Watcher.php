@@ -11,7 +11,7 @@
 
 namespace Symfttpd\Watcher;
 
-use Symfttpd\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfttpd\Watcher\Resource\ResourceInterface;
 use Symfttpd\Watcher\Resource\TrackedResource;
 
@@ -30,7 +30,7 @@ class Watcher
     protected $resources = array();
 
     /**
-     * @var \Symfttpd\Log\LoggerInterface
+     * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
@@ -114,7 +114,7 @@ class Watcher
     }
 
     /**
-     * @param \Symfttpd\Log\LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function setLogger($logger)
     {

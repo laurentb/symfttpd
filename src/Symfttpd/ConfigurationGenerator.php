@@ -11,8 +11,8 @@
 
 namespace Symfttpd;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfttpd\Log\LoggerInterface;
 
 /**
  * ConfigurationGenerator generates and dumps the configuration
@@ -33,7 +33,7 @@ class ConfigurationGenerator
     protected $filesystem;
 
     /**
-     * @var \Symfttpd\Log\LoggerInterface
+     * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
@@ -45,7 +45,7 @@ class ConfigurationGenerator
     /**
      * @param \Twig_Environment                        $twig
      * @param \Symfony\Component\Filesystem\Filesystem $filesystem
-     * @param \Symfttpd\Log\LoggerInterface            $logger
+     * @param \Psr\Log\LoggerInterface                 $logger
      */
     public function __construct(\Twig_Environment $twig, Filesystem $filesystem, LoggerInterface $logger = null)
     {

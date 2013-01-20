@@ -11,11 +11,11 @@
 
 namespace Symfttpd\Server;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfttpd\Config;
 use Symfttpd\ConfigurationGenerator;
 use Symfttpd\Gateway\GatewayInterface;
-use Symfttpd\Log\LoggerInterface;
 use Symfttpd\Project\ProjectInterface;
 use Symfttpd\Server\ServerInterface;
 
@@ -43,7 +43,7 @@ class Server implements ServerInterface
     protected $processBuilder;
 
     /**
-     * @var \Symfttpd\Log\LoggerInterface
+     * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
@@ -352,7 +352,7 @@ class Server implements ServerInterface
     /**
      * Set the logger instance.
      *
-     * @param \Symfttpd\Log\LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -362,7 +362,7 @@ class Server implements ServerInterface
     /**
      * Return the logger instance.
      *
-     * @return null|\Symfttpd\Log\LoggerInterface
+     * @return null|\Psr\Log\LoggerInterface
      */
     public function getLogger()
     {
