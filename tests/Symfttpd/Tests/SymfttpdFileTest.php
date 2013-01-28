@@ -49,11 +49,11 @@ class SymfttpdFileTest extends \PHPUnit_Framework_TestCase
 
     public function testAddPath()
     {
-        $dir = sys_get_temp_dir();
+        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'symfttpd.conf.php';
 
         $this->file->addPath($dir);
 
-        $this->assertContains($dir, $this->file->getPaths());
+        $this->assertContains($dir, $this->file->getFilePaths());
     }
 
     /**
@@ -77,7 +77,7 @@ class SymfttpdFileTest extends \PHPUnit_Framework_TestCase
         $file = new SymfttpdFile();
         $file->write(array('foo' => 'bar'));
 
-        $this->assertFileExists($file->getFilePath());
+        $this->assertFileExists($file->getDefaultFilePath());
         $this->assertEquals(<<<PHP
 <?php
 
@@ -85,8 +85,8 @@ class SymfttpdFileTest extends \PHPUnit_Framework_TestCase
   'foo' => 'bar',
 );
 PHP
-        , file_get_contents($file->getFilePath()));
+        , file_get_contents($file->getDefaultFilePath()));
 
-        unlink($file->getFilePath());
+        unlink($file->getDefaultFilePath());
     }
 }

@@ -68,16 +68,16 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'project_readable_dirs'     => array(),
                     'project_readable_files'    => array(),
                     'project_readable_phpfiles' => array(),
-                    'project_readable_restrict' => false,
+                    'project_readable_restrict' => true,
                     'project_nophp'             => array(),
                     'project_log_dir'           => 'log',
                     'project_cache_dir'         => 'cache',
                     'project_web_dir'           => 'web',
                     'server_type'               => 'lighttpd',
-                    'server_pidfile'            => 'server_pidfile',
+                    'server_pidfile'            => null,
                     'server_restartfile'        => 'server_restartfile',
-                    'server_access_log'         => 'access_log',
-                    'server_error_log'          => 'error_log',
+                    'server_access_log'         => 'access.log',
+                    'server_error_log'          => 'error.log',
                 )
             )
         );

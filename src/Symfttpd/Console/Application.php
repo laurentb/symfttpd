@@ -56,9 +56,6 @@ class Application extends BaseApplication
     {
         parent::__construct('Symfttpd', Symfttpd::VERSION);
 
-        // Add options to Symfttpd globally
-        $this->getDefinition()->addOption(new InputOption('--debug', null, InputOption::VALUE_NONE, 'Switches on debug mode.'));
-
         $this->container = $c = new \Pimple();
 
         $c['debug'] = false;
@@ -291,12 +288,35 @@ class Application extends BaseApplication
     }
 
     /**
+     * @return \Symfony\Component\Console\Input\InputDefinition
+     */
+    protected function getDefaultInputDefinition()
+    {
+        $definition = parent::getDefaultInputDefinition();
+
+        // Add options to Symfttpd globally
+        $definition->addOptions(array(
+            new InputOption('--debug', '-d', InputOption::VALUE_NONE, 'Switch on debug mode.'),
+            new InputOption('--config',  '-c', InputOption::VALUE_OPTIONAL, 'Specify config file to use.'),
+        ));
+
+        return $definition;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
         if (true === $input->hasParameterOption('--debug')) {
             $this->container['debug'] = true;
+        }
+
+        if (true === $input->hasParameterOption('--config')) {
+            $file = $input->getParameterOption('--config');
+
+            $this->container['symfttpd_file']->addPath(realpath($file));
         }
 
         return parent::doRun($input, $output);

@@ -36,9 +36,9 @@ class InitCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $file = new \Symfttpd\SymfttpdFile('symfttpd.conf.php');
+        $file = new \Symfttpd\SymfttpdFile();
 
-        if ($input->isInteractive() && file_exists($file->getFilePath())) {
+        if ($input->isInteractive() && file_exists($file->getDefaultFilePath())) {
             $dialog = $this->getHelper('dialog');
             if (!$dialog->askConfirmation($output, $dialog->getQuestion('The file already exists, do you overwrite it', 'yes', '?'), true)) {
                 $output->writeln('<error>Generation aborted</error>');

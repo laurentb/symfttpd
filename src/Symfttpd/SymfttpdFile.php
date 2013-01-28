@@ -26,12 +26,7 @@ class SymfttpdFile
     /**
      * @var String
      */
-    protected $paths;
-
-    /**
-     * @var string
-     */
-    protected $name;
+    protected $filePaths = array();
 
     /**
      * @var \Symfony\Component\Filesystem\Filesystem
@@ -52,12 +47,11 @@ class SymfttpdFile
     /**
      * Set default paths.
      */
-    public function __construct($name = 'symfttpd.conf.php', Filesystem $filesystem = null)
+    public function __construct(Filesystem $filesystem = null)
     {
-        $this->name = $name;
         $this->filesystem = $filesystem ?: new Filesystem();
 
-        foreach ($this->getDefaultPaths() as $path) {
+        foreach ($this->getDefaultFilePaths() as $path) {
             try {
                 $this->addPath($path);
             } catch (FileNotFoundException $e) {
@@ -71,34 +65,23 @@ class SymfttpdFile
      *
      * @return array
      */
-    public function getDefaultPaths()
+    public function getDefaultFilePaths()
     {
         return array(
-            __DIR__.'/Resources/templates', // Resource directory
-            getenv('HOME').'/symfttpd',     // ~/symfttpd/symfttpd.conf.php
-            getenv('HOME').'/.symfttpd',    // ~/.symfttpd/symfttpd.conf.php
-            getenv('HOME'),                 // ~/.symfttpd.conf.php
-            getcwd().'/config',             // project configuration
-            $this->getCurrentPath(),
+            getenv('HOME').'/symfttpd/symfttpd.conf.php',     // ~/symfttpd/symfttpd.conf.php
+            getenv('HOME').'/.symfttpd/symfttpd.conf.php',    // ~/.symfttpd/symfttpd.conf.php
+            getenv('HOME').'/.symfttpd.conf.php',             // ~/.symfttpd.conf.php
+            getcwd().'/config/symfttpd.conf.php',             // project configuration
+            $this->getDefaultFilePath(),
         );
-    }
-
-    /**
-     * Return the path where Symfttpd lives.
-     *
-     * @return string
-     */
-    public function getCurrentPath()
-    {
-        return getcwd() . '/';
     }
 
     /**
      * @return array
      */
-    public function getPaths()
+    public function getFilePaths()
     {
-        return $this->paths;
+        return $this->filePaths;
     }
 
     /**
@@ -107,11 +90,11 @@ class SymfttpdFile
      */
     public function addPath($path)
     {
-        if (!file_exists($path.DIRECTORY_SEPARATOR.$this->name)) {
+        if (!file_exists($path)) {
             throw new FileNotFoundException(sprintf('Symfttpd file not found in %s', $path));
         }
 
-        $this->paths[] = $path;
+        $this->filePaths[] = $path;
     }
 
     /**
@@ -119,9 +102,9 @@ class SymfttpdFile
      *
      * @return string
      */
-    public function getFilePath()
+    public function getDefaultFilePath()
     {
-        return $this->getCurrentPath().$this->name;
+        return getcwd().'/symfttpd.conf.php';
     }
 
     /**
@@ -137,14 +120,7 @@ class SymfttpdFile
     {
         $configuration = array();
 
-        foreach ($this->getPaths() as $path) {
-            // Look for the ~/.symfttpd.conf.php
-            if (getenv('HOME') === $path) {
-                $file = $path.DIRECTORY_SEPARATOR.'.'.$this->name;
-            } else {
-                $file = $path.DIRECTORY_SEPARATOR.$this->name;
-            }
-
+        foreach ($this->getFilePaths() as $file) {
             if (file_exists($file)) {
                 require $file;
                 if (isset($options)) {
@@ -162,7 +138,7 @@ class SymfttpdFile
      */
     public function write($config = array())
     {
-        $this->filesystem->touch($this->getFilePath());
+        $this->filesystem->touch($this->getDefaultFilePath());
 
         $template = <<<PHP
 <?php
@@ -170,7 +146,7 @@ class SymfttpdFile
 \$options = %s;
 PHP;
 
-        file_put_contents($this->getFilePath(), sprintf($template, var_export($config, true)));
+        file_put_contents($this->getDefaultFilePath(), sprintf($template, var_export($config, true)));
     }
 
     /**
