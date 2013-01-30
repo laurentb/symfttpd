@@ -3,7 +3,7 @@
     "description": "PHP webserver",
     "keywords": ["symfony", "server", "webserver", "lighttpd", "nginx", "php-fpm"],
     "type": "library",
-    "licence": "MIT",
+    "license": "MIT",
     "authors": [
         {
             "name":     "Benjamin Grandfond",
