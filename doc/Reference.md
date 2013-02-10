@@ -39,13 +39,13 @@ $options['server_error_log'] = 'error_log';   // The server error log file of th
 
 ## Gateway configuration
 
-The gateway is the CGI interface used by the web serveur.
+The gateway is the CGI interface used by the web server.
 
 ```
 // Server options
 
 // Required options
-$options['gateway_type'] = 'php-fpm'; // The gateway the server will user, can be fastcgi or php-fpm
+$options['gateway_type'] = 'php-fpm'; // The gateway the server will use, can be fastcgi or php-fpm
 
 // Required options
 $options['gateway_cmd'] = '/usr/bin/php-fpm'; // The command to run the gateway
