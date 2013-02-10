@@ -1,9 +1,9 @@
 # symfttpd - [![Build Status](https://secure.travis-ci.org/benja-M-1/symfttpd.png?branch=master)](http://travis-ci.org/benja-M-1/symfttpd)
 
-Symfttpd is a command line tool to run a web server in your php project,
+Symfttpd is a command line tool to run a web server in your PHP project,
 aimed at lazy developers and sysadmins.
 
-**This version of symfttpd is under development, this documentation can be outdated and contains some errors.**
+**This version of symfttpd is under development, this documentation can be outdated or contain some errors.**
 
 
 `spawn` will setup and start a web server (lighttpd or nginx) with a minimal
