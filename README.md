@@ -1,5 +1,9 @@
 # symfttpd
 
+**This version of symfttpd is a legacy version only supporting symfony 1.x.**
+
+**If you want 2.x support, check out [symfttpd 2.x](https://github.com/benja-M-1/symfttpd).**
+
 symfttpd is a set of tools to use symfony and lighttpd together,
 aimed at lazy developers and sysadmins.
 
